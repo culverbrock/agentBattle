@@ -1,0 +1,34 @@
+{
+  "name": "agentbattle",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "jest --verbose",
+    "test:manual:player": "node testPlayerStateManagement.js",
+    "test:manual:game": "node testGameStateMachine.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/culverbrock/agentBattle.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/culverbrock/agentBattle/issues"
+  },
+  "homepage": "https://github.com/culverbrock/agentBattle#readme",
+  "description": "",
+  "dependencies": {
+    "dotenv": "^16.5.0",
+    "express": "^5.1.0",
+    "knex": "^3.1.0",
+    "pg": "^8.16.0",
+    "uuid": "^11.1.0",
+    "ws": "^8.18.2",
+    "xstate": "^4.13.0"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0"
+  }
+}

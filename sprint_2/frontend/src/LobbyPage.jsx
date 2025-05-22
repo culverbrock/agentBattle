@@ -84,9 +84,6 @@ function LobbyPage() {
 
   return (
     <div style={{ maxWidth: 600, margin: '2rem auto', fontFamily: 'sans-serif' }}>
-      <div style={{ background: '#e0ffe0', color: '#207520', padding: '10px', borderRadius: '6px', marginBottom: '1rem', textAlign: 'center', fontWeight: 'bold', fontSize: '1.1rem' }}>
-        🎉 Yay! Deployment to frontend successful.
-      </div>
       <h1>Game Lobby</h1>
       <form onSubmit={handleCreateGame} style={{ marginBottom: 20 }}>
         <input

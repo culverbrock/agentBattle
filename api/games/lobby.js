@@ -18,6 +18,15 @@ module.exports = async function handler(req, res) {
     return;
   }
   try {
+    // Log the DB connection config for debugging
+    const dbConfig = {
+      user: process.env.POSTGRES_USER,
+      host: process.env.POSTGRES_HOST,
+      database: process.env.POSTGRES_DATABASE,
+      password: process.env.POSTGRES_PASSWORD ? '***REDACTED***' : undefined,
+      port: process.env.POSTGRES_PORT ? parseInt(process.env.POSTGRES_PORT, 10) : 5432,
+    };
+    console.log('API /games/lobby DB config:', dbConfig);
     // Fetch open games
     const gamesQ = `SELECT id, name FROM games WHERE status = 'lobby'`;
     const { rows: games } = await pool.query(gamesQ);

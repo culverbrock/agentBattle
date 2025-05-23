@@ -25,6 +25,9 @@ function LobbyPage() {
   const [expandedGameId, setExpandedGameId] = useState(null);
   const wsRef = useRef(null);
   const pollRef = useRef(null);
+  const [claiming, setClaiming] = useState(false);
+  const [claimError, setClaimError] = useState('');
+  const [claimSuccess, setClaimSuccess] = useState(false);
 
   // Fetch lobby state (for polling fallback)
   const fetchLobby = () => {
@@ -127,24 +130,48 @@ function LobbyPage() {
     }
   };
 
-  // Fetch ABT balance
-  useEffect(() => {
-    const fetchBalance = async () => {
-      if (walletType === 'metamask' && walletAddress) {
-        try {
-          const provider = new ethers.providers.Web3Provider(window.ethereum);
-          const token = new ethers.Contract(ABT_ADDRESS, ERC20_ABI, provider);
-          const bal = await token.balanceOf(walletAddress);
-          setAbtBalance(Number(ethers.utils.formatUnits(bal, ABT_DECIMALS)));
-        } catch (e) {
-          setAbtBalance(null);
-        }
+  // Claim ABT from faucet
+  const claimAbt = async () => {
+    setClaiming(true);
+    setClaimError('');
+    setClaimSuccess(false);
+    try {
+      const res = await fetch('/api/claim-abt', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ address: walletAddress })
+      });
+      const data = await res.json();
+      if (data.success) {
+        setClaimSuccess(true);
+        // Wait a bit for the transaction to confirm, then refresh balance
+        setTimeout(() => {
+          fetchBalance();
+        }, 5000);
       } else {
+        setClaimError(data.error || 'Failed to claim ABT');
+      }
+    } catch (e) {
+      setClaimError('Failed to claim ABT');
+    }
+    setClaiming(false);
+  };
+
+  // Fetch ABT balance (moved out for reuse)
+  const fetchBalance = async () => {
+    if (walletType === 'metamask' && walletAddress) {
+      try {
+        const provider = new ethers.providers.Web3Provider(window.ethereum);
+        const token = new ethers.Contract(ABT_ADDRESS, ERC20_ABI, provider);
+        const bal = await token.balanceOf(walletAddress);
+        setAbtBalance(Number(ethers.utils.formatUnits(bal, ABT_DECIMALS)));
+      } catch (e) {
         setAbtBalance(null);
       }
-    };
-    fetchBalance();
-  }, [walletType, walletAddress]);
+    } else {
+      setAbtBalance(null);
+    }
+  };
 
   // Create game
   const handleCreateGame = async (e) => {
@@ -194,6 +221,10 @@ function LobbyPage() {
     return null;
   };
 
+  useEffect(() => {
+    fetchBalance();
+  }, [walletType, walletAddress]);
+
   return (
     <div style={{ maxWidth: 800, margin: '2rem auto', fontFamily: 'sans-serif', padding: 16 }}>
       <h1>Agent Battle Lobby</h1>
@@ -218,9 +249,15 @@ function LobbyPage() {
           {walletType === 'metamask' && walletAddress && (
             <>
               <button type="button" onClick={addAbtToWallet} style={{ marginRight: 8, padding: '6px 12px', background: '#007bff', color: '#fff', border: 'none', borderRadius: 4 }}>Add ABT to Wallet</button>
-              <span style={{ color: '#007bff', fontWeight: 'bold' }}>
+              <span style={{ color: '#007bff', fontWeight: 'bold', marginRight: 8 }}>
                 {abtBalance !== null ? `ABT: ${abtBalance}` : 'ABT: ...'}
               </span>
+              {abtBalance === 0 && !claiming && !claimSuccess && (
+                <button type="button" onClick={claimAbt} style={{ padding: '6px 12px', background: '#28a745', color: '#fff', border: 'none', borderRadius: 4 }}>Claim ABT</button>
+              )}
+              {claiming && <span style={{ color: '#888', marginLeft: 8 }}>Claiming...</span>}
+              {claimSuccess && <span style={{ color: '#28a745', marginLeft: 8 }}>Claimed!</span>}
+              {claimError && <span style={{ color: 'red', marginLeft: 8 }}>{claimError}</span>}
             </>
           )}
         </div>

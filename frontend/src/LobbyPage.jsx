@@ -400,7 +400,8 @@ function LobbyPage() {
 
   return (
     <div style={{ maxWidth: 800, margin: '2rem auto', fontFamily: 'sans-serif', padding: 16 }}>
-      {/* Debug Panel */}
+      {/* Debug Panel (hidden/removed) */}
+      {/*
       <div style={{ background: '#f5f5f5', border: '1px solid #ccc', borderRadius: 8, padding: 12, marginBottom: 16, fontSize: 13 }}>
         <div><strong>Debug Info</strong></div>
         <div>window.ethereum detected: {typeof window !== 'undefined' && window.ethereum ? 'Yes' : 'No'}</div>
@@ -413,6 +414,7 @@ function LobbyPage() {
         <div style={{ color: debug.networkError ? 'red' : '#888' }}>Network error: {debug.networkError || 'None'}</div>
         <div style={{ color: debug.balanceError ? 'red' : '#888' }}>Balance error: {debug.balanceError || 'None'}</div>
       </div>
+      */}
       {/* Wallet/Personal Info Section */}
       <div style={{ marginBottom: 24 }}>
         {walletInfoDisplay()}

@@ -1,12 +1,9 @@
 const { PublicKey, Connection, Keypair, sendAndConfirmTransaction, clusterApiUrl } = require('@solana/web3.js');
 const { getOrCreateAssociatedTokenAccount, createTransferInstruction, TOKEN_PROGRAM_ID } = require('@solana/spl-token');
-const fs = require('fs');
-const path = require('path');
 
 const MINT_ADDRESS = '7iJY63ffm5Q7QC6mxb6v3QECMv2Ss4E5UcMmmdaMfFCb';
 const AMOUNT_TO_SEND = 100 * 1e6; // 100 tokens, 6 decimals
 const DEVNET_URL = clusterApiUrl('devnet');
-const KEYPAIR_PATH = path.join(require('os').homedir(), '.config', 'solana', 'id.json');
 
 module.exports = async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -34,7 +31,11 @@ module.exports = async function handler(req, res) {
   }
   try {
     const connection = new Connection(DEVNET_URL, 'confirmed');
-    const secret = JSON.parse(fs.readFileSync(KEYPAIR_PATH, 'utf8'));
+    if (!process.env.SOLANA_KEYPAIR) {
+      res.status(500).json({ error: 'SOLANA_KEYPAIR env var not set' });
+      return;
+    }
+    const secret = JSON.parse(process.env.SOLANA_KEYPAIR);
     const payer = Keypair.fromSecretKey(Uint8Array.from(secret));
     const mint = new PublicKey(MINT_ADDRESS);
     // Get or create associated token accounts

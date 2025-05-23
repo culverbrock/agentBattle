@@ -46,7 +46,6 @@ npm run dev
 1. Push this folder to a Git repository (GitHub, GitLab, etc.).
 2. Connect the repo to Vercel (https://vercel.com/new).
 3. Set the following environment variables in the Vercel dashboard:
-   - `VITE_API_URL` (e.g., https://your-backend.vercel.app)
    - `VITE_WS_URL` (e.g., wss://your-backend.vercel.app)
 4. Vercel will auto-detect the build (`npm run build`) and output (`dist`).
 5. Make sure your backend is also deployed and accessible from the frontend.

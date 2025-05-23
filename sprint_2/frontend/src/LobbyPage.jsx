@@ -1,7 +1,6 @@
 import React, { useEffect, useState, useRef } from 'react';
 
 const WS_URL = import.meta.env.VITE_WS_URL || 'ws://localhost:3000';
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
 
 function LobbyPage() {
   const [games, setGames] = useState([]);
@@ -14,7 +13,7 @@ function LobbyPage() {
 
   // Fetch lobby state (for polling fallback)
   const fetchLobby = () => {
-    fetch(`${API_URL}/games/lobby`)
+    fetch('/api/games/lobby')
       .then(res => res.json())
       .then(data => setGames(data.games || []));
   };
@@ -63,7 +62,7 @@ function LobbyPage() {
   const handleCreateGame = async (e) => {
     e.preventDefault();
     if (!newGameName) return;
-    await fetch(`${API_URL}/games`, {
+    await fetch('/api/games', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ name: newGameName })
@@ -75,7 +74,7 @@ function LobbyPage() {
   const handleJoinGame = async (e) => {
     e.preventDefault();
     if (!selectedGameId || !playerName || !playerId) return;
-    await fetch(`${API_URL}/games/${selectedGameId}/join`, {
+    await fetch(`/api/games/${selectedGameId}/join`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ playerId, name: playerName })

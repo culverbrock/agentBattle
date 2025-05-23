@@ -252,7 +252,8 @@ function LobbyPage() {
               <span style={{ color: '#007bff', fontWeight: 'bold', marginRight: 8 }}>
                 {abtBalance !== null ? `ABT: ${abtBalance}` : 'ABT: ...'}
               </span>
-              {abtBalance === 0 && !claiming && !claimSuccess && (
+              {/* Always show Claim ABT button */}
+              {!claiming && !claimSuccess && (
                 <button type="button" onClick={claimAbt} style={{ padding: '6px 12px', background: '#28a745', color: '#fff', border: 'none', borderRadius: 4 }}>Claim ABT</button>
               )}
               {claiming && <span style={{ color: '#888', marginLeft: 8 }}>Claiming...</span>}

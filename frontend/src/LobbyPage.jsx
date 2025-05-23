@@ -8,6 +8,8 @@ function LobbyPage() {
   const [playerId, setPlayerId] = useState('');
   const [newGameName, setNewGameName] = useState('');
   const [selectedGameId, setSelectedGameId] = useState('');
+  const [showCreateModal, setShowCreateModal] = useState(false);
+  const [expandedGameId, setExpandedGameId] = useState(null);
   const wsRef = useRef(null);
   const pollRef = useRef(null);
 
@@ -60,7 +62,7 @@ function LobbyPage() {
 
   // Create game
   const handleCreateGame = async (e) => {
-    e.preventDefault();
+    e && e.preventDefault();
     if (!newGameName) return;
     await fetch('/api/games', {
       method: 'POST',
@@ -68,65 +70,102 @@ function LobbyPage() {
       body: JSON.stringify({ name: newGameName })
     });
     setNewGameName('');
+    setShowCreateModal(false);
   };
 
   // Join game
-  const handleJoinGame = async (e) => {
-    e.preventDefault();
-    if (!selectedGameId || !playerName || !playerId) return;
-    await fetch(`/api/games/${selectedGameId}/join`, {
+  const handleJoinGame = async (gameId) => {
+    if (!gameId || !playerName || !playerId) return;
+    await fetch(`/api/games/${gameId}/join`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ playerId, name: playerName })
     });
+    setSelectedGameId(gameId);
+  };
+
+  // Status badge helper
+  const getStatusBadge = (game) => {
+    if (game.status === 'lobby') return <span style={{color: 'green', fontWeight: 'bold'}}>Open</span>;
+    if (game.status === 'in_progress') return <span style={{color: 'orange', fontWeight: 'bold'}}>In Progress</span>;
+    if (game.status === 'full') return <span style={{color: 'red', fontWeight: 'bold'}}>Full</span>;
+    return <span>{game.status}</span>;
   };
 
   return (
-    <div style={{ maxWidth: 600, margin: '2rem auto', fontFamily: 'sans-serif' }}>
-      <h1>Game Lobby</h1>
-      <form onSubmit={handleCreateGame} style={{ marginBottom: 20 }}>
-        <input
-          type="text"
-          placeholder="New game name"
-          value={newGameName}
-          onChange={e => setNewGameName(e.target.value)}
-        />
-        <button type="submit">Create Game</button>
-      </form>
-      <form onSubmit={handleJoinGame} style={{ marginBottom: 20 }}>
-        <input
-          type="text"
-          placeholder="Your name"
-          value={playerName}
-          onChange={e => setPlayerName(e.target.value)}
-        />
-        <input
-          type="text"
-          placeholder="Your player ID"
-          value={playerId}
-          onChange={e => setPlayerId(e.target.value)}
-        />
-        <select value={selectedGameId} onChange={e => setSelectedGameId(e.target.value)}>
-          <option value="">Select a game</option>
-          {games.map(game => (
-            <option key={game.id} value={game.id}>{game.name}</option>
-          ))}
-        </select>
-        <button type="submit">Join Game</button>
-      </form>
-      <h2>Open Games</h2>
-      <ul>
+    <div style={{ maxWidth: 800, margin: '2rem auto', fontFamily: 'sans-serif', padding: 16 }}>
+      <h1>Poker Lobby</h1>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
+        <button onClick={() => setShowCreateModal(true)} style={{ fontSize: 18, padding: '8px 16px' }}>+ Create Table</button>
+        <div>
+          <input
+            type="text"
+            placeholder="Your name"
+            value={playerName}
+            onChange={e => setPlayerName(e.target.value)}
+            style={{ marginRight: 8 }}
+          />
+          <input
+            type="text"
+            placeholder="Your player ID"
+            value={playerId}
+            onChange={e => setPlayerId(e.target.value)}
+            style={{ marginRight: 8 }}
+          />
+        </div>
+      </div>
+      {/* Game List */}
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 16 }}>
         {games.map(game => (
-          <li key={game.id}>
-            <strong>{game.name}</strong> (ID: {game.id})
-            <ul>
-              {game.players.map(player => (
-                <li key={player.id}>{player.name} ({player.status})</li>
-              ))}
-            </ul>
-          </li>
+          <div key={game.id} style={{ border: '1px solid #ccc', borderRadius: 8, padding: 16, minWidth: 220, flex: '1 1 220px', background: '#fafafa', boxShadow: selectedGameId === game.id ? '0 0 8px #007bff' : 'none' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <div style={{ fontWeight: 'bold', fontSize: 18 }}>{game.name}</div>
+              {getStatusBadge(game)}
+            </div>
+            <div style={{ margin: '8px 0' }}>Players: {game.players.length} / 6</div>
+            <button
+              onClick={() => handleJoinGame(game.id)}
+              disabled={game.status !== 'lobby'}
+              style={{ width: '100%', padding: 8, background: game.status === 'lobby' ? '#007bff' : '#ccc', color: '#fff', border: 'none', borderRadius: 4, cursor: game.status === 'lobby' ? 'pointer' : 'not-allowed', marginBottom: 8 }}
+            >
+              Join
+            </button>
+            <button
+              onClick={() => setExpandedGameId(expandedGameId === game.id ? null : game.id)}
+              style={{ width: '100%', padding: 4, background: '#eee', border: 'none', borderRadius: 4, cursor: 'pointer' }}
+            >
+              {expandedGameId === game.id ? 'Hide Players' : 'Show Players'}
+            </button>
+            {expandedGameId === game.id && (
+              <ul style={{ marginTop: 8 }}>
+                {game.players.map(player => (
+                  <li key={player.id}>{player.name} ({player.status})</li>
+                ))}
+              </ul>
+            )}
+          </div>
         ))}
-      </ul>
+      </div>
+      {/* Create Table Modal */}
+      {showCreateModal && (
+        <div style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', background: 'rgba(0,0,0,0.3)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000 }}>
+          <form onSubmit={handleCreateGame} style={{ background: '#fff', padding: 32, borderRadius: 8, minWidth: 320, boxShadow: '0 2px 16px rgba(0,0,0,0.2)' }}>
+            <h2>Create New Table</h2>
+            <input
+              type="text"
+              placeholder="Table name"
+              value={newGameName}
+              onChange={e => setNewGameName(e.target.value)}
+              style={{ width: '100%', marginBottom: 16, padding: 8 }}
+            />
+            {/* Future: Add max players, stakes, etc. */}
+            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 8 }}>
+              <button type="button" onClick={() => setShowCreateModal(false)} style={{ padding: '8px 16px' }}>Cancel</button>
+              <button type="submit" style={{ padding: '8px 16px', background: '#007bff', color: '#fff', border: 'none', borderRadius: 4 }}>Create</button>
+            </div>
+          </form>
+        </div>
+      )}
     </div>
   );
 }

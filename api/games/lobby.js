@@ -3,7 +3,7 @@
  * @desc Fetch current lobby state: open games and their players
  * @returns { games: [ { id, name, players: [ ... ] } ] }
  */
-const pool = require('../../database');
+const pool = require('../database');
 
 module.exports = async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');

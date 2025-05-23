@@ -5,7 +5,7 @@
  * @returns { id, name, status, created_at, updated_at }
  */
 const { v4: uuidv4 } = require('uuid');
-const pool = require('../../database');
+const pool = require('../database');
 
 module.exports = async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');

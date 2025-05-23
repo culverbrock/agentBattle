@@ -3,7 +3,7 @@
  * @desc Fetch all events/messages for a game
  * @returns { events: [ ... ] }
  */
-const pool = require('../../../database.js');
+const pool = require('../../database');
 
 module.exports = async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');

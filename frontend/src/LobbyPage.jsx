@@ -11,6 +11,13 @@ const ERC20_ABI = [
   "function decimals() view returns (uint8)"
 ];
 
+// Utility to safely stringify objects with BigInt values
+function safeStringify(obj) {
+  return JSON.stringify(obj, (key, value) =>
+    typeof value === 'bigint' ? value.toString() : value
+  );
+}
+
 function LobbyPage() {
   const [games, setGames] = useState([]);
   const [playerName, setPlayerName] = useState('');
@@ -309,7 +316,7 @@ function LobbyPage() {
         <div>walletType: {walletType || 'None'}</div>
         <div>walletAddress: {walletAddress || 'None'}</div>
         <div>phantomAddress: {phantomAddress || 'None'}</div>
-        <div>network: {JSON.stringify(network)}</div>
+        <div>network: {safeStringify(network)}</div>
         <div>ABT balance: {abtBalance !== null ? abtBalance : 'N/A'}</div>
         <div style={{ color: debug.networkError ? 'red' : '#888' }}>Network error: {debug.networkError || 'None'}</div>
         <div style={{ color: debug.balanceError ? 'red' : '#888' }}>Balance error: {debug.balanceError || 'None'}</div>

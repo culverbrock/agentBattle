@@ -86,7 +86,7 @@ function LobbyPage() {
     wsRef.current.onerror = () => {
       startPolling();
     };
-    ws.current.onclose = () => {
+    wsRef.current.onclose = () => {
       startPolling();
     };
     return () => {

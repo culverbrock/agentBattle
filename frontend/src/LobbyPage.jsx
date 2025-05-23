@@ -399,7 +399,11 @@ function LobbyPage() {
   }, [walletType, walletAddress, phantomAddress]);
 
   return (
-    <div style={{ maxWidth: 800, margin: '2rem auto', fontFamily: 'sans-serif', padding: 16 }}>
+    <div style={{ maxWidth: 800, margin: '2rem auto', fontFamily: 'sans-serif', padding: 16, position: 'relative' }}>
+      {/* Leaderboard Link */}
+      <div style={{ position: 'absolute', top: 16, right: 16 }}>
+        <a href="/leaderboard" style={{ textDecoration: 'none', color: '#007bff', fontWeight: 'bold', fontSize: 18 }}>🏆 Leaderboard</a>
+      </div>
       {/* Debug Panel (hidden/removed) */}
       {/*
       <div style={{ background: '#f5f5f5', border: '1px solid #ccc', borderRadius: 8, padding: 12, marginBottom: 16, fontSize: 13 }}>

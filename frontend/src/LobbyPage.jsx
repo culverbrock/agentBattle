@@ -337,9 +337,14 @@ function LobbyPage() {
           )}
           <div style={{ marginTop: 8 }}>
             <button type="button" onClick={addAbtToWallet} style={{ marginRight: 8, padding: '6px 12px', background: '#007bff', color: '#fff', border: 'none', borderRadius: 4 }}>Add ABT to Wallet</button>
-            {/* Always show Claim ABT button */}
+            {/* Always show Claim ABT button for backend test */}
             {!claiming && !claimSuccess && (
-              <button type="button" onClick={claimAbt} style={{ padding: '6px 12px', background: '#28a745', color: '#fff', border: 'none', borderRadius: 4 }}>Claim ABT</button>
+              <>
+                <button type="button" onClick={claimAbt} style={{ padding: '6px 12px', background: '#28a745', color: '#fff', border: 'none', borderRadius: 4 }}>Claim ABT</button>
+                {abtBalance !== null && abtBalance >= 100 && (
+                  <span style={{ color: '#888', marginLeft: 8 }}>You must have less than 100 ABT to claim (backend enforced).</span>
+                )}
+              </>
             )}
             {claiming && <span style={{ color: '#888', marginLeft: 8 }}>Claiming...</span>}
             {claimSuccess && <span style={{ color: '#28a745', marginLeft: 8 }}>Claimed!</span>}
@@ -356,8 +361,14 @@ function LobbyPage() {
             SPL: {splBalance !== null ? splBalance : '...'}
           </div>
           <div style={{ marginTop: 8 }}>
+            {/* Always show Claim SPL button for backend test */}
             {!claimingSpl && !claimSplSuccess && (
-              <button type="button" onClick={claimSpl} style={{ padding: '6px 12px', background: '#8e44ad', color: '#fff', border: 'none', borderRadius: 4 }}>Claim SPL</button>
+              <>
+                <button type="button" onClick={claimSpl} style={{ padding: '6px 12px', background: '#8e44ad', color: '#fff', border: 'none', borderRadius: 4 }}>Claim SPL</button>
+                {splBalance !== null && splBalance >= 100 && (
+                  <span style={{ color: '#888', marginLeft: 8 }}>You must have less than 100 SPL to claim (backend enforced).</span>
+                )}
+              </>
             )}
             {claimingSpl && <span style={{ color: '#888', marginLeft: 8 }}>Claiming...</span>}
             {claimSplSuccess && <span style={{ color: '#28a745', marginLeft: 8 }}>Claimed!</span>}

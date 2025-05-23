@@ -41,6 +41,11 @@ module.exports = async function handler(req, res) {
     // Get or create associated token accounts
     const fromTokenAccount = await getOrCreateAssociatedTokenAccount(connection, payer, mint, payer.publicKey);
     const toTokenAccount = await getOrCreateAssociatedTokenAccount(connection, payer, mint, recipient);
+    // Check balance first
+    if (Number(toTokenAccount.amount) >= 100 * 1e6) {
+      res.status(400).json({ error: 'You must have less than 100 SPL to claim.' });
+      return;
+    }
     // Create transfer instruction
     const transferIx = createTransferInstruction(
       fromTokenAccount.address,

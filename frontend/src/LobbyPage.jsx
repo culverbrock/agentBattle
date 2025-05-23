@@ -214,7 +214,7 @@ function LobbyPage() {
   // Fetch network info
   useEffect(() => {
     async function fetchNetwork() {
-      if (walletType === 'metamask' && window.ethereum) {
+      if (window.ethereum) {
         try {
           const provider = new ethers.providers.Web3Provider(window.ethereum);
           const net = await provider.getNetwork();
@@ -227,6 +227,15 @@ function LobbyPage() {
       }
     }
     fetchNetwork();
+    // Listen for network/account changes
+    if (window.ethereum) {
+      window.ethereum.on('chainChanged', fetchNetwork);
+      window.ethereum.on('accountsChanged', fetchNetwork);
+      return () => {
+        window.ethereum.removeListener('chainChanged', fetchNetwork);
+        window.ethereum.removeListener('accountsChanged', fetchNetwork);
+      };
+    }
   }, [walletType, walletAddress]);
 
   // Wallet display (now returns more info)
@@ -261,6 +270,19 @@ function LobbyPage() {
       return (
         <div style={{ marginBottom: 8 }}>
           <div style={{ color: '#8e44ad', fontWeight: 'bold' }}>Phantom: {phantomAddress.slice(0, 6)}...{phantomAddress.slice(-4)}</div>
+        </div>
+      );
+    }
+    // If MetaMask is available but not connected, show network info
+    if (window.ethereum) {
+      return (
+        <div style={{ marginBottom: 8 }}>
+          <div style={{ color: '#333', fontWeight: 'bold' }}>
+            Network: {network.name || 'Unknown'} (Chain ID: {network.chainId || 'N/A'})
+          </div>
+          {network.chainId === 0 && (
+            <div style={{ color: 'orange', fontWeight: 'bold' }}>Please connect MetaMask to see wallet and ABT info.</div>
+          )}
         </div>
       );
     }

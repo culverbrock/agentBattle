@@ -4,7 +4,7 @@
  * @body { playerId: string }
  * @returns { player }
  */
-const pool = require('../../database');
+const pool = require('../../../database');
 
 module.exports = async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');

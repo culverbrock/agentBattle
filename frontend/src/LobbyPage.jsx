@@ -28,6 +28,7 @@ function LobbyPage() {
   const [claiming, setClaiming] = useState(false);
   const [claimError, setClaimError] = useState('');
   const [claimSuccess, setClaimSuccess] = useState(false);
+  const [network, setNetwork] = useState({ name: '', chainId: 0 });
 
   // Fetch lobby state (for polling fallback)
   const fetchLobby = () => {
@@ -210,13 +211,58 @@ function LobbyPage() {
     return (!game.status || game.status === 'lobby');
   };
 
-  // Wallet display
-  const walletDisplay = () => {
+  // Fetch network info
+  useEffect(() => {
+    async function fetchNetwork() {
+      if (walletType === 'metamask' && window.ethereum) {
+        try {
+          const provider = new ethers.providers.Web3Provider(window.ethereum);
+          const net = await provider.getNetwork();
+          setNetwork({ name: net.name, chainId: net.chainId });
+        } catch (e) {
+          setNetwork({ name: '', chainId: 0 });
+        }
+      } else {
+        setNetwork({ name: '', chainId: 0 });
+      }
+    }
+    fetchNetwork();
+  }, [walletType, walletAddress]);
+
+  // Wallet display (now returns more info)
+  const walletInfoDisplay = () => {
     if (walletType === 'metamask' && walletAddress) {
-      return <span style={{ marginRight: 8, color: '#007bff', fontWeight: 'bold' }}>MetaMask: {walletAddress.slice(0, 6)}...{walletAddress.slice(-4)}</span>;
+      return (
+        <div style={{ marginBottom: 8 }}>
+          <div style={{ color: '#007bff', fontWeight: 'bold' }}>MetaMask: {walletAddress.slice(0, 6)}...{walletAddress.slice(-4)}</div>
+          <div style={{ color: '#007bff', fontWeight: 'bold' }}>
+            {abtBalance !== null ? `ABT: ${abtBalance}` : 'ABT: ...'}
+          </div>
+          <div style={{ color: '#333', fontWeight: 'bold' }}>
+            Network: {network.name || 'Unknown'} (Chain ID: {network.chainId || 'N/A'})
+          </div>
+          {network.chainId !== 11155111 && network.chainId !== 0 && (
+            <div style={{ color: 'red', fontWeight: 'bold' }}>Please switch to Sepolia to use ABT!</div>
+          )}
+          <div style={{ marginTop: 8 }}>
+            <button type="button" onClick={addAbtToWallet} style={{ marginRight: 8, padding: '6px 12px', background: '#007bff', color: '#fff', border: 'none', borderRadius: 4 }}>Add ABT to Wallet</button>
+            {/* Always show Claim ABT button */}
+            {!claiming && !claimSuccess && (
+              <button type="button" onClick={claimAbt} style={{ padding: '6px 12px', background: '#28a745', color: '#fff', border: 'none', borderRadius: 4 }}>Claim ABT</button>
+            )}
+            {claiming && <span style={{ color: '#888', marginLeft: 8 }}>Claiming...</span>}
+            {claimSuccess && <span style={{ color: '#28a745', marginLeft: 8 }}>Claimed!</span>}
+            {claimError && <span style={{ color: 'red', marginLeft: 8 }}>{claimError}</span>}
+          </div>
+        </div>
+      );
     }
     if (walletType === 'phantom' && phantomAddress) {
-      return <span style={{ marginRight: 8, color: '#8e44ad', fontWeight: 'bold' }}>Phantom: {phantomAddress.slice(0, 6)}...{phantomAddress.slice(-4)}</span>;
+      return (
+        <div style={{ marginBottom: 8 }}>
+          <div style={{ color: '#8e44ad', fontWeight: 'bold' }}>Phantom: {phantomAddress.slice(0, 6)}...{phantomAddress.slice(-4)}</div>
+        </div>
+      );
     }
     return null;
   };
@@ -227,6 +273,17 @@ function LobbyPage() {
 
   return (
     <div style={{ maxWidth: 800, margin: '2rem auto', fontFamily: 'sans-serif', padding: 16 }}>
+      {/* Wallet/Personal Info Section */}
+      <div style={{ marginBottom: 24 }}>
+        {walletInfoDisplay()}
+        {/* Wallet connect buttons if not connected */}
+        {!walletType && (
+          <div>
+            <button type="button" onClick={connectWallet} style={{ marginRight: 8, padding: '6px 12px', background: '#f6851b', color: '#fff', border: 'none', borderRadius: 4 }}>Connect MetaMask</button>
+            <button type="button" onClick={connectPhantom} style={{ marginRight: 8, padding: '6px 12px', background: '#8e44ad', color: '#fff', border: 'none', borderRadius: 4 }}>Connect Phantom</button>
+          </div>
+        )}
+      </div>
       <h1>Agent Battle Lobby</h1>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
         <button onClick={() => setShowCreateModal(true)} style={{ fontSize: 18, padding: '8px 16px' }}>+ Create Table</button>
@@ -238,29 +295,6 @@ function LobbyPage() {
             onChange={e => setPlayerName(e.target.value)}
             style={{ marginRight: 8 }}
           />
-          {/* Wallet connect */}
-          {walletDisplay() || (
-            <>
-              <button type="button" onClick={connectWallet} style={{ marginRight: 8, padding: '6px 12px', background: '#f6851b', color: '#fff', border: 'none', borderRadius: 4 }}>Connect MetaMask</button>
-              <button type="button" onClick={connectPhantom} style={{ marginRight: 8, padding: '6px 12px', background: '#8e44ad', color: '#fff', border: 'none', borderRadius: 4 }}>Connect Phantom</button>
-            </>
-          )}
-          {/* Add ABT to Wallet button and balance */}
-          {walletType === 'metamask' && walletAddress && (
-            <>
-              <button type="button" onClick={addAbtToWallet} style={{ marginRight: 8, padding: '6px 12px', background: '#007bff', color: '#fff', border: 'none', borderRadius: 4 }}>Add ABT to Wallet</button>
-              <span style={{ color: '#007bff', fontWeight: 'bold', marginRight: 8 }}>
-                {abtBalance !== null ? `ABT: ${abtBalance}` : 'ABT: ...'}
-              </span>
-              {/* Always show Claim ABT button */}
-              {!claiming && !claimSuccess && (
-                <button type="button" onClick={claimAbt} style={{ padding: '6px 12px', background: '#28a745', color: '#fff', border: 'none', borderRadius: 4 }}>Claim ABT</button>
-              )}
-              {claiming && <span style={{ color: '#888', marginLeft: 8 }}>Claiming...</span>}
-              {claimSuccess && <span style={{ color: '#28a745', marginLeft: 8 }}>Claimed!</span>}
-              {claimError && <span style={{ color: 'red', marginLeft: 8 }}>{claimError}</span>}
-            </>
-          )}
         </div>
       </div>
       {/* Game List */}

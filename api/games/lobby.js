@@ -6,6 +6,7 @@
 const pool = require('../../database');
 
 module.exports = async function handler(req, res) {
+  console.log('[lobby] handler called', { method: req.method, url: req.url });
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET,POST,OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
@@ -26,7 +27,7 @@ module.exports = async function handler(req, res) {
       password: process.env.POSTGRES_PASSWORD ? '***REDACTED***' : undefined,
       port: process.env.POSTGRES_PORT ? parseInt(process.env.POSTGRES_PORT, 10) : 5432,
     };
-    console.log('API /games/lobby DB config:', dbConfig);
+    console.log('[lobby] DB config:', dbConfig);
     // Fetch open games
     const gamesQ = `SELECT id, name FROM games WHERE status = 'lobby'`;
     const { rows: games } = await pool.query(gamesQ);
@@ -36,9 +37,10 @@ module.exports = async function handler(req, res) {
       const { rows: players } = await pool.query(playersQ, [game.id]);
       game.players = players;
     }
+    console.log(`[lobby] Returning ${games.length} games`);
     res.status(200).json({ games });
   } catch (err) {
-    console.error('Error fetching lobby state:', err);
+    console.error('[lobby] Error fetching lobby state:', err);
     res.status(500).json({ error: 'Internal server error' });
   }
 }; 

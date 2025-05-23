@@ -29,6 +29,7 @@ function LobbyPage() {
   const [claimError, setClaimError] = useState('');
   const [claimSuccess, setClaimSuccess] = useState(false);
   const [network, setNetwork] = useState({ name: '', chainId: 0 });
+  const [debug, setDebug] = useState({ networkError: '', balanceError: '' });
 
   // Fetch lobby state (for polling fallback)
   const fetchLobby = () => {
@@ -158,6 +159,36 @@ function LobbyPage() {
     setClaiming(false);
   };
 
+  // Fetch network info
+  useEffect(() => {
+    async function fetchNetwork() {
+      if (window.ethereum) {
+        try {
+          const provider = new ethers.providers.Web3Provider(window.ethereum);
+          const net = await provider.getNetwork();
+          setNetwork({ name: net.name, chainId: net.chainId });
+          setDebug(d => ({ ...d, networkError: '' }));
+        } catch (e) {
+          setNetwork({ name: '', chainId: 0 });
+          setDebug(d => ({ ...d, networkError: e.message }));
+        }
+      } else {
+        setNetwork({ name: '', chainId: 0 });
+        setDebug(d => ({ ...d, networkError: 'window.ethereum not detected' }));
+      }
+    }
+    fetchNetwork();
+    // Listen for network/account changes
+    if (window.ethereum) {
+      window.ethereum.on('chainChanged', fetchNetwork);
+      window.ethereum.on('accountsChanged', fetchNetwork);
+      return () => {
+        window.ethereum.removeListener('chainChanged', fetchNetwork);
+        window.ethereum.removeListener('accountsChanged', fetchNetwork);
+      };
+    }
+  }, [walletType, walletAddress]);
+
   // Fetch ABT balance (moved out for reuse)
   const fetchBalance = async () => {
     if (walletType === 'metamask' && walletAddress) {
@@ -166,11 +197,14 @@ function LobbyPage() {
         const token = new ethers.Contract(ABT_ADDRESS, ERC20_ABI, provider);
         const bal = await token.balanceOf(walletAddress);
         setAbtBalance(Number(ethers.utils.formatUnits(bal, ABT_DECIMALS)));
+        setDebug(d => ({ ...d, balanceError: '' }));
       } catch (e) {
         setAbtBalance(null);
+        setDebug(d => ({ ...d, balanceError: e.message }));
       }
     } else {
       setAbtBalance(null);
+      setDebug(d => ({ ...d, balanceError: 'No wallet connected or not MetaMask' }));
     }
   };
 
@@ -210,33 +244,6 @@ function LobbyPage() {
   const isJoinable = (game) => {
     return (!game.status || game.status === 'lobby');
   };
-
-  // Fetch network info
-  useEffect(() => {
-    async function fetchNetwork() {
-      if (window.ethereum) {
-        try {
-          const provider = new ethers.providers.Web3Provider(window.ethereum);
-          const net = await provider.getNetwork();
-          setNetwork({ name: net.name, chainId: net.chainId });
-        } catch (e) {
-          setNetwork({ name: '', chainId: 0 });
-        }
-      } else {
-        setNetwork({ name: '', chainId: 0 });
-      }
-    }
-    fetchNetwork();
-    // Listen for network/account changes
-    if (window.ethereum) {
-      window.ethereum.on('chainChanged', fetchNetwork);
-      window.ethereum.on('accountsChanged', fetchNetwork);
-      return () => {
-        window.ethereum.removeListener('chainChanged', fetchNetwork);
-        window.ethereum.removeListener('accountsChanged', fetchNetwork);
-      };
-    }
-  }, [walletType, walletAddress]);
 
   // Wallet display (now returns more info)
   const walletInfoDisplay = () => {
@@ -295,6 +302,18 @@ function LobbyPage() {
 
   return (
     <div style={{ maxWidth: 800, margin: '2rem auto', fontFamily: 'sans-serif', padding: 16 }}>
+      {/* Debug Panel */}
+      <div style={{ background: '#f5f5f5', border: '1px solid #ccc', borderRadius: 8, padding: 12, marginBottom: 16, fontSize: 13 }}>
+        <div><strong>Debug Info</strong></div>
+        <div>window.ethereum detected: {typeof window !== 'undefined' && window.ethereum ? 'Yes' : 'No'}</div>
+        <div>walletType: {walletType || 'None'}</div>
+        <div>walletAddress: {walletAddress || 'None'}</div>
+        <div>phantomAddress: {phantomAddress || 'None'}</div>
+        <div>network: {JSON.stringify(network)}</div>
+        <div>ABT balance: {abtBalance !== null ? abtBalance : 'N/A'}</div>
+        <div style={{ color: debug.networkError ? 'red' : '#888' }}>Network error: {debug.networkError || 'None'}</div>
+        <div style={{ color: debug.balanceError ? 'red' : '#888' }}>Balance error: {debug.balanceError || 'None'}</div>
+      </div>
       {/* Wallet/Personal Info Section */}
       <div style={{ marginBottom: 24 }}>
         {walletInfoDisplay()}

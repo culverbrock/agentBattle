@@ -1,5 +1,4 @@
-const { ethers } = require('ethers');
-const { isAddress, parseUnits } = require('ethers').utils;
+const { isAddress, parseUnits, JsonRpcProvider, Wallet, Contract } = require('ethers');
 
 const ABT_ADDRESS = '0x799b7b7cC889449952283CF23a15956920E7f85B';
 const ABT_ABI = [
@@ -24,9 +23,9 @@ module.exports = async function handler(req, res) {
     return;
   }
   try {
-    const provider = new ethers.providers.JsonRpcProvider(process.env.SEPOLIA_RPC_URL);
-    const wallet = new ethers.Wallet(process.env.FAUCET_PRIVATE_KEY, provider);
-    const abt = new ethers.Contract(ABT_ADDRESS, ABT_ABI, wallet);
+    const provider = new JsonRpcProvider(process.env.SEPOLIA_RPC_URL);
+    const wallet = new Wallet(process.env.FAUCET_PRIVATE_KEY, provider);
+    const abt = new Contract(ABT_ADDRESS, ABT_ABI, wallet);
     const AMOUNT_TO_SEND = parseUnits('100', 18); // 100 ABT
     const tx = await abt.transfer(address, AMOUNT_TO_SEND);
     await tx.wait();

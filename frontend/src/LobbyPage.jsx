@@ -2,6 +2,8 @@ import React, { useEffect, useState, useRef } from 'react';
 import { BrowserProvider, Contract, formatUnits } from 'ethers';
 import { Connection as SolConnection, PublicKey } from '@solana/web3.js';
 import { getAssociatedTokenAddress, getAccount, TOKEN_PROGRAM_ID } from '@solana/spl-token';
+import { Buffer } from 'buffer';
+window.Buffer = Buffer;
 
 const WS_URL = import.meta.env.VITE_WS_URL || 'ws://localhost:3000';
 const ABT_ADDRESS = '0x799b7b7cC889449952283CF23a15956920E7f85B';

@@ -1,5 +1,7 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { BrowserProvider, Contract, formatUnits } from 'ethers';
+import { Connection as SolConnection, PublicKey } from '@solana/web3.js';
+import { getAssociatedTokenAddress, getAccount, TOKEN_PROGRAM_ID } from '@solana/spl-token';
 
 const WS_URL = import.meta.env.VITE_WS_URL || 'ws://localhost:3000';
 const ABT_ADDRESS = '0x799b7b7cC889449952283CF23a15956920E7f85B';
@@ -10,6 +12,9 @@ const ERC20_ABI = [
   "function balanceOf(address owner) view returns (uint256)",
   "function decimals() view returns (uint8)"
 ];
+const SPL_MINT_ADDRESS = '7iJY63ffm5Q7QC6mxb6v3QECMv2Ss4E5UcMmmdaMfFCb';
+const SPL_DECIMALS = 6;
+const SOL_DEVNET_URL = 'https://api.devnet.solana.com';
 
 // Utility to safely stringify objects with BigInt values
 function safeStringify(obj) {
@@ -37,6 +42,10 @@ function LobbyPage() {
   const [claimSuccess, setClaimSuccess] = useState(false);
   const [network, setNetwork] = useState({ name: '', chainId: 0 });
   const [debug, setDebug] = useState({ networkError: '', balanceError: '' });
+  const [splBalance, setSplBalance] = useState(null);
+  const [claimingSpl, setClaimingSpl] = useState(false);
+  const [claimSplError, setClaimSplError] = useState('');
+  const [claimSplSuccess, setClaimSplSuccess] = useState(false);
 
   // Fetch lobby state (for polling fallback)
   const fetchLobby = () => {
@@ -215,6 +224,55 @@ function LobbyPage() {
     }
   };
 
+  // Fetch SPL balance for Phantom
+  const fetchSplBalance = async () => {
+    if (walletType === 'phantom' && phantomAddress) {
+      try {
+        const connection = new SolConnection(SOL_DEVNET_URL, 'confirmed');
+        const mint = new PublicKey(SPL_MINT_ADDRESS);
+        const owner = new PublicKey(phantomAddress);
+        const ata = await getAssociatedTokenAddress(mint, owner);
+        try {
+          const account = await getAccount(connection, ata);
+          setSplBalance(Number(account.amount) / 10 ** SPL_DECIMALS);
+        } catch (e) {
+          // No account yet
+          setSplBalance(0);
+        }
+      } catch (e) {
+        setSplBalance(null);
+      }
+    } else {
+      setSplBalance(null);
+    }
+  };
+
+  // Claim SPL from faucet
+  const claimSpl = async () => {
+    setClaimingSpl(true);
+    setClaimSplError('');
+    setClaimSplSuccess(false);
+    try {
+      const res = await fetch('/api/claim-spl', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ address: phantomAddress })
+      });
+      const data = await res.json();
+      if (data.success) {
+        setClaimSplSuccess(true);
+        setTimeout(() => {
+          fetchSplBalance();
+        }, 5000);
+      } else {
+        setClaimSplError(data.error || 'Failed to claim SPL');
+      }
+    } catch (e) {
+      setClaimSplError('Failed to claim SPL');
+    }
+    setClaimingSpl(false);
+  };
+
   // Create game
   const handleCreateGame = async (e) => {
     e && e.preventDefault();
@@ -284,6 +342,17 @@ function LobbyPage() {
       return (
         <div style={{ marginBottom: 8 }}>
           <div style={{ color: '#8e44ad', fontWeight: 'bold' }}>Phantom: {phantomAddress.slice(0, 6)}...{phantomAddress.slice(-4)}</div>
+          <div style={{ color: '#8e44ad', fontWeight: 'bold' }}>
+            SPL: {splBalance !== null ? splBalance : '...'}
+          </div>
+          <div style={{ marginTop: 8 }}>
+            {!claimingSpl && !claimSplSuccess && (
+              <button type="button" onClick={claimSpl} style={{ padding: '6px 12px', background: '#8e44ad', color: '#fff', border: 'none', borderRadius: 4 }}>Claim SPL</button>
+            )}
+            {claimingSpl && <span style={{ color: '#888', marginLeft: 8 }}>Claiming...</span>}
+            {claimSplSuccess && <span style={{ color: '#28a745', marginLeft: 8 }}>Claimed!</span>}
+            {claimSplError && <span style={{ color: 'red', marginLeft: 8 }}>{claimSplError}</span>}
+          </div>
         </div>
       );
     }
@@ -305,7 +374,8 @@ function LobbyPage() {
 
   useEffect(() => {
     fetchBalance();
-  }, [walletType, walletAddress]);
+    fetchSplBalance();
+  }, [walletType, walletAddress, phantomAddress]);
 
   return (
     <div style={{ maxWidth: 800, margin: '2rem auto', fontFamily: 'sans-serif', padding: 16 }}>

@@ -6,6 +6,7 @@ function LobbyPage() {
   const [games, setGames] = useState([]);
   const [playerName, setPlayerName] = useState('');
   const [playerId, setPlayerId] = useState('');
+  const [walletAddress, setWalletAddress] = useState('');
   const [newGameName, setNewGameName] = useState('');
   const [selectedGameId, setSelectedGameId] = useState('');
   const [showCreateModal, setShowCreateModal] = useState(false);
@@ -60,6 +61,21 @@ function LobbyPage() {
     };
   }, []);
 
+  // MetaMask wallet connect
+  const connectWallet = async () => {
+    if (window.ethereum) {
+      try {
+        const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+        setWalletAddress(accounts[0]);
+        setPlayerId(accounts[0]);
+      } catch (err) {
+        alert('Wallet connection failed');
+      }
+    } else {
+      alert('MetaMask not detected. Please install MetaMask.');
+    }
+  };
+
   // Create game
   const handleCreateGame = async (e) => {
     e && e.preventDefault();
@@ -86,15 +102,20 @@ function LobbyPage() {
 
   // Status badge helper
   const getStatusBadge = (game) => {
-    if (game.status === 'lobby') return <span style={{color: 'green', fontWeight: 'bold'}}>Open</span>;
+    if (game.status === 'lobby' || !game.status) return <span style={{color: 'green', fontWeight: 'bold'}}>Open</span>;
     if (game.status === 'in_progress') return <span style={{color: 'orange', fontWeight: 'bold'}}>In Progress</span>;
     if (game.status === 'full') return <span style={{color: 'red', fontWeight: 'bold'}}>Full</span>;
     return <span>{game.status}</span>;
   };
 
+  // Joinable logic
+  const isJoinable = (game) => {
+    return (!game.status || game.status === 'lobby');
+  };
+
   return (
     <div style={{ maxWidth: 800, margin: '2rem auto', fontFamily: 'sans-serif', padding: 16 }}>
-      <h1>Poker Lobby</h1>
+      <h1>Agent Battle Lobby</h1>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
         <button onClick={() => setShowCreateModal(true)} style={{ fontSize: 18, padding: '8px 16px' }}>+ Create Table</button>
         <div>
@@ -105,13 +126,12 @@ function LobbyPage() {
             onChange={e => setPlayerName(e.target.value)}
             style={{ marginRight: 8 }}
           />
-          <input
-            type="text"
-            placeholder="Your player ID"
-            value={playerId}
-            onChange={e => setPlayerId(e.target.value)}
-            style={{ marginRight: 8 }}
-          />
+          {/* Wallet connect */}
+          {walletAddress ? (
+            <span style={{ marginRight: 8, color: '#007bff', fontWeight: 'bold' }}>{walletAddress.slice(0, 6)}...{walletAddress.slice(-4)}</span>
+          ) : (
+            <button type="button" onClick={connectWallet} style={{ marginRight: 8, padding: '6px 12px', background: '#f6851b', color: '#fff', border: 'none', borderRadius: 4 }}>Connect Wallet</button>
+          )}
         </div>
       </div>
       {/* Game List */}
@@ -125,8 +145,8 @@ function LobbyPage() {
             <div style={{ margin: '8px 0' }}>Players: {game.players.length} / 6</div>
             <button
               onClick={() => handleJoinGame(game.id)}
-              disabled={game.status !== 'lobby'}
-              style={{ width: '100%', padding: 8, background: game.status === 'lobby' ? '#007bff' : '#ccc', color: '#fff', border: 'none', borderRadius: 4, cursor: game.status === 'lobby' ? 'pointer' : 'not-allowed', marginBottom: 8 }}
+              disabled={!isJoinable(game) || !walletAddress}
+              style={{ width: '100%', padding: 8, background: isJoinable(game) && walletAddress ? '#007bff' : '#ccc', color: '#fff', border: 'none', borderRadius: 4, cursor: isJoinable(game) && walletAddress ? 'pointer' : 'not-allowed', marginBottom: 8 }}
             >
               Join
             </button>

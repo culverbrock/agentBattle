@@ -46,6 +46,7 @@ function LobbyPage() {
   const [claimingSpl, setClaimingSpl] = useState(false);
   const [claimSplError, setClaimSplError] = useState('');
   const [claimSplSuccess, setClaimSplSuccess] = useState(false);
+  const [splFetchError, setSplFetchError] = useState('');
 
   // Fetch lobby state (for polling fallback)
   const fetchLobby = () => {
@@ -85,7 +86,7 @@ function LobbyPage() {
     wsRef.current.onerror = () => {
       startPolling();
     };
-    wsRef.current.onclose = () => {
+    ws.current.onclose = () => {
       startPolling();
     };
     return () => {
@@ -232,18 +233,25 @@ function LobbyPage() {
         const mint = new PublicKey(SPL_MINT_ADDRESS);
         const owner = new PublicKey(phantomAddress);
         const ata = await getAssociatedTokenAddress(mint, owner);
+        console.log('SPL Debug:', { mint: SPL_MINT_ADDRESS, owner: phantomAddress, ata: ata.toBase58() });
         try {
           const account = await getAccount(connection, ata);
+          console.log('SPL Account:', account);
           setSplBalance(Number(account.amount) / 10 ** SPL_DECIMALS);
+          setSplFetchError('');
         } catch (e) {
-          // No account yet
+          console.log('SPL getAccount error:', e);
           setSplBalance(0);
+          setSplFetchError(e.message || String(e));
         }
       } catch (e) {
+        console.log('SPL fetch error:', e);
         setSplBalance(null);
+        setSplFetchError(e.message || String(e));
       }
     } else {
       setSplBalance(null);
+      setSplFetchError('');
     }
   };
 
@@ -388,6 +396,7 @@ function LobbyPage() {
         <div>phantomAddress: {phantomAddress || 'None'}</div>
         <div>network: {safeStringify(network)}</div>
         <div>ABT balance: {abtBalance !== null ? abtBalance : 'N/A'}</div>
+        <div>SPL fetch error: {splFetchError || 'None'}</div>
         <div style={{ color: debug.networkError ? 'red' : '#888' }}>Network error: {debug.networkError || 'None'}</div>
         <div style={{ color: debug.balanceError ? 'red' : '#888' }}>Balance error: {debug.balanceError || 'None'}</div>
       </div>

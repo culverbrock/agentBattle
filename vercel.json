@@ -1,7 +1,7 @@
 {
   "functions": {
     "api/**/*.js": {
-      "includeFiles": ["database.js"]
+      "includeFiles": "database.js"
     }
   },
   "routes": [

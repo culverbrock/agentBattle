@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { ethers } from 'ethers';
+import { BrowserProvider, Contract, formatUnits } from 'ethers';
 
 const WS_URL = import.meta.env.VITE_WS_URL || 'ws://localhost:3000';
 const ABT_ADDRESS = '0x799b7b7cC889449952283CF23a15956920E7f85B';
@@ -164,7 +164,7 @@ function LobbyPage() {
     async function fetchNetwork() {
       if (window.ethereum) {
         try {
-          const provider = new ethers.providers.Web3Provider(window.ethereum);
+          const provider = new BrowserProvider(window.ethereum);
           const net = await provider.getNetwork();
           setNetwork({ name: net.name, chainId: net.chainId });
           setDebug(d => ({ ...d, networkError: '' }));
@@ -193,10 +193,10 @@ function LobbyPage() {
   const fetchBalance = async () => {
     if (walletType === 'metamask' && walletAddress) {
       try {
-        const provider = new ethers.providers.Web3Provider(window.ethereum);
-        const token = new ethers.Contract(ABT_ADDRESS, ERC20_ABI, provider);
+        const provider = new BrowserProvider(window.ethereum);
+        const token = new Contract(ABT_ADDRESS, ERC20_ABI, provider);
         const bal = await token.balanceOf(walletAddress);
-        setAbtBalance(Number(ethers.utils.formatUnits(bal, ABT_DECIMALS)));
+        setAbtBalance(Number(formatUnits(bal, ABT_DECIMALS)));
         setDebug(d => ({ ...d, balanceError: '' }));
       } catch (e) {
         setAbtBalance(null);

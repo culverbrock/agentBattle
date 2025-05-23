@@ -1,4 +1,4 @@
-const { PublicKey, Connection, Keypair, sendAndConfirmTransaction, clusterApiUrl } = require('@solana/web3.js');
+const { PublicKey, Connection, Keypair, sendAndConfirmTransaction, clusterApiUrl, Transaction } = require('@solana/web3.js');
 const { getOrCreateAssociatedTokenAccount, createTransferInstruction, TOKEN_PROGRAM_ID } = require('@solana/spl-token');
 
 const MINT_ADDRESS = '7iJY63ffm5Q7QC6mxb6v3QECMv2Ss4E5UcMmmdaMfFCb';
@@ -50,15 +50,14 @@ module.exports = async function handler(req, res) {
       [],
       TOKEN_PROGRAM_ID
     );
-    // Send transaction
+    // Build and send transaction
+    const tx = new Transaction().add(transferIx);
+    tx.feePayer = payer.publicKey;
+    tx.recentBlockhash = (await connection.getLatestBlockhash()).blockhash;
     const txSig = await sendAndConfirmTransaction(
       connection,
-      {
-        feePayer: payer.publicKey,
-        recentBlockhash: (await connection.getLatestBlockhash()).blockhash,
-        instructions: [transferIx],
-        signers: [payer],
-      }
+      tx,
+      [payer]
     );
     res.status(200).json({ success: true, txSig });
   } catch (err) {

@@ -1,6 +1,15 @@
 import React, { useEffect, useState, useRef } from 'react';
+import { ethers } from 'ethers';
 
 const WS_URL = import.meta.env.VITE_WS_URL || 'ws://localhost:3000';
+const ABT_ADDRESS = '0x799b7b7cC889449952283CF23a15956920E7f85B';
+const ABT_SYMBOL = 'ABT';
+const ABT_DECIMALS = 18;
+const ABT_IMAGE = '';
+const ERC20_ABI = [
+  "function balanceOf(address owner) view returns (uint256)",
+  "function decimals() view returns (uint8)"
+];
 
 function LobbyPage() {
   const [games, setGames] = useState([]);
@@ -9,6 +18,7 @@ function LobbyPage() {
   const [walletAddress, setWalletAddress] = useState('');
   const [phantomAddress, setPhantomAddress] = useState('');
   const [walletType, setWalletType] = useState(''); // 'metamask' or 'phantom'
+  const [abtBalance, setAbtBalance] = useState(null);
   const [newGameName, setNewGameName] = useState('');
   const [selectedGameId, setSelectedGameId] = useState('');
   const [showCreateModal, setShowCreateModal] = useState(false);
@@ -95,6 +105,47 @@ function LobbyPage() {
     }
   };
 
+  // Add ABT token to MetaMask
+  const addAbtToWallet = async () => {
+    if (window.ethereum) {
+      try {
+        await window.ethereum.request({
+          method: 'wallet_watchAsset',
+          params: {
+            type: 'ERC20',
+            options: {
+              address: ABT_ADDRESS,
+              symbol: ABT_SYMBOL,
+              decimals: ABT_DECIMALS,
+              image: ABT_IMAGE,
+            },
+          },
+        });
+      } catch (error) {
+        alert('Failed to add ABT token');
+      }
+    }
+  };
+
+  // Fetch ABT balance
+  useEffect(() => {
+    const fetchBalance = async () => {
+      if (walletType === 'metamask' && walletAddress) {
+        try {
+          const provider = new ethers.providers.Web3Provider(window.ethereum);
+          const token = new ethers.Contract(ABT_ADDRESS, ERC20_ABI, provider);
+          const bal = await token.balanceOf(walletAddress);
+          setAbtBalance(Number(ethers.utils.formatUnits(bal, ABT_DECIMALS)));
+        } catch (e) {
+          setAbtBalance(null);
+        }
+      } else {
+        setAbtBalance(null);
+      }
+    };
+    fetchBalance();
+  }, [walletType, walletAddress]);
+
   // Create game
   const handleCreateGame = async (e) => {
     e && e.preventDefault();
@@ -161,6 +212,15 @@ function LobbyPage() {
             <>
               <button type="button" onClick={connectWallet} style={{ marginRight: 8, padding: '6px 12px', background: '#f6851b', color: '#fff', border: 'none', borderRadius: 4 }}>Connect MetaMask</button>
               <button type="button" onClick={connectPhantom} style={{ marginRight: 8, padding: '6px 12px', background: '#8e44ad', color: '#fff', border: 'none', borderRadius: 4 }}>Connect Phantom</button>
+            </>
+          )}
+          {/* Add ABT to Wallet button and balance */}
+          {walletType === 'metamask' && walletAddress && (
+            <>
+              <button type="button" onClick={addAbtToWallet} style={{ marginRight: 8, padding: '6px 12px', background: '#007bff', color: '#fff', border: 'none', borderRadius: 4 }}>Add ABT to Wallet</button>
+              <span style={{ color: '#007bff', fontWeight: 'bold' }}>
+                {abtBalance !== null ? `ABT: ${abtBalance}` : 'ABT: ...'}
+              </span>
             </>
           )}
         </div>

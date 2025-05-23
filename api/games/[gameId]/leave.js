@@ -4,7 +4,7 @@
  * @body { playerId: string }
  * @returns { player }
  */
-const pool = require('../../../database.js');
+const pool = require('../../../database');
 
 module.exports = async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -20,8 +20,8 @@ module.exports = async function handler(req, res) {
   }
   const { playerId } = req.body;
   const { gameId } = req.query;
-  if (!playerId || !gameId) {
-    res.status(400).json({ error: 'playerId and gameId are required' });
+  if (!playerId) {
+    res.status(400).json({ error: 'playerId is required' });
     return;
   }
   try {

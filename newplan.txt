@@ -1,0 +1,50 @@
+Unified Vercel Deployment Plan
+=============================
+
+1. Project Structure
+-------------------
+- /api/                # Vercel serverless functions (backend API)
+- /sprint_2/frontend/  # React/Vite frontend
+- package.json         # (root, or in each subfolder)
+- vercel.json          # (root)
+
+2. vercel.json Configuration
+----------------------------
+- Place this file at the project root:
+
+{
+  "builds": [
+    { "src": "sprint_2/frontend/package.json", "use": "@vercel/static-build", "config": { "distDir": "dist" } },
+    { "src": "api/**/*.js", "use": "@vercel/node" }
+  ],
+  "routes": [
+    { "src": "/api/(.*)", "dest": "/api/$1.js" },
+    { "src": "/(.*)", "dest": "/sprint_2/frontend/dist/index.html" }
+  ]
+}
+
+3. Frontend Build Command
+-------------------------
+- In Vercel dashboard:
+  - Root Directory: (leave blank or set to repo root)
+  - Build Command: cd sprint_2/frontend && npm install && npm run build
+  - Output Directory: sprint_2/frontend/dist
+
+4. API Functions
+----------------
+- Place API endpoints as serverless functions in /api/ (e.g., /api/games.js, /api/lobby.js)
+- If using Express, adapt for serverless or use vercel-serverless-express
+
+5. Environment Variables
+------------------------
+- Set DB credentials and secrets in Vercel dashboard
+
+6. Deploy
+---------
+- Push to GitHub, connect to Vercel, and deploy
+
+Notes:
+------
+- /api/* routes go to backend, everything else goes to frontend
+- Adjust paths in vercel.json if your folders are different
+- For local dev, run frontend and backend separately as usual 

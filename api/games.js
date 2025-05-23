@@ -4,10 +4,10 @@
  * @body { name: string }
  * @returns { id, name, status, created_at, updated_at }
  */
-import { v4 as uuidv4 } from 'uuid';
-import pool from '../database';
+const { v4: uuidv4 } = require('uuid');
+const pool = require('../../database');
 
-export default async function handler(req, res) {
+module.exports = async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET,POST,OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
@@ -33,4 +33,4 @@ export default async function handler(req, res) {
     console.error('Error creating game:', err);
     res.status(500).json({ error: 'Failed to create game' });
   }
-} 
+}; 

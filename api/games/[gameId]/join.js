@@ -4,7 +4,7 @@
  * @body { playerId: string, name: string }
  * @returns { player }
  */
-const PlayerManager = require('../../../playerManager.js');
+const pool = require('../../../database');
 
 module.exports = async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -20,13 +20,15 @@ module.exports = async function handler(req, res) {
   }
   const { playerId, name } = req.body;
   const { gameId } = req.query;
-  if (!playerId || !name || !gameId) {
-    res.status(400).json({ error: 'playerId, name, and gameId are required' });
+  if (!playerId || !name) {
+    res.status(400).json({ error: 'playerId and name are required' });
     return;
   }
   try {
-    const player = await PlayerManager.joinPlayer(playerId, name, gameId);
-    res.status(200).json(player);
+    const query = `INSERT INTO players (id, name, status, game_id) VALUES ($1, $2, 'connected', $3)
+      ON CONFLICT (id) DO UPDATE SET name = $2, status = 'connected', game_id = $3 RETURNING *`;
+    const { rows } = await pool.query(query, [playerId, name, gameId]);
+    res.status(200).json(rows[0]);
   } catch (err) {
     console.error('Error joining game:', err);
     res.status(500).json({ error: 'Failed to join game' });

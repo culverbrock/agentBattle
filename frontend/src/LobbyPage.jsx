@@ -7,6 +7,8 @@ function LobbyPage() {
   const [playerName, setPlayerName] = useState('');
   const [playerId, setPlayerId] = useState('');
   const [walletAddress, setWalletAddress] = useState('');
+  const [phantomAddress, setPhantomAddress] = useState('');
+  const [walletType, setWalletType] = useState(''); // 'metamask' or 'phantom'
   const [newGameName, setNewGameName] = useState('');
   const [selectedGameId, setSelectedGameId] = useState('');
   const [showCreateModal, setShowCreateModal] = useState(false);
@@ -68,11 +70,28 @@ function LobbyPage() {
         const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
         setWalletAddress(accounts[0]);
         setPlayerId(accounts[0]);
+        setWalletType('metamask');
       } catch (err) {
         alert('Wallet connection failed');
       }
     } else {
       alert('MetaMask not detected. Please install MetaMask.');
+    }
+  };
+
+  // Phantom wallet connect
+  const connectPhantom = async () => {
+    if (window.solana && window.solana.isPhantom) {
+      try {
+        const resp = await window.solana.connect();
+        setPhantomAddress(resp.publicKey.toString());
+        setPlayerId(resp.publicKey.toString());
+        setWalletType('phantom');
+      } catch (err) {
+        alert('Phantom connection failed');
+      }
+    } else {
+      alert('Phantom not detected. Please install Phantom Wallet.');
     }
   };
 
@@ -113,6 +132,17 @@ function LobbyPage() {
     return (!game.status || game.status === 'lobby');
   };
 
+  // Wallet display
+  const walletDisplay = () => {
+    if (walletType === 'metamask' && walletAddress) {
+      return <span style={{ marginRight: 8, color: '#007bff', fontWeight: 'bold' }}>MetaMask: {walletAddress.slice(0, 6)}...{walletAddress.slice(-4)}</span>;
+    }
+    if (walletType === 'phantom' && phantomAddress) {
+      return <span style={{ marginRight: 8, color: '#8e44ad', fontWeight: 'bold' }}>Phantom: {phantomAddress.slice(0, 6)}...{phantomAddress.slice(-4)}</span>;
+    }
+    return null;
+  };
+
   return (
     <div style={{ maxWidth: 800, margin: '2rem auto', fontFamily: 'sans-serif', padding: 16 }}>
       <h1>Agent Battle Lobby</h1>
@@ -127,10 +157,11 @@ function LobbyPage() {
             style={{ marginRight: 8 }}
           />
           {/* Wallet connect */}
-          {walletAddress ? (
-            <span style={{ marginRight: 8, color: '#007bff', fontWeight: 'bold' }}>{walletAddress.slice(0, 6)}...{walletAddress.slice(-4)}</span>
-          ) : (
-            <button type="button" onClick={connectWallet} style={{ marginRight: 8, padding: '6px 12px', background: '#f6851b', color: '#fff', border: 'none', borderRadius: 4 }}>Connect Wallet</button>
+          {walletDisplay() || (
+            <>
+              <button type="button" onClick={connectWallet} style={{ marginRight: 8, padding: '6px 12px', background: '#f6851b', color: '#fff', border: 'none', borderRadius: 4 }}>Connect MetaMask</button>
+              <button type="button" onClick={connectPhantom} style={{ marginRight: 8, padding: '6px 12px', background: '#8e44ad', color: '#fff', border: 'none', borderRadius: 4 }}>Connect Phantom</button>
+            </>
           )}
         </div>
       </div>
@@ -145,8 +176,8 @@ function LobbyPage() {
             <div style={{ margin: '8px 0' }}>Players: {game.players.length} / 6</div>
             <button
               onClick={() => handleJoinGame(game.id)}
-              disabled={!isJoinable(game) || !walletAddress}
-              style={{ width: '100%', padding: 8, background: isJoinable(game) && walletAddress ? '#007bff' : '#ccc', color: '#fff', border: 'none', borderRadius: 4, cursor: isJoinable(game) && walletAddress ? 'pointer' : 'not-allowed', marginBottom: 8 }}
+              disabled={!isJoinable(game) || !playerId}
+              style={{ width: '100%', padding: 8, background: isJoinable(game) && playerId ? '#007bff' : '#ccc', color: '#fff', border: 'none', borderRadius: 4, cursor: isJoinable(game) && playerId ? 'pointer' : 'not-allowed', marginBottom: 8 }}
             >
               Join
             </button>

@@ -5,7 +5,8 @@
   "scripts": {
     "test": "jest --verbose",
     "test:manual:player": "node testPlayerStateManagement.js",
-    "test:manual:game": "node testGameStateMachine.js"
+    "test:manual:game": "node testGameStateMachine.js",
+    "build": "cd frontend && npm install && npm run build"
   },
   "repository": {
     "type": "git",

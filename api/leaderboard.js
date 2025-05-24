@@ -1,6 +1,7 @@
 const { JsonRpcProvider, Contract } = require('ethers');
 const { Connection, PublicKey } = require('@solana/web3.js');
 const { getMint, getTokenAccountsByOwner } = require('@solana/spl-token');
+const fetch = require('node-fetch');
 
 const ABT_ADDRESS = '0x799b7b7cC889449952283CF23a15956920E7f85B';
 const ABT_ABI = [
@@ -18,6 +19,33 @@ const abtClaimers = [
   '0x9abc...wxyz',
 ];
 
+async function getAbtHoldersFromEtherscan() {
+  const apiKey = process.env.ETHERSCAN_API_KEY;
+  if (!apiKey) {
+    console.error('[leaderboard] ETHERSCAN_API_KEY not set');
+    return [];
+  }
+  // Etherscan Sepolia endpoint
+  const url = `https://api-sepolia.etherscan.io/api?module=token&action=tokenholderlist&contractaddress=${ABT_ADDRESS}&page=1&offset=100&apikey=${apiKey}`;
+  try {
+    const res = await fetch(url);
+    const data = await res.json();
+    if (data.status !== '1' || !Array.isArray(data.result)) {
+      console.error('[leaderboard] Etherscan error:', data);
+      return [];
+    }
+    // data.result: [{TokenHolderAddress, TokenHolderQuantity}, ...]
+    return data.result.map(holder => ({
+      address: holder.TokenHolderAddress,
+      abt: Number(holder.TokenHolderQuantity) / 1e18,
+      spl: 0
+    }));
+  } catch (err) {
+    console.error('[leaderboard] Error fetching from Etherscan:', err);
+    return [];
+  }
+}
+
 module.exports = async function handler(req, res) {
   console.log('[leaderboard] handler called', { method: req.method, url: req.url });
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -32,20 +60,8 @@ module.exports = async function handler(req, res) {
     return;
   }
   try {
-    // --- ABT Holders (testnet: from faucet claimers) ---
-    let abtResults = [];
-    if (abtClaimers.length > 0) {
-      const provider = new JsonRpcProvider(process.env.SEPOLIA_RPC_URL);
-      const abt = new Contract(ABT_ADDRESS, ABT_ABI, provider);
-      for (const address of abtClaimers) {
-        try {
-          const bal = await abt.balanceOf(address);
-          abtResults.push({ address, abt: Number(bal) / 1e18, spl: 0 });
-        } catch (e) {
-          console.error('[leaderboard] error fetching ABT balance for', address, e);
-        }
-      }
-    }
+    // --- ABT Holders (live from Etherscan) ---
+    const abtResults = await getAbtHoldersFromEtherscan();
     console.log(`[leaderboard] ABT holders found: ${abtResults.length}`);
     // --- SPL Holders (live from Solana devnet) ---
     const connection = new Connection(SOL_DEVNET_URL, 'confirmed');

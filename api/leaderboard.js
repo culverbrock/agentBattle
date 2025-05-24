@@ -4,10 +4,6 @@ const { getMint, getTokenAccountsByOwner } = require('@solana/spl-token');
 const fetch = require('node-fetch');
 
 const ABT_ADDRESS = '0x799b7b7cC889449952283CF23a15956920E7f85B';
-const ABT_ABI = [
-  "function balanceOf(address owner) view returns (uint256)",
-  "function decimals() view returns (uint8)"
-];
 const SPL_MINT_ADDRESS = '7iJY63ffm5Q7QC6mxb6v3QECMv2Ss4E5UcMmmdaMfFCb';
 const SOL_DEVNET_URL = 'https://api.devnet.solana.com';
 
@@ -19,29 +15,30 @@ const abtClaimers = [
   '0x9abc...wxyz',
 ];
 
-async function getAbtHoldersFromEtherscan() {
-  const apiKey = process.env.ETHERSCAN_API_KEY;
+async function getAbtHoldersFromMoralis() {
+  const apiKey = process.env.MORALIS_API_KEY;
   if (!apiKey) {
-    console.error('[leaderboard] ETHERSCAN_API_KEY not set');
+    console.error('[leaderboard] MORALIS_API_KEY not set');
     return [];
   }
-  // Etherscan Sepolia endpoint
-  const url = `https://api-sepolia.etherscan.io/api?module=token&action=tokenholderlist&contractaddress=${ABT_ADDRESS}&page=1&offset=100&apikey=${apiKey}`;
+  const url = `https://deep-index.moralis.io/api/v2.2/erc20/${ABT_ADDRESS}/holders?chain=sepolia`;
   try {
-    const res = await fetch(url);
+    const res = await fetch(url, {
+      headers: { 'X-API-Key': apiKey }
+    });
     const data = await res.json();
-    if (data.status !== '1' || !Array.isArray(data.result)) {
-      console.error('[leaderboard] Etherscan error:', data);
+    if (!data.result || !Array.isArray(data.result)) {
+      console.error('[leaderboard] Moralis error:', data);
       return [];
     }
-    // data.result: [{TokenHolderAddress, TokenHolderQuantity}, ...]
+    // data.result: [{address, balance}, ...]
     return data.result.map(holder => ({
-      address: holder.TokenHolderAddress,
-      abt: Number(holder.TokenHolderQuantity) / 1e18,
+      address: holder.address,
+      abt: Number(holder.balance) / 1e18,
       spl: 0
     }));
   } catch (err) {
-    console.error('[leaderboard] Error fetching from Etherscan:', err);
+    console.error('[leaderboard] Error fetching from Moralis:', err);
     return [];
   }
 }
@@ -60,8 +57,8 @@ module.exports = async function handler(req, res) {
     return;
   }
   try {
-    // --- ABT Holders (live from Etherscan) ---
-    const abtResults = await getAbtHoldersFromEtherscan();
+    // --- ABT Holders (live from Moralis) ---
+    const abtResults = await getAbtHoldersFromMoralis();
     console.log(`[leaderboard] ABT holders found: ${abtResults.length}`);
     // --- SPL Holders (live from Solana devnet) ---
     const connection = new Connection(SOL_DEVNET_URL, 'confirmed');

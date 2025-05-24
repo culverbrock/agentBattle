@@ -4,6 +4,10 @@ const { getMint, getTokenAccountsByOwner } = require('@solana/spl-token');
 const fetch = require('node-fetch');
 
 const ABT_ADDRESS = '0x799b7b7cC889449952283CF23a15956920E7f85B';
+const ABT_ABI = [
+  "function balanceOf(address owner) view returns (uint256)",
+  "function decimals() view returns (uint8)"
+];
 const SPL_MINT_ADDRESS = '7iJY63ffm5Q7QC6mxb6v3QECMv2Ss4E5UcMmmdaMfFCb';
 const SOL_DEVNET_URL = 'https://api.devnet.solana.com';
 
@@ -15,30 +19,45 @@ const abtClaimers = [
   '0x9abc...wxyz',
 ];
 
-async function getAbtHoldersFromMoralis() {
-  const apiKey = process.env.MORALIS_API_KEY;
+async function getAbtHoldersFromEtherscan() {
+  const apiKey = process.env.ETHERSCAN_API_KEY;
   if (!apiKey) {
-    console.error('[leaderboard] MORALIS_API_KEY not set');
+    console.error('[leaderboard] ETHERSCAN_API_KEY not set');
     return [];
   }
-  const url = `https://deep-index.moralis.io/api/v2.2/erc20/${ABT_ADDRESS}/holders?chain=sepolia`;
+  const url = `https://api-sepolia.etherscan.io/api?module=account&action=tokentx&contractaddress=${ABT_ADDRESS}&startblock=0&endblock=99999999&sort=asc&apikey=${apiKey}`;
   try {
-    const res = await fetch(url, {
-      headers: { 'X-API-Key': apiKey }
-    });
+    const res = await fetch(url);
     const data = await res.json();
-    if (!data.result || !Array.isArray(data.result)) {
-      console.error('[leaderboard] Moralis error:', data);
+    if (data.status !== '1' || !Array.isArray(data.result)) {
+      console.error('[leaderboard] Etherscan error:', data);
       return [];
     }
-    // data.result: [{address, balance}, ...]
-    return data.result.map(holder => ({
-      address: holder.address,
-      abt: Number(holder.balance) / 1e18,
-      spl: 0
-    }));
+    // Extract unique addresses from 'from' and 'to'
+    const addresses = new Set();
+    for (const tx of data.result) {
+      if (tx.from) addresses.add(tx.from.toLowerCase());
+      if (tx.to) addresses.add(tx.to.toLowerCase());
+    }
+    console.log(`[leaderboard] Unique ABT addresses from Etherscan: ${addresses.size}`);
+    // Check balance for each address
+    const provider = new JsonRpcProvider(process.env.SEPOLIA_RPC_URL);
+    const abt = new Contract(ABT_ADDRESS, ABT_ABI, provider);
+    const results = [];
+    for (const address of addresses) {
+      try {
+        const bal = await abt.balanceOf(address);
+        const balNum = Number(bal) / 1e18;
+        if (balNum > 0) {
+          results.push({ address, abt: balNum, spl: 0 });
+        }
+      } catch (e) {
+        console.error('[leaderboard] error fetching ABT balance for', address, e);
+      }
+    }
+    return results;
   } catch (err) {
-    console.error('[leaderboard] Error fetching from Moralis:', err);
+    console.error('[leaderboard] Error fetching from Etherscan:', err);
     return [];
   }
 }
@@ -57,8 +76,8 @@ module.exports = async function handler(req, res) {
     return;
   }
   try {
-    // --- ABT Holders (live from Moralis) ---
-    const abtResults = await getAbtHoldersFromMoralis();
+    // --- ABT Holders (from Etherscan tx scan) ---
+    const abtResults = await getAbtHoldersFromEtherscan();
     console.log(`[leaderboard] ABT holders found: ${abtResults.length}`);
     // --- SPL Holders (live from Solana devnet) ---
     const connection = new Connection(SOL_DEVNET_URL, 'confirmed');

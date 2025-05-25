@@ -34,16 +34,23 @@ app.post('/games', async (req, res) => {
  * @desc Join a game
  */
 app.post('/games/:gameId/join', async (req, res) => {
-  const { playerId, name } = req.body;
+  const { playerId } = req.body;
   const { gameId } = req.params;
-  if (!playerId || !name) {
-    return res.status(400).json({ error: 'playerId and name are required' });
+  if (!playerId) {
+    return res.status(400).json({ error: 'playerId is required' });
   }
   try {
-    // Upsert player into the players table
+    // Check current player count
+    const countQ = `SELECT COUNT(*) FROM players WHERE game_id = $1 AND status = 'connected'`;
+    const { rows: countRows } = await pool.query(countQ, [gameId]);
+    const playerCount = parseInt(countRows[0].count, 10);
+    if (playerCount >= 10) {
+      return res.status(400).json({ error: 'Game is full (max 10 players)' });
+    }
+    // Upsert player into the players table (name is now nullable, use playerId as name fallback)
     const query = `INSERT INTO players (id, name, status, game_id) VALUES ($1, $2, 'connected', $3)
       ON CONFLICT (id) DO UPDATE SET name = $2, status = 'connected', game_id = $3 RETURNING *`;
-    const { rows } = await pool.query(query, [playerId, name, gameId]);
+    const { rows } = await pool.query(query, [playerId, playerId, gameId]);
     res.status(200).json(rows[0]);
     // Broadcast lobby state after player joins
     broadcastLobbyState();

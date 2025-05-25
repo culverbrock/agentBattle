@@ -27,8 +27,6 @@ function safeStringify(obj) {
 
 function LobbyPage() {
   const [games, setGames] = useState([]);
-  const [playerName, setPlayerName] = useState('');
-  const [playerId, setPlayerId] = useState('');
   const [walletAddress, setWalletAddress] = useState('');
   const [phantomAddress, setPhantomAddress] = useState('');
   const [walletType, setWalletType] = useState(''); // 'metamask' or 'phantom'
@@ -103,7 +101,6 @@ function LobbyPage() {
       try {
         const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
         setWalletAddress(accounts[0]);
-        setPlayerId(accounts[0]);
         setWalletType('metamask');
       } catch (err) {
         alert('Wallet connection failed');
@@ -119,7 +116,6 @@ function LobbyPage() {
       try {
         const resp = await window.solana.connect();
         setPhantomAddress(resp.publicKey.toString());
-        setPlayerId(resp.publicKey.toString());
         setWalletType('phantom');
       } catch (err) {
         alert('Phantom connection failed');
@@ -298,13 +294,28 @@ function LobbyPage() {
 
   // Join game
   const handleJoinGame = async (gameId) => {
-    if (!gameId || !playerName || !playerId) return;
-    await fetch(`/api/games/${gameId}/join`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ playerId, name: playerName })
-    });
-    setSelectedGameId(gameId);
+    if (!gameId || !walletAddress) return;
+    try {
+      // Require the user to send 100 ABT or 100 SPL to the prize pool contract before joining
+      if (walletType === 'metamask' && abtBalance && abtBalance < 100) {
+        setClaimError('You must have at least 100 ABT to join the game');
+        return;
+      }
+      if (walletType === 'phantom' && splBalance && splBalance < 100) {
+        setClaimError('You must have at least 100 SPL to join the game');
+        return;
+      }
+
+      // Proceed with joining the game
+      await fetch(`/api/games/${gameId}/join`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ walletAddress })
+      });
+      setSelectedGameId(gameId);
+    } catch (e) {
+      setClaimError('Failed to join the game');
+    }
   };
 
   // Status badge helper
@@ -433,15 +444,6 @@ function LobbyPage() {
       <h1>Agent Battle Lobby</h1>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
         <button onClick={() => setShowCreateModal(true)} style={{ fontSize: 18, padding: '8px 16px' }}>+ Create Table</button>
-        <div>
-          <input
-            type="text"
-            placeholder="Your name"
-            value={playerName}
-            onChange={e => setPlayerName(e.target.value)}
-            style={{ marginRight: 8 }}
-          />
-        </div>
       </div>
       {/* Game List */}
       <div style={{ display: 'flex', flexWrap: 'wrap', gap: 16 }}>
@@ -451,11 +453,11 @@ function LobbyPage() {
               <div style={{ fontWeight: 'bold', fontSize: 18 }}>{game.name}</div>
               {getStatusBadge(game)}
             </div>
-            <div style={{ margin: '8px 0' }}>Players: {game.players.length} / 6</div>
+            <div style={{ margin: '8px 0' }}>Players: {game.players.length} / 10</div>
             <button
               onClick={() => handleJoinGame(game.id)}
-              disabled={!isJoinable(game) || !playerId}
-              style={{ width: '100%', padding: 8, background: isJoinable(game) && playerId ? '#007bff' : '#ccc', color: '#fff', border: 'none', borderRadius: 4, cursor: isJoinable(game) && playerId ? 'pointer' : 'not-allowed', marginBottom: 8 }}
+              disabled={!isJoinable(game) || !walletAddress}
+              style={{ width: '100%', padding: 8, background: isJoinable(game) && walletAddress ? '#007bff' : '#ccc', color: '#fff', border: 'none', borderRadius: 4, cursor: isJoinable(game) && walletAddress ? 'pointer' : 'not-allowed', marginBottom: 8 }}
             >
               Join
             </button>

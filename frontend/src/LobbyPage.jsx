@@ -294,7 +294,8 @@ function LobbyPage() {
 
   // Join game
   const handleJoinGame = async (gameId) => {
-    if (!gameId || !walletAddress) return;
+    const playerId = walletType === 'phantom' ? phantomAddress : walletAddress;
+    if (!gameId || !playerId) return;
     try {
       // Require the user to send 100 ABT or 100 SPL to the prize pool contract before joining
       if (walletType === 'metamask' && abtBalance && abtBalance < 100) {
@@ -310,7 +311,7 @@ function LobbyPage() {
       await fetch(`/api/games/${gameId}/join`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ walletAddress })
+        body: JSON.stringify({ playerId })
       });
       setSelectedGameId(gameId);
     } catch (e) {

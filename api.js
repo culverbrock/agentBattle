@@ -10,6 +10,8 @@ app.use(cors());
 // Use '/api' prefix for all API routes
 const router = express.Router();
 
+const leaderboardHandler = require('./api/leaderboard');
+
 /**
  * @route POST /games
  * @desc Create a new game
@@ -155,6 +157,8 @@ router.get('/games/lobby', async (req, res) => {
     res.status(500).json({ error: 'Internal server error' });
   }
 });
+
+router.get('/leaderboard', leaderboardHandler);
 
 app.use('/api', router);
 

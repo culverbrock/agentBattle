@@ -33,6 +33,15 @@ function getOnlinePlayerIds(gameId) {
   return Array.from(gamePlayersMap.get(gameId) || []);
 }
 
+function broadcastGameRoomState(gameId, state) {
+  if (!wss) return;
+  wss.clients.forEach((client) => {
+    if (client.readyState === WebSocket.OPEN && client.gameId === gameId) {
+      client.send(JSON.stringify({ type: 'state_update', data: state }));
+    }
+  });
+}
+
 function startGameRoomWebSocketServer(server) {
   wss = new WebSocket.Server({ noServer: true });
   server.on('upgrade', (request, socket, head) => {
@@ -109,4 +118,9 @@ function startGameRoomWebSocketServer(server) {
   });
 }
 
-module.exports = { startGameRoomWebSocketServer, broadcastGameEvent, getOnlinePlayerIds }; 
+module.exports = {
+  startGameRoomWebSocketServer,
+  broadcastGameRoomState,
+  broadcastGameEvent,
+  getOnlinePlayerIds,
+}; 

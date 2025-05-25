@@ -4,7 +4,7 @@ const { saveGameState, loadGameState } = require('../gameStatePersistence');
 const createGameStateMachine = require('../gameStateMachine');
 const { v4: uuidv4 } = require('uuid');
 const pool = require('../database');
-const { broadcastGameEvent } = require('../gameRoomWebSocketServer');
+const { broadcastGameEvent, broadcastGameRoomState } = require('../gameRoomWebSocketServer');
 const agentInvoker = require('../agentInvoker');
 const eventLogger = require('../eventLogger');
 
@@ -209,6 +209,7 @@ router.post('/:gameId/start', async (req, res) => {
   // Agent-driven phase progression
   newContext = await agentPhaseHandler(gameId, newContext);
   await saveGameState(gameId, newContext);
+  broadcastGameRoomState(gameId, newContext);
   machines[gameId] = machine.withContext(newContext);
   broadcastGameEvent(gameId, { type: 'state_update', data: newContext });
   res.json({ gameId, state: newContext });
@@ -379,6 +380,7 @@ router.post('/:gameId/ready', async (req, res) => {
   const machine = createGameStateMachine(state);
   const nextState = machine.transition(machine.initialState, { type: 'PLAYER_READY', playerId, strategy });
   await saveGameState(gameId, nextState.context);
+  broadcastGameRoomState(gameId, nextState.context);
   machines[gameId] = machine.withContext(nextState.context);
   broadcastGameEvent(gameId, { type: 'state_update', data: nextState.context });
   res.json({ gameId, state: nextState.context });

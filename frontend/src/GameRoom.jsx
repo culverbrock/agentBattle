@@ -291,12 +291,10 @@ function GameRoom() {
         <div style={{ marginTop: 16 }}>
           {error && <div style={{ color: 'red', marginBottom: 8 }}>{error}</div>}
           {phase === 'strategy' && (
-            <form onSubmit={submitStrategy} style={{ display: 'flex', gap: 8 }}>
-              <input type="text" value={actionInput} onChange={e => setActionInput(e.target.value)} placeholder="Your strategy..." style={{ flex: 1, padding: 8 }} />
-              <button type="submit" style={{ padding: '8px 16px' }}>Submit Strategy</button>
-            </form>
+            <div style={{ margin: '24px 0', padding: 16, background: '#f5f5f5', borderRadius: 8 }}>
+              <b>Strategies are locked in from the lobby. Waiting for agents to act...</b>
+            </div>
           )}
-          {/* All other phases: just display agent actions, no forms */}
           {phase === 'negotiation' && (
             <div style={{ color: '#888' }}>Agents are negotiating...</div>
           )}

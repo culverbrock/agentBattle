@@ -5,6 +5,7 @@ const { startLobbyWebSocketServer, broadcastLobbyState } = require('./lobbyWebSo
 const cors = require('cors');
 const { ethers } = require('ethers');
 const solanaWeb3 = require('@solana/web3.js');
+const nacl = require('tweetnacl');
 const app = express();
 app.use(express.json());
 app.use(cors());
@@ -240,7 +241,7 @@ router.post('/game-state/:gameId/ready', async (req, res) => {
       const pubkey = new solanaWeb3.PublicKey(playerId);
       const msgUint8 = new TextEncoder().encode(message);
       const sigUint8 = Buffer.from(signature, 'base64');
-      valid = solanaWeb3.SignaturePubkeyPair.verify(pubkey, msgUint8, sigUint8);
+      valid = nacl.sign.detached.verify(msgUint8, sigUint8, pubkey.toBytes());
     } catch (e) {
       return res.status(401).json({ error: 'Invalid SOL signature' });
     }

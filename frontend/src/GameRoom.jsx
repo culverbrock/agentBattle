@@ -226,6 +226,11 @@ function GameRoom() {
   return (
     <div style={{ maxWidth: 800, margin: '2rem auto', fontFamily: 'sans-serif', padding: 16 }}>
       <button onClick={() => navigate('/')} style={{ marginBottom: 16, padding: '8px 16px', background: '#eee', border: 'none', borderRadius: 4, cursor: 'pointer' }}>← Leave Room</button>
+      {/* Debug panel for raw game state */}
+      <div style={{ background: '#f5f5f5', border: '1px solid #ccc', borderRadius: 8, padding: 12, marginBottom: 16, fontSize: 13 }}>
+        <div><strong>Debug: Raw gameState</strong></div>
+        <pre style={{ fontSize: 12, margin: 0, background: 'none', border: 'none' }}>{JSON.stringify(gameState, null, 2)}</pre>
+      </div>
       <h1>Game Room: {gameId}</h1>
       <div>Status: {wsConnected ? '🟢 Connected' : '🔴 Disconnected'}</div>
       <div style={{ margin: '16px 0', padding: 16, background: '#f5f5f5', borderRadius: 8 }}>

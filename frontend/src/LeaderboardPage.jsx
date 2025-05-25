@@ -6,10 +6,12 @@ function LeaderboardPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
+  const API_URL = import.meta.env.VITE_API_URL || '';
+
   useEffect(() => {
     setLoading(true);
     setError('');
-    fetch('/api/leaderboard')
+    fetch(`${API_URL}/api/leaderboard`)
       .then(res => res.json())
       .then(json => {
         if (Array.isArray(json)) {

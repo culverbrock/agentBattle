@@ -17,6 +17,7 @@ const ERC20_ABI = [
 const SPL_MINT_ADDRESS = '7iJY63ffm5Q7QC6mxb6v3QECMv2Ss4E5UcMmmdaMfFCb';
 const SPL_DECIMALS = 6;
 const SOL_DEVNET_URL = 'https://api.devnet.solana.com';
+const API_URL = import.meta.env.VITE_API_URL || '';
 
 // Utility to safely stringify objects with BigInt values
 function safeStringify(obj) {
@@ -50,7 +51,7 @@ function LobbyPage() {
 
   // Fetch lobby state (for polling fallback)
   const fetchLobby = () => {
-    fetch('/api/games/lobby')
+    fetch(`${API_URL}/api/games/lobby`)
       .then(res => res.json())
       .then(data => setGames(data.games || []));
   };
@@ -153,7 +154,7 @@ function LobbyPage() {
     setClaimError('');
     setClaimSuccess(false);
     try {
-      const res = await fetch('/api/claim-abt', {
+      const res = await fetch(`${API_URL}/api/claim-abt`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ address: walletAddress })
@@ -259,7 +260,7 @@ function LobbyPage() {
     setClaimSplError('');
     setClaimSplSuccess(false);
     try {
-      const res = await fetch('/api/claim-spl', {
+      const res = await fetch(`${API_URL}/api/claim-spl`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ address: phantomAddress })
@@ -283,7 +284,7 @@ function LobbyPage() {
   const handleCreateGame = async (e) => {
     e && e.preventDefault();
     if (!newGameName) return;
-    await fetch('/api/games', {
+    await fetch(`${API_URL}/api/games`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ name: newGameName })
@@ -308,7 +309,7 @@ function LobbyPage() {
       }
 
       // Proceed with joining the game
-      await fetch(`/api/games/${gameId}/join`, {
+      await fetch(`${API_URL}/api/games/${gameId}/join`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ playerId })

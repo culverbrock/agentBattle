@@ -27,7 +27,14 @@ async function fetchLobbyState() {
 }
 
 function startLobbyWebSocketServer(server) {
-  wss = new WebSocket.Server({ server });
+  wss = new WebSocket.Server({ noServer: true });
+  server.on('upgrade', (request, socket, head) => {
+    if (request.url === '/ws/lobby') {
+      wss.handleUpgrade(request, socket, head, (ws) => {
+        wss.emit('connection', ws, request);
+      });
+    }
+  });
   wss.on('connection', (ws) => {
     // Send initial lobby state
     fetchLobbyState().then((lobbyState) => {

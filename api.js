@@ -2,8 +2,13 @@ const express = require('express');
 const { v4: uuidv4 } = require('uuid');
 const pool = require('./database');
 const { startLobbyWebSocketServer, broadcastLobbyState } = require('./lobbyWebSocketServer');
+const cors = require('cors');
 const app = express();
 app.use(express.json());
+app.use(cors());
+
+// Use '/api' prefix for all API routes
+const router = express.Router();
 
 /**
  * @route POST /games
@@ -11,7 +16,7 @@ app.use(express.json());
  * @body { name: string }
  * @returns { id, name, status, created_at, updated_at }
  */
-app.post('/games', async (req, res) => {
+router.post('/games', async (req, res) => {
   const { name } = req.body;
   if (!name) {
     return res.status(400).json({ error: 'Game name is required' });
@@ -33,7 +38,7 @@ app.post('/games', async (req, res) => {
  * @route POST /games/:gameId/join
  * @desc Join a game
  */
-app.post('/games/:gameId/join', async (req, res) => {
+router.post('/games/:gameId/join', async (req, res) => {
   const { playerId } = req.body;
   const { gameId } = req.params;
   if (!playerId) {
@@ -64,7 +69,7 @@ app.post('/games/:gameId/join', async (req, res) => {
  * @route POST /games/:gameId/proposals
  * @desc Submit a proposal
  */
-app.post('/games/:gameId/proposals', (req, res) => {
+router.post('/games/:gameId/proposals', (req, res) => {
   // TODO: Implement proposal submission
   res.status(501).json({ message: 'Not implemented' });
 });
@@ -73,7 +78,7 @@ app.post('/games/:gameId/proposals', (req, res) => {
  * @route POST /games/:gameId/votes
  * @desc Submit a vote
  */
-app.post('/games/:gameId/votes', (req, res) => {
+router.post('/games/:gameId/votes', (req, res) => {
   // TODO: Implement voting
   res.status(501).json({ message: 'Not implemented' });
 });
@@ -82,7 +87,7 @@ app.post('/games/:gameId/votes', (req, res) => {
  * @route GET /games/:gameId
  * @desc Fetch game state
  */
-app.get('/games/:gameId', (req, res) => {
+router.get('/games/:gameId', (req, res) => {
   // TODO: Implement fetch game state
   res.status(501).json({ message: 'Not implemented' });
 });
@@ -91,7 +96,7 @@ app.get('/games/:gameId', (req, res) => {
  * @route GET /games/:gameId/players
  * @desc Fetch players in a game
  */
-app.get('/games/:gameId/players', (req, res) => {
+router.get('/games/:gameId/players', (req, res) => {
   // TODO: Implement fetch players
   res.status(501).json({ message: 'Not implemented' });
 });
@@ -100,7 +105,7 @@ app.get('/games/:gameId/players', (req, res) => {
  * @route GET /games/:gameId/proposals
  * @desc Fetch proposals for a game
  */
-app.get('/games/:gameId/proposals', (req, res) => {
+router.get('/games/:gameId/proposals', (req, res) => {
   // TODO: Implement fetch proposals
   res.status(501).json({ message: 'Not implemented' });
 });
@@ -109,7 +114,7 @@ app.get('/games/:gameId/proposals', (req, res) => {
  * @route POST /games/:gameId/leave
  * @desc Leave a game
  */
-app.post('/games/:gameId/leave', async (req, res) => {
+router.post('/games/:gameId/leave', async (req, res) => {
   const { playerId } = req.body;
   const { gameId } = req.params;
   if (!playerId) {
@@ -135,7 +140,7 @@ app.post('/games/:gameId/leave', async (req, res) => {
  * @route GET /games/lobby
  * @desc Fetch current lobby state: open games and their players
  */
-app.get('/games/lobby', async (req, res) => {
+router.get('/games/lobby', async (req, res) => {
   try {
     const gamesQ = `SELECT id, name FROM games WHERE status = 'lobby'`;
     const { rows: games } = await pool.query(gamesQ);
@@ -150,6 +155,8 @@ app.get('/games/lobby', async (req, res) => {
     res.status(500).json({ error: 'Internal server error' });
   }
 });
+
+app.use('/api', router);
 
 const PORT = process.env.PORT || 3000;
 const server = app.listen(PORT, () => {

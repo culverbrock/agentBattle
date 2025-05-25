@@ -32,6 +32,13 @@ router.get('/:gameId', async (req, res) => {
   const { gameId } = req.params;
   const state = await loadGameState(gameId);
   if (!state) return res.status(404).json({ error: 'Game not found' });
+  // Add 'ready' property to each player
+  if (state.players && state.strategyMessages) {
+    state.players = state.players.map(p => ({
+      ...p,
+      ready: !!state.strategyMessages[p.id]
+    }));
+  }
   res.json({ gameId, state });
 });
 

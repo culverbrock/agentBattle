@@ -1,14 +1,12 @@
-require("dotenv").config();
-require("@nomiclabs/hardhat-ethers");
-
-const PRIVATE_KEY = process.env.PRIVATE_KEY;
+require('@nomiclabs/hardhat-ethers');
+require('dotenv').config();
 
 module.exports = {
-  solidity: "0.8.20",
+  solidity: '0.8.20',
   networks: {
     sepolia: {
-      url: "https://eth-sepolia.g.alchemy.com/v2/UabqS2_hIwk2H0b6cdVsPeAHY5JWQneI",
-      accounts: PRIVATE_KEY ? [PRIVATE_KEY] : []
+      url: process.env.SEPOLIA_RPC_URL,
+      accounts: [process.env.DEPLOYER_PRIVATE_KEY]
     }
   }
 }; 

@@ -3,6 +3,7 @@ import { BrowserProvider, Contract, formatUnits } from 'ethers';
 import { Connection as SolConnection, PublicKey } from '@solana/web3.js';
 import { getAssociatedTokenAddress, getAccount, TOKEN_PROGRAM_ID } from '@solana/spl-token';
 import { Buffer } from 'buffer';
+import { ethers } from 'ethers';
 window.Buffer = Buffer;
 
 const WS_URL = import.meta.env.VITE_WS_URL || 'ws://localhost:3000';
@@ -18,6 +19,8 @@ const SPL_MINT_ADDRESS = '7iJY63ffm5Q7QC6mxb6v3QECMv2Ss4E5UcMmmdaMfFCb';
 const SPL_DECIMALS = 6;
 const SOL_DEVNET_URL = 'https://api.devnet.solana.com';
 const API_URL = import.meta.env.VITE_API_URL || '';
+const PRIZE_POOL_CA = import.meta.env.VITE_PRIZE_POOL_CA || '0x94Aba2204C686f41a1fC7dd5DBaA56172844593a';
+const SOL_PRIZE_POOL_TOKEN_ACCOUNT = import.meta.env.VITE_SOL_PRIZE_POOL_TOKEN_ACCOUNT || 'AhKmoZR7KHQzUYpV9WEAR8FBLi4SxXAAcMSfYTPnH4he';
 
 // Utility to safely stringify objects with BigInt values
 function safeStringify(obj) {
@@ -297,26 +300,56 @@ function LobbyPage() {
   const handleJoinGame = async (gameId) => {
     const playerId = walletType === 'phantom' ? phantomAddress : walletAddress;
     if (!gameId || !playerId) return;
+    setClaimError('');
     try {
-      // Require the user to send 100 ABT or 100 SPL to the prize pool contract before joining
-      if (walletType === 'metamask' && abtBalance && abtBalance < 100) {
-        setClaimError('You must have at least 100 ABT to join the game');
+      let txHashOrSig = '';
+      if (walletType === 'metamask') {
+        // Prompt for 100 ABT transfer to prize pool contract
+        const provider = new ethers.BrowserProvider(window.ethereum);
+        const signer = await provider.getSigner();
+        const abt = new ethers.Contract(ABT_ADDRESS, ["function transfer(address,uint256) returns (bool)"], signer);
+        const amount = ethers.parseUnits('100', ABT_DECIMALS);
+        const tx = await abt.transfer(PRIZE_POOL_CA, amount);
+        setClaimError('Waiting for ABT transaction confirmation...');
+        const receipt = await tx.wait();
+        if (!receipt.status) throw new Error('Transaction failed');
+        txHashOrSig = tx.hash;
+      } else if (walletType === 'phantom') {
+        // Prompt for 100 SPL transfer to prize pool token account
+        if (!window.solana) throw new Error('Phantom not found');
+        const connection = new SolConnection(SOL_DEVNET_URL, 'confirmed');
+        const fromPubkey = new PublicKey(phantomAddress);
+        const toPubkey = new PublicKey(SOL_PRIZE_POOL_TOKEN_ACCOUNT);
+        const mint = new PublicKey(SPL_MINT_ADDRESS);
+        const ata = await getAssociatedTokenAddress(mint, fromPubkey);
+        const { Transaction, SystemProgram } = await import('@solana/web3.js');
+        const { createTransferInstruction } = await import('@solana/spl-token');
+        const amount = 100 * 10 ** SPL_DECIMALS;
+        const ix = createTransferInstruction(ata, toPubkey, fromPubkey, amount, [], TOKEN_PROGRAM_ID);
+        const tx = new Transaction().add(ix);
+        tx.feePayer = fromPubkey;
+        tx.recentBlockhash = (await connection.getLatestBlockhash()).blockhash;
+        const signed = await window.solana.signTransaction(tx);
+        const sig = await connection.sendRawTransaction(signed.serialize());
+        setClaimError('Waiting for SPL transaction confirmation...');
+        await connection.confirmTransaction(sig, 'confirmed');
+        txHashOrSig = sig;
+      } else {
+        setClaimError('Connect MetaMask or Phantom to join');
         return;
       }
-      if (walletType === 'phantom' && splBalance && splBalance < 100) {
-        setClaimError('You must have at least 100 SPL to join the game');
-        return;
-      }
-
-      // Proceed with joining the game
-      await fetch(`${API_URL}/api/games/${gameId}/join`, {
+      // Proceed with joining the game, sending txHash or txSignature
+      const res = await fetch(`${API_URL}/api/games/${gameId}/join`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ playerId })
+        body: JSON.stringify({ playerId, tx: txHashOrSig, chain: walletType === 'metamask' ? 'eth' : 'sol' })
       });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Failed to join');
       setSelectedGameId(gameId);
+      setClaimError('');
     } catch (e) {
-      setClaimError('Failed to join the game');
+      setClaimError(e.message || 'Failed to join the game');
     }
   };
 

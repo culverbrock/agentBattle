@@ -1,0 +1,47 @@
+# On-Chain Entrance Fee & Prize Pool Plan
+
+## 1. Prize Pool Setup
+
+### Ethereum (Sepolia, ABT ERC-20)
+- [x] Deploy a new smart contract to act as the prize pool (simple contract that can receive ABT and later distribute to winners)
+- [x] Fund/deploy a wallet or use a multisig as the prize pool address
+- [x] Record the contract address (CA) and wallet address for use in frontend/backend
+  - Contract address: 0x94Aba2204C686f41a1fC7dd5DBaA56172844593a
+
+### Solana (Devnet, SPL Token)
+- [x] Create a new Solana wallet to act as the prize pool
+- [x] Create an associated token account for the SPL mint (if not already)
+- [x] Record the wallet address for use in frontend/backend
+  - Wallet address: 6y1zGrQnVwGpkBF9KttimW9skiG5yfnXWso3XCEvEury
+  - Token account: AhKmoZR7KHQzUYpV9WEAR8FBLi4SxXAAcMSfYTPnH4he
+
+## 2. Frontend Integration
+- [ ] When user clicks Join, prompt wallet to send 100 ABT (MetaMask) or 100 SPL (Phantom) to the prize pool address
+- [ ] Only allow join if the transaction is confirmed on-chain
+- [ ] Show error if user cancels or transaction fails
+
+## 3. Backend Integration
+- [ ] Store a record of each entrance fee payment (tx hash, playerId, amount, chain)
+- [ ] Only add player to game if payment is confirmed
+- [ ] Prize pool can be distributed to winners at game end (future step)
+
+## 4. What You Need to Create
+- [x] Prize pool contract (Ethereum, Sepolia)
+- [x] Prize pool wallet (Solana, Devnet)
+- [x] Update frontend with these addresses
+- [x] Update backend to verify payment before joining
+
+---
+
+## Checklist: After Creating Addresses
+- [x] Paste Ethereum prize pool contract address here: 0x94Aba2204C686f41a1fC7dd5DBaA56172844593a
+- [x] Paste Solana prize pool wallet/token account address here: 6y1zGrQnVwGpkBF9KttimW9skiG5yfnXWso3XCEvEury / AhKmoZR7KHQzUYpV9WEAR8FBLi4SxXAAcMSfYTPnH4he
+- [x] Update frontend and backend configs with these addresses
+- [x] Notify the assistant to wire up the on-chain entrance fee logic
+
+## References
+- ABT ERC-20 contract address (already deployed): 0x799b7b7cC889449952283CF23a15956920E7f85B
+- SPL mint address (already deployed): 7iJY63ffm5Q7QC6mxb6v3QECMv2Ss4E5UcMmmdaMfFCb
+- Prize pool contract address (ETH): 0x94Aba2204C686f41a1fC7dd5DBaA56172844593a
+- Prize pool wallet address (SOL): 6y1zGrQnVwGpkBF9KttimW9skiG5yfnXWso3XCEvEury
+- Prize pool token account (SOL): AhKmoZR7KHQzUYpV9WEAR8FBLi4SxXAAcMSfYTPnH4he 

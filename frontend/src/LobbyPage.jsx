@@ -450,6 +450,11 @@ function LobbyPage() {
     fetchSplBalance();
   }, [walletType, walletAddress, phantomAddress]);
 
+  // Placeholder for entering the game room
+  const handleEnterRoom = (gameId) => {
+    alert(`Entering game room for game ${gameId} (not yet implemented)`);
+  };
+
   return (
     <div style={{ maxWidth: 800, margin: '2rem auto', fontFamily: 'sans-serif', padding: 16, position: 'relative' }}>
       {/* Leaderboard Link */}
@@ -502,6 +507,15 @@ function LobbyPage() {
             >
               {isAlreadyJoined(game) ? 'Joined' : 'Join'}
             </button>
+            {/* Show Enter Room/Play Game button if already joined */}
+            {isAlreadyJoined(game) && (
+              <button
+                onClick={() => handleEnterRoom(game.id)}
+                style={{ width: '100%', padding: 8, background: '#28a745', color: '#fff', border: 'none', borderRadius: 4, cursor: 'pointer', marginBottom: 8 }}
+              >
+                Enter Room
+              </button>
+            )}
             <button
               onClick={() => setExpandedGameId(expandedGameId === game.id ? null : game.id)}
               style={{ width: '100%', padding: 4, background: '#eee', border: 'none', borderRadius: 4, cursor: 'pointer' }}

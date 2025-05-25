@@ -516,8 +516,8 @@ function LobbyPage() {
             <div style={{ margin: '8px 0' }}>Players: {game.players.length} / 10</div>
             <button
               onClick={() => handleJoinGame(game.id)}
-              disabled={!isJoinable(game) || !walletAddress || isAlreadyJoined(game)}
-              style={{ width: '100%', padding: 8, background: isJoinable(game) && walletAddress && !isAlreadyJoined(game) ? '#007bff' : '#ccc', color: '#fff', border: 'none', borderRadius: 4, cursor: isJoinable(game) && walletAddress && !isAlreadyJoined(game) ? 'pointer' : 'not-allowed', marginBottom: 8 }}
+              disabled={!isJoinable(game) || (!walletAddress && !phantomAddress) || isAlreadyJoined(game)}
+              style={{ width: '100%', padding: 8, background: isJoinable(game) && (walletAddress || phantomAddress) && !isAlreadyJoined(game) ? '#007bff' : '#ccc', color: '#fff', border: 'none', borderRadius: 4, cursor: isJoinable(game) && (walletAddress || phantomAddress) && !isAlreadyJoined(game) ? 'pointer' : 'not-allowed', marginBottom: 8 }}
             >
               {isAlreadyJoined(game) ? 'Joined' : 'Join'}
             </button>

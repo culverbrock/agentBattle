@@ -366,6 +366,12 @@ function LobbyPage() {
     return (!game.status || game.status === 'lobby');
   };
 
+  // Helper to check if the connected wallet is already a player in the game
+  const isAlreadyJoined = (game) => {
+    const playerId = walletType === 'phantom' ? phantomAddress : walletAddress;
+    return game.players.some(player => player.id === playerId);
+  };
+
   // Wallet display (now returns more info)
   const walletInfoDisplay = () => {
     if (walletType === 'metamask' && walletAddress) {
@@ -491,10 +497,10 @@ function LobbyPage() {
             <div style={{ margin: '8px 0' }}>Players: {game.players.length} / 10</div>
             <button
               onClick={() => handleJoinGame(game.id)}
-              disabled={!isJoinable(game) || !walletAddress}
-              style={{ width: '100%', padding: 8, background: isJoinable(game) && walletAddress ? '#007bff' : '#ccc', color: '#fff', border: 'none', borderRadius: 4, cursor: isJoinable(game) && walletAddress ? 'pointer' : 'not-allowed', marginBottom: 8 }}
+              disabled={!isJoinable(game) || !walletAddress || isAlreadyJoined(game)}
+              style={{ width: '100%', padding: 8, background: isJoinable(game) && walletAddress && !isAlreadyJoined(game) ? '#007bff' : '#ccc', color: '#fff', border: 'none', borderRadius: 4, cursor: isJoinable(game) && walletAddress && !isAlreadyJoined(game) ? 'pointer' : 'not-allowed', marginBottom: 8 }}
             >
-              Join
+              {isAlreadyJoined(game) ? 'Joined' : 'Join'}
             </button>
             <button
               onClick={() => setExpandedGameId(expandedGameId === game.id ? null : game.id)}

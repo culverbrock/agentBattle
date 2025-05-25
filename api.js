@@ -16,6 +16,8 @@ const leaderboardHandler = require('./api/leaderboard');
 const gameStateRouter = require('./api/gameState');
 const { startGameRoomWebSocketServer } = require('./gameRoomWebSocketServer');
 const { saveGameState, loadGameState } = require('./gameStatePersistence');
+const claimSplHandler = require('./api/claim-spl');
+const claimAbtHandler = require('./api/claim-abt');
 
 /**
  * @route POST /games
@@ -251,6 +253,9 @@ router.post('/game-state/:gameId/ready', async (req, res) => {
   // ... existing ready logic ...
   // (rest of the endpoint unchanged)
 });
+
+router.post('/claim-spl', claimSplHandler);
+router.post('/claim-abt', claimAbtHandler);
 
 app.use('/api', router);
 app.use('/api/game-state', gameStateRouter);

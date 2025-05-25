@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useNavigate } from 'react-router-dom';
 
 const API_URL = import.meta.env.VITE_API_URL || '';
 const WS_URL = API_URL.replace(/^http/, 'ws') + '/game-room';
@@ -33,6 +33,7 @@ function GameRoom() {
   const [onlinePlayerIds, setOnlinePlayerIds] = useState([]);
   const [strategyInput, setStrategyInput] = useState('');
   const [isReady, setIsReady] = useState(false);
+  const navigate = useNavigate();
 
   // Fetch initial state and messages
   useEffect(() => {
@@ -215,6 +216,7 @@ function GameRoom() {
 
   return (
     <div style={{ maxWidth: 800, margin: '2rem auto', fontFamily: 'sans-serif', padding: 16 }}>
+      <button onClick={() => navigate('/')} style={{ marginBottom: 16, padding: '8px 16px', background: '#eee', border: 'none', borderRadius: 4, cursor: 'pointer' }}>← Leave Room</button>
       <h1>Game Room: {gameId}</h1>
       <div>Status: {wsConnected ? '🟢 Connected' : '🔴 Disconnected'}</div>
       <div style={{ margin: '16px 0', padding: 16, background: '#f5f5f5', borderRadius: 8 }}>

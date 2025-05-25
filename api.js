@@ -13,6 +13,7 @@ const router = express.Router();
 const leaderboardHandler = require('./api/leaderboard');
 const gameStateRouter = require('./api/gameState');
 const { startGameRoomWebSocketServer } = require('./gameRoomWebSocketServer');
+const { saveGameState, loadGameState } = require('./gameStatePersistence');
 
 /**
  * @route POST /games
@@ -60,6 +61,15 @@ router.post('/games/:gameId/join', async (req, res) => {
     const query = `INSERT INTO players (id, name, status, game_id) VALUES ($1, $2, 'connected', $3)
       ON CONFLICT (id) DO UPDATE SET name = $2, status = 'connected', game_id = $3 RETURNING *`;
     const { rows } = await pool.query(query, [playerId, playerId, gameId]);
+    // Fetch all players for this game
+    const playersQ = `SELECT id, name, status FROM players WHERE game_id = $1`;
+    const { rows: players } = await pool.query(playersQ, [gameId]);
+    // Update and persist game state
+    let state = await loadGameState(gameId);
+    if (state) {
+      state.players = players;
+      await saveGameState(gameId, state);
+    }
     res.status(200).json(rows[0]);
     // Broadcast lobby state after player joins
     broadcastLobbyState();

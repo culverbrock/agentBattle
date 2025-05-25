@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
+import { ethers } from 'ethers';
 
 const API_URL = import.meta.env.VITE_API_URL || '';
 const WS_URL = API_URL.replace(/^http/, 'ws') + '/game-room';
@@ -196,10 +197,30 @@ function GameRoom() {
   };
   const markReady = async () => {
     if (!strategyInput.trim()) return;
+    let playerId = window.localStorage.getItem('playerId');
+    let walletType = '';
+    let signature = '';
+    let message = `Ready for game: ${gameId}`;
+    if (window.ethereum && playerId && playerId.startsWith('0x')) {
+      walletType = 'eth';
+      // MetaMask signature
+      const provider = new ethers.BrowserProvider(window.ethereum);
+      const signer = await provider.getSigner();
+      signature = await signer.signMessage(message);
+    } else if (window.solana && playerId && playerId.length > 32) {
+      walletType = 'sol';
+      // Phantom signature
+      const encodedMessage = new TextEncoder().encode(message);
+      const signed = await window.solana.signMessage(encodedMessage, 'utf8');
+      signature = signed.signature ? Buffer.from(signed.signature).toString('base64') : '';
+    } else {
+      setError('No wallet connected or unknown wallet type');
+      return;
+    }
     await fetch(`${API_URL}/api/game-state/${gameId}/ready`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ playerId, strategy: strategyInput })
+      body: JSON.stringify({ playerId, strategy: strategyInput, message, signature, walletType })
     });
     setIsReady(true);
   };

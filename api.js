@@ -69,6 +69,24 @@ router.post('/games/:gameId/join', async (req, res) => {
     if (state) {
       state.players = players;
       await saveGameState(gameId, state);
+    } else {
+      // Create initial game state if missing
+      state = {
+        phase: 'lobby',
+        round: 0,
+        maxRounds: 10,
+        players: players,
+        eliminated: [],
+        proposals: [],
+        votes: {},
+        speakingOrder: [],
+        currentSpeakerIdx: 0,
+        strategyMessages: {},
+        gameId: gameId,
+        winnerProposal: null,
+        ended: false
+      };
+      await saveGameState(gameId, state);
     }
     res.status(200).json(rows[0]);
     // Broadcast lobby state after player joins

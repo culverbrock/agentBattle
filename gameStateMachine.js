@@ -271,4 +271,20 @@ function createGameStateMachine(initialContext) {
   });
 }
 
+function transitionToNextPhase(game) {
+  console.log('transitionToNextPhase called. Current phase:', game.phase);
+  // ... existing code ...
+  console.log('Next phase:', game.phase);
+}
+
+async function invokeAgentAction(agent, context) {
+  console.log('invokeAgentAction called for agent:', agent, 'with context:', context);
+  try {
+    // ... existing code ...
+  } catch (err) {
+    console.error('Error in invokeAgentAction:', err.stack || err);
+    // ... existing code ...
+  }
+}
+
 module.exports = createGameStateMachine; 

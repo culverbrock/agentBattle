@@ -1,6 +1,7 @@
 const pool = require('./database');
 
 async function saveGameState(gameId, state) {
+  console.log('saveGameState called:', { gameId, state });
   await pool.query(
     `INSERT INTO game_states (game_id, state, updated_at)
      VALUES ($1, $2, NOW())
@@ -10,6 +11,7 @@ async function saveGameState(gameId, state) {
 }
 
 async function loadGameState(gameId) {
+  console.log('loadGameState called:', { gameId });
   const { rows } = await pool.query(
     `SELECT state FROM game_states WHERE game_id = $1`,
     [gameId]

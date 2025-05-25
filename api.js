@@ -145,18 +145,21 @@ router.post('/games/:gameId/leave', async (req, res) => {
  * @desc Fetch current lobby state: open games and their players
  */
 router.get('/games/lobby', async (req, res) => {
+  console.log('--- /api/games/lobby called ---');
   try {
     const gamesQ = `SELECT id, name FROM games WHERE status = 'lobby'`;
     const { rows: games } = await pool.query(gamesQ);
+    console.log('Lobby games:', games);
     for (const game of games) {
       const playersQ = `SELECT id, name, status FROM players WHERE game_id = $1`;
       const { rows: players } = await pool.query(playersQ, [game.id]);
       game.players = players;
+      console.log(`Players for game ${game.id}:`, players);
     }
     res.status(200).json({ games });
   } catch (err) {
-    console.error('Error fetching lobby state:', err);
-    res.status(500).json({ error: 'Internal server error' });
+    console.error('Error fetching lobby state:', err.stack || err);
+    res.status(500).json({ error: 'Internal server error', details: err.message });
   }
 });
 

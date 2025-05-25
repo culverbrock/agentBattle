@@ -355,6 +355,18 @@ function LobbyPage() {
     }
   };
 
+  // Delete game
+  const handleDeleteGame = async (gameId) => {
+    if (!window.confirm('Are you sure you want to delete this game?')) return;
+    try {
+      const res = await fetch(`${API_URL}/api/games/${gameId}`, { method: 'DELETE' });
+      if (!res.ok) throw new Error('Failed to delete game');
+      fetchLobby(); // Refresh lobby list
+    } catch (e) {
+      alert(e.message || 'Failed to delete game');
+    }
+  };
+
   // Status badge helper
   const getStatusBadge = (game) => {
     if (game.status === 'lobby' || !game.status) return <span style={{color: 'green', fontWeight: 'bold'}}>Open</span>;
@@ -524,6 +536,12 @@ function LobbyPage() {
                 View History
               </Link>
             )}
+            <button
+              onClick={() => handleDeleteGame(game.id)}
+              style={{ width: '100%', padding: 8, background: '#dc3545', color: '#fff', border: 'none', borderRadius: 4, cursor: 'pointer', marginTop: 4 }}
+            >
+              Delete
+            </button>
             <button
               onClick={() => setExpandedGameId(expandedGameId === game.id ? null : game.id)}
               style={{ width: '100%', padding: 4, background: '#eee', border: 'none', borderRadius: 4, cursor: 'pointer' }}

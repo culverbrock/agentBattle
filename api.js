@@ -163,6 +163,30 @@ router.get('/games/lobby', async (req, res) => {
   }
 });
 
+/**
+ * @route DELETE /games/:gameId
+ * @desc Delete a game and all associated data
+ */
+router.delete('/games/:gameId', async (req, res) => {
+  const { gameId } = req.params;
+  try {
+    // Delete all associated data (order matters due to FKs)
+    await pool.query('DELETE FROM players WHERE game_id = $1', [gameId]);
+    await pool.query('DELETE FROM proposals WHERE game_id = $1', [gameId]);
+    await pool.query('DELETE FROM votes WHERE game_id = $1', [gameId]);
+    await pool.query('DELETE FROM messages WHERE game_id = $1', [gameId]);
+    await pool.query('DELETE FROM strategies WHERE game_id = $1', [gameId]);
+    await pool.query('DELETE FROM transactions WHERE game_id = $1', [gameId]);
+    await pool.query('DELETE FROM game_states WHERE game_id = $1', [gameId]);
+    await pool.query('DELETE FROM games WHERE id = $1', [gameId]);
+    res.status(200).json({ success: true });
+    broadcastLobbyState();
+  } catch (err) {
+    console.error('Error deleting game:', err);
+    res.status(500).json({ error: 'Failed to delete game' });
+  }
+});
+
 router.get('/leaderboard', leaderboardHandler);
 
 app.use('/api', router);

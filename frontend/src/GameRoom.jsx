@@ -252,6 +252,23 @@ function GameRoom() {
         <div><strong>Debug: Raw gameState</strong></div>
         <pre style={{ fontSize: 12, margin: 0, background: 'none', border: 'none' }}>{JSON.stringify(gameState, null, 2)}</pre>
       </div>
+      {gameState?.strategyMessages && (
+        <div style={{ background: '#e9f7ef', border: '1px solid #b2dfdb', borderRadius: 8, padding: 12, marginBottom: 16 }}>
+          <b>Strategy Panel:</b>
+          <ul style={{ margin: 0, paddingLeft: 20 }}>
+            {players.map(p => (
+              <li key={p.id}>
+                <span style={{ fontWeight: p.id === playerId ? 'bold' : undefined }}>
+                  {p.name || p.id}{p.id === playerId ? ' (You)' : ''}:
+                </span>
+                <span style={{ marginLeft: 8, color: '#007bff' }}>
+                  {gameState.strategyMessages?.[p.id] || <i>No strategy submitted</i>}
+                </span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
       <h1>Game Room: {gameId}</h1>
       <div>Status: {wsConnected ? '🟢 Connected' : '🔴 Disconnected'}</div>
       <div style={{ margin: '16px 0', padding: 16, background: '#f5f5f5', borderRadius: 8 }}>
@@ -290,11 +307,6 @@ function GameRoom() {
         {/* Phase-specific actions */}
         <div style={{ marginTop: 16 }}>
           {error && <div style={{ color: 'red', marginBottom: 8 }}>{error}</div>}
-          {phase === 'strategy' && (
-            <div style={{ margin: '24px 0', padding: 16, background: '#f5f5f5', borderRadius: 8 }}>
-              <b>Strategies are locked in from the lobby. Waiting for agents to act...</b>
-            </div>
-          )}
           {phase === 'negotiation' && (
             <div style={{ color: '#888' }}>Agents are negotiating...</div>
           )}

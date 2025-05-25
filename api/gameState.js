@@ -200,11 +200,14 @@ router.post('/:gameId/start', async (req, res) => {
   let state = await loadGameState(gameId);
   if (!state) return res.status(404).json({ error: 'Game not found' });
   const machine = createGameStateMachine(state);
-  const nextState = machine.transition(machine.initialState, { type: 'START_GAME' });
+  let nextState = machine.transition(machine.initialState, { type: 'START_GAME' });
   let newContext = nextState.context;
   // If entering strategy phase, auto-submit for disconnected
   if (newContext.phase === 'strategy') {
     newContext = await autoSubmitDefaultStrategies(gameId, newContext);
+    // Immediately transition to the next phase (e.g., negotiation)
+    const afterStrategy = createGameStateMachine(newContext).transition(createGameStateMachine(newContext).initialState, { type: 'CONTINUE' });
+    newContext = afterStrategy.context;
   }
   // Agent-driven phase progression
   newContext = await agentPhaseHandler(gameId, newContext);

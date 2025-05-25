@@ -3,6 +3,8 @@ const { v4: uuidv4 } = require('uuid');
 const pool = require('./database');
 const { startLobbyWebSocketServer, broadcastLobbyState } = require('./lobbyWebSocketServer');
 const cors = require('cors');
+const { ethers } = require('ethers');
+const solanaWeb3 = require('@solana/web3.js');
 const app = express();
 app.use(express.json());
 app.use(cors());
@@ -216,6 +218,39 @@ router.delete('/games/:gameId', async (req, res) => {
 });
 
 router.get('/leaderboard', leaderboardHandler);
+
+router.post('/game-state/:gameId/ready', async (req, res) => {
+  const { gameId } = req.params;
+  const { playerId, strategy, message, signature, walletType } = req.body;
+  if (!playerId || !strategy || !message || !signature || !walletType) {
+    return res.status(400).json({ error: 'Missing required fields' });
+  }
+  let valid = false;
+  if (walletType === 'eth') {
+    try {
+      const recovered = ethers.utils.verifyMessage(message, signature);
+      valid = (recovered.toLowerCase() === playerId.toLowerCase());
+    } catch (e) {
+      return res.status(401).json({ error: 'Invalid ETH signature' });
+    }
+  } else if (walletType === 'sol') {
+    try {
+      const pubkey = new solanaWeb3.PublicKey(playerId);
+      const msgUint8 = new TextEncoder().encode(message);
+      const sigUint8 = Buffer.from(signature, 'base64');
+      valid = solanaWeb3.SignaturePubkeyPair.verify(pubkey, msgUint8, sigUint8);
+    } catch (e) {
+      return res.status(401).json({ error: 'Invalid SOL signature' });
+    }
+  } else {
+    return res.status(400).json({ error: 'Unknown wallet type' });
+  }
+  if (!valid) {
+    return res.status(401).json({ error: 'Signature does not match playerId' });
+  }
+  // ... existing ready logic ...
+  // (rest of the endpoint unchanged)
+});
 
 app.use('/api', router);
 app.use('/api/game-state', gameStateRouter);

@@ -108,6 +108,7 @@ function LobbyPage() {
         const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
         setWalletAddress(accounts[0]);
         setWalletType('metamask');
+        localStorage.setItem('playerId', accounts[0]);
       } catch (err) {
         alert('Wallet connection failed');
       }
@@ -123,6 +124,7 @@ function LobbyPage() {
         const resp = await window.solana.connect();
         setPhantomAddress(resp.publicKey.toString());
         setWalletType('phantom');
+        localStorage.setItem('playerId', resp.publicKey.toString());
       } catch (err) {
         alert('Phantom connection failed');
       }

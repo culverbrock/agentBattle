@@ -30,6 +30,18 @@ function safeStringify(obj) {
   );
 }
 
+// Helper to get the MetaMask provider (not Phantom)
+function getMetaMaskProvider() {
+  if (window.ethereum && window.ethereum.isMetaMask) {
+    return window.ethereum;
+  }
+  // If multiple providers, try to find MetaMask
+  if (window.ethereum?.providers) {
+    return window.ethereum.providers.find((p) => p.isMetaMask) || null;
+  }
+  return null;
+}
+
 function LobbyPage() {
   const [games, setGames] = useState([]);
   const [walletAddress, setWalletAddress] = useState('');
@@ -103,9 +115,10 @@ function LobbyPage() {
 
   // MetaMask wallet connect
   const connectWallet = async () => {
-    if (window.ethereum) {
+    const provider = getMetaMaskProvider();
+    if (provider) {
       try {
-        const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+        const accounts = await provider.request({ method: 'eth_requestAccounts' });
         setWalletAddress(accounts[0]);
         setWalletType('metamask');
         localStorage.setItem('playerId', accounts[0]);

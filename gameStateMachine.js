@@ -21,6 +21,23 @@ const player = new PlayerState('player1');
 // player.startHeartbeat();
 
 /**
+ * Enhanced Game State Machine for Agent Battle
+ * Phases: lobby -> strategy -> negotiation (5x) -> proposal -> voting -> elimination/endgame
+ * Handles: random speaking order, proposal/voting, elimination, endgame, player disconnects, etc.
+ */
+function shuffle(array) {
+  // Fisher-Yates shuffle
+  let m = array.length, t, i;
+  while (m) {
+    i = Math.floor(Math.random() * m--);
+    t = array[m];
+    array[m] = array[i];
+    array[i] = t;
+  }
+  return array;
+}
+
+/**
  * Factory to create a game state machine with optional initial context.
  * @param {object} [initialContext]
  * @returns {StateMachine}
@@ -30,155 +47,225 @@ function createGameStateMachine(initialContext) {
     id: 'game',
     initial: 'lobby',
     context: initialContext || {
+      phase: 'lobby',
       round: 0,
-      players: [player] // Add players to the context
+      maxRounds: 10,
+      players: [], // Each player: { id, name, status, ready, agent }
+      eliminated: [],
+      proposals: [],
+      votes: {},
+      speakingOrder: [],
+      currentSpeakerIdx: 0,
+      strategyMessages: {},
+      gameId: null,
+      winnerProposal: null,
+      ended: false
     },
     states: {
       lobby: {
         on: {
-          START_GAME: {
-            target: 'activeGame',
-            actions: [
-              initializeRound,
-              async (context) => {
-                if (context.gameId) {
-                  await eventLogger.logEvent({
-                    gameId: context.gameId,
-                    type: 'state_transition',
-                    content: 'Transitioned from lobby to activeGame'
-                  });
+          PLAYER_READY: {
+            actions: assign((ctx, event) => {
+              // Mark player as ready and store their strategy
+              const updatedPlayers = ctx.players.map(p =>
+                p.id === event.playerId
+                  ? { ...p, ready: true, agent: { strategy: event.strategy || 'default', type: 'default' } }
+                  : p
+              );
+              return {
+                players: updatedPlayers,
+                strategyMessages: {
+                  ...ctx.strategyMessages,
+                  [event.playerId]: event.strategy || 'default'
                 }
-              }
-            ]
+              };
+            })
           },
-          /**
-           * Handle player join event: update DB via PlayerManager.
-           */
+          START_GAME: [
+            {
+              target: 'strategy',
+              cond: (ctx) => ctx.players.length >= 2 && ctx.players.every(p => p.ready),
+              actions: assign({
+                phase: 'strategy',
+                round: 1,
+                proposals: [],
+                votes: {},
+                eliminated: [],
+                winnerProposal: null,
+                ended: false
+              })
+            }
+          ],
           PLAYER_JOIN: {
-            actions: async (context, event) => {
-              if (event.playerId && event.name) {
-                const PlayerManager = require('./playerManager');
-                PlayerManager.joinPlayer(event.playerId, event.name, context.gameId)
-                  .then(async (player) => {
-                    console.log('Player joined and persisted to DB:', player);
-                    if (context.gameId) {
-                      await eventLogger.logEvent({
-                        gameId: context.gameId,
-                        playerId: event.playerId,
-                        type: 'player_join',
-                        content: `Player ${event.playerId} (${event.name}) joined.`
-                      });
-                    }
-                  })
-                  .catch(err => {
-                    console.error('Failed to persist player join to DB:', err);
-                  });
+            actions: assign((ctx, event) => {
+              // Add player if not already present
+              if (!ctx.players.some(p => p.id === event.playerId)) {
+                return {
+                  players: [
+                    ...ctx.players,
+                    { id: event.playerId, name: event.name, status: 'connected', ready: false, agent: { strategy: 'default', type: 'default' } }
+                  ]
+                };
               }
-            }
+              return {};
+            })
           },
-          /**
-           * Handle player leave event: update DB via PlayerManager.
-           */
           PLAYER_LEAVE: {
-            actions: async (context, event) => {
-              if (event.playerId) {
-                const PlayerManager = require('./playerManager');
-                PlayerManager.leavePlayer(event.playerId)
-                  .then(async (player) => {
-                    console.log('Player left and updated in DB:', player);
-                    if (context.gameId) {
-                      await eventLogger.logEvent({
-                        gameId: context.gameId,
-                        playerId: event.playerId,
-                        type: 'player_leave',
-                        content: `Player ${event.playerId} left.`
-                      });
-                    }
-                  })
-                  .catch(err => {
-                    console.error('Failed to persist player leave to DB:', err);
-                  });
-              }
-            }
+            actions: assign((ctx, event) => {
+              // Mark player as disconnected
+              return {
+                players: ctx.players.map(p =>
+                  p.id === event.playerId ? { ...p, status: 'disconnected' } : p
+                )
+              };
+            })
           }
         }
       },
-      activeGame: {
+      strategy: {
         on: {
-          SUBMIT_PROPOSAL: {
-            target: 'proposal',
-            actions: [
-              /**
-               * Log proposal submission for each player and persist to DB.
-               * @param {object} context
-               * @param {object} event - Should have { proposal, playerId }
-               */
-              async (context, event) => {
-                context.players.forEach(player => player.logProposalSubmission(event.proposal));
-                // Persist proposal to DB
-                if (event.proposal && event.playerId) {
-                  ProposalManager.createProposal({
-                    gameId: context.gameId || null,
-                    playerId: event.playerId,
-                    content: event.proposal
-                  })
-                    .then(async (dbProposal) => {
-                      console.log('Proposal persisted to DB:', dbProposal);
-                      if (context.gameId) {
-                        await eventLogger.logEvent({
-                          gameId: context.gameId,
-                          playerId: event.playerId,
-                          type: 'proposal',
-                          content: `Player ${event.playerId} submitted proposal: ${event.proposal}`
-                        });
-                      }
-                    })
-                    .catch((err) => {
-                      console.error('Failed to persist proposal to DB:', err);
-                    });
+          SUBMIT_STRATEGY: {
+            actions: assign((ctx, event) => {
+              // Store strategy message for player
+              return {
+                strategyMessages: {
+                  ...ctx.strategyMessages,
+                  [event.playerId]: event.message
                 }
+              };
+            })
+          },
+          ALL_STRATEGIES_SUBMITTED: {
+            target: 'negotiation',
+            actions: assign((ctx) => {
+              // Randomize speaking order for negotiation
+              const order = shuffle(ctx.players.filter(p => !ctx.eliminated.includes(p.id)));
+              return {
+                phase: 'negotiation',
+                speakingOrder: order.map(p => p.id),
+                currentSpeakerIdx: 0
+              };
+            })
+          }
+        }
+      },
+      negotiation: {
+        on: {
+          SPEAK: {
+            actions: assign((ctx, event) => {
+              // Log message, advance speaker
+              // (Store messages as needed)
+              let nextIdx = ctx.currentSpeakerIdx + 1;
+              let nextState = {};
+              if (nextIdx >= ctx.speakingOrder.length) {
+                // End of round
+                if (ctx.round < 5) {
+                  // Next negotiation round
+                  nextState = {
+                    round: ctx.round + 1,
+                    currentSpeakerIdx: 0,
+                    speakingOrder: shuffle(ctx.players.filter(p => !ctx.eliminated.includes(p.id))).map(p => p.id)
+                  };
+                } else {
+                  // Move to proposal phase
+                  nextState = { phase: 'proposal', currentSpeakerIdx: 0 };
+                }
+              } else {
+                nextState = { currentSpeakerIdx: nextIdx };
               }
-            ]
+              return nextState;
+            })
           }
         }
       },
       proposal: {
         on: {
-          VOTE: {
+          SUBMIT_PROPOSAL: {
+            actions: assign((ctx, event) => {
+              // Add proposal to list
+              return {
+                proposals: [...ctx.proposals, event.proposal]
+              };
+            })
+          },
+          ALL_PROPOSALS_SUBMITTED: {
             target: 'voting',
-            actions: async (context, event) => {
-              context.players.forEach(player => player.logVote(event.vote));
-              if (context.gameId && event.playerId && event.vote) {
-                await eventLogger.logEvent({
-                  gameId: context.gameId,
-                  playerId: event.playerId,
-                  type: 'vote',
-                  content: `Player ${event.playerId} voted: ${event.vote}`
-                });
-              }
-            }
+            actions: assign({ phase: 'voting' })
           }
         }
       },
       voting: {
         on: {
-          END_VOTING: {
-            target: 'lobby',
-            actions: [
-              incrementRound,
-              (context) => logRoundCompletion(context.round),
-              async (context) => {
-                if (context.gameId) {
-                  await eventLogger.logEvent({
-                    gameId: context.gameId,
-                    type: 'state_transition',
-                    content: 'Transitioned from voting to lobby'
-                  });
+          SUBMIT_VOTE: {
+            actions: assign((ctx, event) => {
+              // Store votes per player
+              return {
+                votes: {
+                  ...ctx.votes,
+                  [event.playerId]: event.votes
                 }
-              }
-            ]
-          }
+              };
+            })
+          },
+          ALL_VOTES_SUBMITTED: [
+            {
+              target: 'endgame',
+              cond: (ctx) => {
+                // Check if any proposal has >= 61% of votes
+                const totalVotes = Object.values(ctx.votes).reduce((sum, v) => sum + Object.values(v).reduce((a, b) => a + b, 0), 0);
+                return ctx.proposals.some((proposal, idx) => {
+                  const proposalVotes = Object.values(ctx.votes).reduce((sum, v) => sum + (v[idx] || 0), 0);
+                  return proposalVotes / totalVotes >= 0.61;
+                });
+              },
+              actions: assign((ctx) => {
+                // Set winner proposal
+                const totalVotes = Object.values(ctx.votes).reduce((sum, v) => sum + Object.values(v).reduce((a, b) => a + b, 0), 0);
+                let winnerIdx = -1;
+                ctx.proposals.forEach((proposal, idx) => {
+                  const proposalVotes = Object.values(ctx.votes).reduce((sum, v) => sum + (v[idx] || 0), 0);
+                  if (proposalVotes / totalVotes >= 0.61) winnerIdx = idx;
+                });
+                return {
+                  winnerProposal: winnerIdx >= 0 ? ctx.proposals[winnerIdx] : null,
+                  ended: winnerIdx >= 0
+                };
+              })
+            },
+            {
+              target: 'elimination',
+              actions: assign({ phase: 'elimination' })
+            }
+          ]
         }
+      },
+      elimination: {
+        on: {
+          ELIMINATE: {
+            actions: assign((ctx, event) => {
+              // Eliminate players not in top 2, or handle tie logic
+              // (Implement tie-breaker and random selection as per rules)
+              // For now, just mark eliminated
+              return {
+                eliminated: event.eliminated
+              };
+            })
+          },
+          CONTINUE: [
+            {
+              target: 'strategy',
+              cond: (ctx) => ctx.round < ctx.maxRounds
+            },
+            {
+              target: 'endgame',
+              actions: assign({ ended: true })
+            }
+          ]
+        }
+      },
+      endgame: {
+        type: 'final',
+        entry: assign({ phase: 'endgame', ended: true })
       }
     }
   });

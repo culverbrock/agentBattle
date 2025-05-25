@@ -4,6 +4,7 @@ import { Connection as SolConnection, PublicKey } from '@solana/web3.js';
 import { getAssociatedTokenAddress, getAccount, TOKEN_PROGRAM_ID } from '@solana/spl-token';
 import { Buffer } from 'buffer';
 import { ethers } from 'ethers';
+import { useNavigate, Link } from 'react-router-dom';
 window.Buffer = Buffer;
 
 const WS_URL = import.meta.env.VITE_WS_URL || 'ws://localhost:3000';
@@ -51,6 +52,7 @@ function LobbyPage() {
   const [claimSplError, setClaimSplError] = useState('');
   const [claimSplSuccess, setClaimSplSuccess] = useState(false);
   const [splFetchError, setSplFetchError] = useState('');
+  const navigate = useNavigate();
 
   // Fetch lobby state (for polling fallback)
   const fetchLobby = () => {
@@ -452,7 +454,7 @@ function LobbyPage() {
 
   // Placeholder for entering the game room
   const handleEnterRoom = (gameId) => {
-    alert(`Entering game room for game ${gameId} (not yet implemented)`);
+    navigate(`/game/${gameId}`);
   };
 
   return (
@@ -515,6 +517,12 @@ function LobbyPage() {
               >
                 Enter Room
               </button>
+            )}
+            {/* Show View History button for completed games */}
+            {game.status && game.status !== 'lobby' && game.status !== 'in_progress' && (
+              <Link to={`/history/${game.id}`} style={{ display: 'block', width: '100%', padding: 8, background: '#007bff', color: '#fff', borderRadius: 4, textAlign: 'center', textDecoration: 'none', marginBottom: 8 }}>
+                View History
+              </Link>
             )}
             <button
               onClick={() => setExpandedGameId(expandedGameId === game.id ? null : game.id)}

@@ -11,6 +11,8 @@ app.use(cors());
 const router = express.Router();
 
 const leaderboardHandler = require('./api/leaderboard');
+const gameStateRouter = require('./api/gameState');
+const { startGameRoomWebSocketServer } = require('./gameRoomWebSocketServer');
 
 /**
  * @route POST /games
@@ -71,28 +73,28 @@ router.post('/games/:gameId/join', async (req, res) => {
  * @route POST /games/:gameId/proposals
  * @desc Submit a proposal
  */
-router.post('/games/:gameId/proposals', (req, res) => {
-  // TODO: Implement proposal submission
-  res.status(501).json({ message: 'Not implemented' });
-});
+// router.post('/games/:gameId/proposals', (req, res) => {
+//   // TODO: Implement proposal submission
+//   res.status(501).json({ message: 'Not implemented' });
+// });
 
 /**
  * @route POST /games/:gameId/votes
  * @desc Submit a vote
  */
-router.post('/games/:gameId/votes', (req, res) => {
-  // TODO: Implement voting
-  res.status(501).json({ message: 'Not implemented' });
-});
+// router.post('/games/:gameId/votes', (req, res) => {
+//   // TODO: Implement voting
+//   res.status(501).json({ message: 'Not implemented' });
+// });
 
 /**
  * @route GET /games/:gameId
  * @desc Fetch game state
  */
-router.get('/games/:gameId', (req, res) => {
-  // TODO: Implement fetch game state
-  res.status(501).json({ message: 'Not implemented' });
-});
+// router.get('/games/:gameId', (req, res) => {
+//   // TODO: Implement fetch game state
+//   res.status(501).json({ message: 'Not implemented' });
+// });
 
 /**
  * @route GET /games/:gameId/players
@@ -107,10 +109,10 @@ router.get('/games/:gameId/players', (req, res) => {
  * @route GET /games/:gameId/proposals
  * @desc Fetch proposals for a game
  */
-router.get('/games/:gameId/proposals', (req, res) => {
-  // TODO: Implement fetch proposals
-  res.status(501).json({ message: 'Not implemented' });
-});
+// router.get('/games/:gameId/proposals', (req, res) => {
+//   // TODO: Implement fetch proposals
+//   res.status(501).json({ message: 'Not implemented' });
+// });
 
 /**
  * @route POST /games/:gameId/leave
@@ -161,6 +163,7 @@ router.get('/games/lobby', async (req, res) => {
 router.get('/leaderboard', leaderboardHandler);
 
 app.use('/api', router);
+app.use('/api/game-state', gameStateRouter);
 
 const PORT = process.env.PORT || 3000;
 const server = app.listen(PORT, () => {
@@ -169,5 +172,7 @@ const server = app.listen(PORT, () => {
 
 // Start the WebSocket server for lobby updates
 startLobbyWebSocketServer(server);
+// Start the WebSocket server for game room updates
+startGameRoomWebSocketServer(server);
 
 // TODO: After implementing join/leave, call broadcastLobbyState() after those actions as well. 

@@ -39,11 +39,16 @@ function GameRoom() {
   useEffect(() => {
     fetch(`${API_URL}/api/game-state/${gameId}`)
       .then(res => res.json())
-      .then(data => setGameState(data.state));
+      .then(data => {
+        setGameState(data.state);
+        // Set isReady if this player is marked ready in backend
+        const me = data.state?.players?.find(p => p.id === playerId);
+        setIsReady(!!me?.ready);
+      });
     fetch(`${API_URL}/api/game-state/${gameId}/messages`)
       .then(res => res.json())
       .then(setMessages);
-  }, [gameId]);
+  }, [gameId, playerId]);
 
   // WebSocket connection
   useEffect(() => {
@@ -57,10 +62,14 @@ function GameRoom() {
       const msg = JSON.parse(event.data);
       if (msg.type === 'state_update' || msg.type === 'end') {
         setGameState(msg.data);
+        const me = msg.data?.players?.find(p => p.id === playerId);
+        setIsReady(!!me?.ready);
       } else if (msg.type === 'message') {
         setMessages(prev => [...prev, msg.data]);
       } else if (msg.type === 'proposal' || msg.type === 'vote' || msg.type === 'elimination') {
         setGameState(msg.data.state);
+        const me = msg.data.state?.players?.find(p => p.id === playerId);
+        setIsReady(!!me?.ready);
       } else if (msg.type === 'presence') {
         setOnlinePlayerIds(msg.data.playerIds);
       }

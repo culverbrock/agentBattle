@@ -260,8 +260,19 @@ router.post('/game-state/:gameId/ready', async (req, res) => {
       console.log('[READY] Signature does not match playerId');
       return res.status(401).json({ error: 'Signature does not match playerId' });
     }
-    // ... existing ready logic ...
-    // (rest of the endpoint unchanged)
+    // --- Mark player as ready and broadcast update ---
+    const { saveGameState, loadGameState } = require('./gameStatePersistence');
+    const createGameStateMachine = require('./gameStateMachine');
+    const { broadcastGameRoomState, broadcastGameEvent } = require('./gameRoomWebSocketServer');
+    // Load current state
+    let state = await loadGameState(gameId);
+    if (!state) return res.status(404).json({ error: 'Game not found' });
+    const machine = createGameStateMachine(state);
+    const nextState = machine.transition(machine.initialState, { type: 'PLAYER_READY', playerId, strategy });
+    await saveGameState(gameId, nextState.context);
+    broadcastGameRoomState(gameId, nextState.context);
+    broadcastGameEvent(gameId, { type: 'state_update', data: nextState.context });
+    res.json({ gameId, state: nextState.context });
   } catch (err) {
     console.error('[READY] Unexpected error:', err);
     return res.status(500).json({ error: 'Internal server error' });

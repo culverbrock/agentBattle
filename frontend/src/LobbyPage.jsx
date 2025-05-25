@@ -495,6 +495,22 @@ function LobbyPage() {
       {/* Wallet/Personal Info Section */}
       <div style={{ marginBottom: 24 }}>
         {walletInfoDisplay()}
+        {/* Disconnect Wallet button if connected */}
+        {walletType && (
+          <button
+            type="button"
+            onClick={async () => {
+              window.localStorage.removeItem('playerId');
+              if (window.solana && window.solana.isPhantom) {
+                try { await window.solana.disconnect(); } catch {}
+              }
+              window.location.reload();
+            }}
+            style={{ marginRight: 8, padding: '6px 12px', background: '#dc3545', color: '#fff', border: 'none', borderRadius: 4 }}
+          >
+            Disconnect Wallet
+          </button>
+        )}
         {/* Wallet connect buttons if not connected */}
         {!walletType && (
           <div>

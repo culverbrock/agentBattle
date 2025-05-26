@@ -87,11 +87,13 @@ function GameRoom() {
     const ws = new WebSocket(WS_URL);
     wsRef.current = ws;
     ws.onopen = () => {
+      console.log('[WebSocket] Connected');
       setWsConnected(true);
       ws.send(JSON.stringify({ type: 'subscribe', gameId, playerId }));
     };
     ws.onmessage = (event) => {
       const msg = JSON.parse(event.data);
+      console.log('[WebSocket] Message received:', msg);
       if (msg.type === 'state_update' || msg.type === 'end') {
         setGameState(msg.data);
         // Always update isReady from the latest gameState
@@ -107,7 +109,10 @@ function GameRoom() {
         setOnlinePlayerIds(msg.data.playerIds);
       }
     };
-    ws.onclose = () => setWsConnected(false);
+    ws.onclose = () => {
+      console.log('[WebSocket] Disconnected');
+      setWsConnected(false);
+    };
     return () => ws.close();
   }, [gameId, playerId]);
 

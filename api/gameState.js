@@ -100,8 +100,14 @@ async function agentPhaseHandler(gameId, state) {
     const players = context.players.filter(p => !context.eliminated.includes(p.id));
     let idx = context.currentSpeakerIdx || 0;
     while (idx < context.speakingOrder.length) {
+      // Guard: break if phase is no longer negotiation
+      if (context.phase !== 'negotiation') {
+        console.log(`[AGENT] Breaking negotiation loop: phase is now ${context.phase}`);
+        break;
+      }
       const playerId = context.speakingOrder[idx];
       const player = players.find(p => p.id === playerId);
+      console.log(`[AGENT] Negotiation phase, idx=${idx}, playerId=${playerId}, phase=${context.phase}`);
       if (player) {
         const agent = player.agent || { strategy: 'default', type: 'default' };
         let message;
@@ -223,6 +229,11 @@ router.post('/:gameId/start', async (req, res) => {
         speakingOrder: order.map(p => p.id),
         currentSpeakerIdx: 0
       };
+      // Immediately save and broadcast negotiation state
+      await saveGameState(gameId, newContext);
+      broadcastGameRoomState(gameId, newContext);
+      machines[gameId] = createGameStateMachine(newContext);
+      broadcastGameEvent(gameId, { type: 'state_update', data: newContext });
     }
   }
   console.log(`[START_GAME] Before agentPhaseHandler, phase: ${newContext.phase}`);

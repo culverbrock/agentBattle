@@ -215,16 +215,19 @@ router.post('/:gameId/start', async (req, res) => {
     // If all players have a strategy, immediately transition to negotiation
     const allHaveStrategy = (newContext.players || []).every(p => newContext.strategyMessages && newContext.strategyMessages[p.id]);
     if (allHaveStrategy) {
-      console.log('[START_GAME] All strategies present, skipping to negotiation');
-      const afterStrategy = createGameStateMachine(newContext).transition(createGameStateMachine(newContext).initialState, { type: 'ALL_STRATEGIES_SUBMITTED' });
-      newContext = afterStrategy.context;
-      console.log(`[START_GAME] After ALL_STRATEGIES_SUBMITTED, phase: ${newContext.phase}`);
-    } else {
-      console.log('[START_GAME] Waiting in strategy phase for missing strategies');
+      // Move directly to negotiation phase
+      const order = (newContext.players || []).filter(p => !(newContext.eliminated || []).includes(p.id));
+      newContext = {
+        ...newContext,
+        phase: 'negotiation',
+        speakingOrder: order.map(p => p.id),
+        currentSpeakerIdx: 0
+      };
     }
   }
-  // Agent-driven phase progression
+  console.log(`[START_GAME] Before agentPhaseHandler, phase: ${newContext.phase}`);
   newContext = await agentPhaseHandler(gameId, newContext);
+  console.log(`[START_GAME] After agentPhaseHandler, phase: ${newContext.phase}`);
   await saveGameState(gameId, newContext);
   broadcastGameRoomState(gameId, newContext);
   machines[gameId] = machine.withContext(newContext);

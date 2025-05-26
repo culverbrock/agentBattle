@@ -19,6 +19,22 @@ function phaseInstruction(phase, isMyTurn) {
   }
 }
 
+// Helper to get the MetaMask provider (not Phantom)
+function getMetaMaskProvider() {
+  // EIP-5749: Multiple injected providers
+  if (window.ethereum?.providers) {
+    // Prefer MetaMask that is NOT Phantom
+    return window.ethereum.providers.find(
+      (p) => p.isMetaMask && !p.isPhantom
+    ) || null;
+  }
+  // Single provider fallback
+  if (window.ethereum && window.ethereum.isMetaMask && !window.ethereum.isPhantom) {
+    return window.ethereum;
+  }
+  return null;
+}
+
 function GameRoom() {
   const { gameId } = useParams();
   const [gameState, setGameState] = useState(null);
@@ -35,6 +51,21 @@ function GameRoom() {
   const [strategyInput, setStrategyInput] = useState('');
   const [isReady, setIsReady] = useState(false);
   const navigate = useNavigate();
+  const [walletAddress, setWalletAddress] = useState(() => {
+    const id = window.localStorage.getItem('playerId');
+    return id && id.startsWith('0x') ? id : '';
+  });
+  const [phantomAddress, setPhantomAddress] = useState(() => {
+    const id = window.localStorage.getItem('playerId');
+    return id && !id.startsWith('0x') ? id : '';
+  });
+  const [walletType, setWalletType] = useState(() => {
+    const id = window.localStorage.getItem('playerId');
+    if (!id) return '';
+    if (id.startsWith('0x')) return 'metamask';
+    if (id.length > 32) return 'phantom';
+    return '';
+  });
 
   // Fetch initial state and messages
   useEffect(() => {
@@ -228,6 +259,53 @@ function GameRoom() {
     await fetch(`${API_URL}/api/game-state/${gameId}/start`, { method: 'POST' });
   };
 
+  // MetaMask wallet connect
+  const connectWallet = async () => {
+    const provider = getMetaMaskProvider();
+    if (provider) {
+      try {
+        const accounts = await provider.request({ method: 'eth_requestAccounts' });
+        setWalletAddress(accounts[0]);
+        setWalletType('metamask');
+        setPhantomAddress('');
+        localStorage.setItem('playerId', accounts[0]);
+      } catch (err) {
+        alert('Wallet connection failed');
+      }
+    } else {
+      alert('MetaMask not detected. Please install MetaMask.');
+    }
+  };
+
+  // Phantom wallet connect
+  const connectPhantom = async () => {
+    if (window.solana && window.solana.isPhantom) {
+      try {
+        const resp = await window.solana.connect();
+        setPhantomAddress(resp.publicKey.toString());
+        setWalletType('phantom');
+        setWalletAddress('');
+        localStorage.setItem('playerId', resp.publicKey.toString());
+      } catch (err) {
+        alert('Phantom connection failed');
+      }
+    } else {
+      alert('Phantom not detected. Please install Phantom Wallet.');
+    }
+  };
+
+  // Disconnect wallet
+  const disconnectWallet = async () => {
+    window.localStorage.removeItem('playerId');
+    setWalletAddress('');
+    setPhantomAddress('');
+    setWalletType('');
+    if (window.solana && window.solana.isPhantom) {
+      try { await window.solana.disconnect(); } catch {}
+    }
+    window.location.reload();
+  };
+
   // Helpers
   const phase = gameState?.phase;
   const round = gameState?.round;
@@ -247,6 +325,30 @@ function GameRoom() {
   return (
     <div style={{ maxWidth: 800, margin: '2rem auto', fontFamily: 'sans-serif', padding: 16 }}>
       <button onClick={() => navigate('/')} style={{ marginBottom: 16, padding: '8px 16px', background: '#eee', border: 'none', borderRadius: 4, cursor: 'pointer' }}>← Leave Room</button>
+      {/* Wallet connect/disconnect UI */}
+      <div style={{ marginBottom: 16 }}>
+        {walletType === 'metamask' && walletAddress && (
+          <span style={{ color: '#007bff', fontWeight: 'bold', marginRight: 8 }}>MetaMask: {walletAddress.slice(0, 6)}...{walletAddress.slice(-4)}</span>
+        )}
+        {walletType === 'phantom' && phantomAddress && (
+          <span style={{ color: '#8e44ad', fontWeight: 'bold', marginRight: 8 }}>Phantom: {phantomAddress.slice(0, 6)}...{phantomAddress.slice(-4)}</span>
+        )}
+        {walletType && (
+          <button
+            type="button"
+            onClick={disconnectWallet}
+            style={{ marginRight: 8, padding: '6px 12px', background: '#dc3545', color: '#fff', border: 'none', borderRadius: 4 }}
+          >
+            Disconnect Wallet
+          </button>
+        )}
+        {!walletType && (
+          <>
+            <button type="button" onClick={connectWallet} style={{ marginRight: 8, padding: '6px 12px', background: '#f6851b', color: '#fff', border: 'none', borderRadius: 4 }}>Connect MetaMask</button>
+            <button type="button" onClick={connectPhantom} style={{ marginRight: 8, padding: '6px 12px', background: '#8e44ad', color: '#fff', border: 'none', borderRadius: 4 }}>Connect Phantom</button>
+          </>
+        )}
+      </div>
       {/* Debug panel for raw game state */}
       <div style={{ background: '#f5f5f5', border: '1px solid #ccc', borderRadius: 8, padding: 12, marginBottom: 16, fontSize: 13 }}>
         <div><strong>Debug: Raw gameState</strong></div>

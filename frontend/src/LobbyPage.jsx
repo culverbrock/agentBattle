@@ -491,36 +491,80 @@ function LobbyPage() {
   return (
     <div style={{ minHeight: '100vh', background: '#f7f9fb' }}>
       {/* Header Bar */}
-      <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '24px 40px 16px 40px', background: '#fff', boxShadow: '0 2px 8px rgba(0,0,0,0.04)', borderBottom: '1px solid #eee' }}>
-        <div style={{ fontSize: 32, fontWeight: 800, color: '#222', letterSpacing: 1 }}>Agent Battle Lobby</div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 24 }}>
+      <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', padding: '24px 40px 16px 40px', background: '#fff', boxShadow: '0 2px 8px rgba(0,0,0,0.04)', borderBottom: '1px solid #eee' }}>
+        <div style={{ fontSize: 32, fontWeight: 800, color: '#222', letterSpacing: 1, marginRight: 48, marginTop: 6 }}>Agent Battle Lobby</div>
+        <div style={{ display: 'flex', alignItems: 'flex-start', gap: 32 }}>
           {/* Wallet Info & Connect/Disconnect */}
-          <div>
-            {walletInfoDisplay()}
-            {walletType && (
-              <button
-                type="button"
-                onClick={async () => {
-                  window.localStorage.removeItem('playerId');
-                  if (window.solana && window.solana.isPhantom) {
-                    try { await window.solana.disconnect(); } catch {}
-                  }
-                  window.location.reload();
-                }}
-                style={{ marginRight: 8, padding: '6px 12px', background: '#dc3545', color: '#fff', border: 'none', borderRadius: 4 }}
-              >
-                Disconnect Wallet
-              </button>
-            )}
-            {!walletType && (
-              <>
-                <button type="button" onClick={connectWallet} style={{ marginRight: 8, padding: '6px 12px', background: '#f6851b', color: '#fff', border: 'none', borderRadius: 4 }}>Connect MetaMask</button>
-                <button type="button" onClick={connectPhantom} style={{ marginRight: 8, padding: '6px 12px', background: '#8e44ad', color: '#fff', border: 'none', borderRadius: 4 }}>Connect Phantom</button>
-              </>
-            )}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+            {/* Wallet Info Card */}
+            <div style={{ background: '#f3f6fa', borderRadius: 12, padding: '12px 18px', minWidth: 180, boxShadow: '0 1px 4px rgba(0,0,0,0.03)', marginRight: 8, display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
+              {walletType === 'metamask' && walletAddress && (
+                <>
+                  <div style={{ color: '#007bff', fontWeight: 700, fontSize: 16, marginBottom: 2 }}>MetaMask: <span style={{ fontFamily: 'monospace', fontWeight: 500 }}>{walletAddress.slice(0, 6)}...{walletAddress.slice(-4)}</span></div>
+                  <div style={{ color: '#007bff', fontWeight: 600, fontSize: 15, marginBottom: 2 }}>ABT: <span style={{ fontFamily: 'monospace' }}>{abtBalance !== null ? abtBalance : '...'}</span></div>
+                  <div style={{ color: '#333', fontWeight: 500, fontSize: 14, marginBottom: 2 }}>Network: <span style={{ fontFamily: 'monospace' }}>{network.name || 'Unknown'}</span> <span style={{ color: '#888', fontSize: 13 }}>(Chain ID: {network.chainId || 'N/A'})</span></div>
+                  {network.chainId !== 11155111 && network.chainId !== 0 && (
+                    <div style={{ color: '#fff', background: '#dc3545', borderRadius: 6, padding: '2px 8px', fontWeight: 600, fontSize: 13, margin: '4px 0 0 0' }}>Please switch to Sepolia to use ABT!</div>
+                  )}
+                  {abtBalance !== null && abtBalance >= 100 && (
+                    <div style={{ color: '#888', fontSize: 12, marginTop: 2 }}>You must have less than 100 ABT to claim (backend enforced).</div>
+                  )}
+                </>
+              )}
+              {walletType === 'phantom' && phantomAddress && (
+                <>
+                  <div style={{ color: '#8e44ad', fontWeight: 700, fontSize: 16, marginBottom: 2 }}>Phantom: <span style={{ fontFamily: 'monospace', fontWeight: 500 }}>{phantomAddress.slice(0, 6)}...{phantomAddress.slice(-4)}</span></div>
+                  <div style={{ color: '#8e44ad', fontWeight: 600, fontSize: 15, marginBottom: 2 }}>SPL: <span style={{ fontFamily: 'monospace' }}>{splBalance !== null ? splBalance : '...'}</span></div>
+                  {splBalance !== null && splBalance >= 100 && (
+                    <div style={{ color: '#888', fontSize: 12, marginTop: 2 }}>You must have less than 100 SPL to claim (backend enforced).</div>
+                  )}
+                </>
+              )}
+              {/* If not connected, show network info */}
+              {!walletType && window.ethereum && (
+                <div style={{ color: '#333', fontWeight: 500, fontSize: 14 }}>Network: {network.name || 'Unknown'} <span style={{ color: '#888', fontSize: 13 }}>(Chain ID: {network.chainId || 'N/A'})</span></div>
+              )}
+            </div>
+            {/* Wallet Buttons */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+              {walletType && (
+                <button
+                  type="button"
+                  onClick={async () => {
+                    window.localStorage.removeItem('playerId');
+                    if (window.solana && window.solana.isPhantom) {
+                      try { await window.solana.disconnect(); } catch {}
+                    }
+                    window.location.reload();
+                  }}
+                  style={{ padding: '6px 12px', background: '#dc3545', color: '#fff', border: 'none', borderRadius: 5, fontWeight: 600, fontSize: 15 }}
+                >
+                  Disconnect Wallet
+                </button>
+              )}
+              {!walletType && (
+                <>
+                  <button type="button" onClick={connectWallet} style={{ padding: '6px 12px', background: '#f6851b', color: '#fff', border: 'none', borderRadius: 5, fontWeight: 600, fontSize: 15 }}>Connect MetaMask</button>
+                  <button type="button" onClick={connectPhantom} style={{ padding: '6px 12px', background: '#8e44ad', color: '#fff', border: 'none', borderRadius: 5, fontWeight: 600, fontSize: 15 }}>Connect Phantom</button>
+                </>
+              )}
+              {/* Claim/Add buttons for MetaMask */}
+              {walletType === 'metamask' && walletAddress && (
+                <div style={{ display: 'flex', gap: 6, marginTop: 2 }}>
+                  <button type="button" onClick={addAbtToWallet} style={{ padding: '4px 10px', background: '#007bff', color: '#fff', border: 'none', borderRadius: 4, fontSize: 13 }}>Add ABT</button>
+                  <button type="button" onClick={claimAbt} style={{ padding: '4px 10px', background: '#28a745', color: '#fff', border: 'none', borderRadius: 4, fontSize: 13 }}>Claim ABT</button>
+                </div>
+              )}
+              {/* Claim button for Phantom */}
+              {walletType === 'phantom' && phantomAddress && (
+                <div style={{ display: 'flex', gap: 6, marginTop: 2 }}>
+                  <button type="button" onClick={claimSpl} style={{ padding: '4px 10px', background: '#8e44ad', color: '#fff', border: 'none', borderRadius: 4, fontSize: 13 }}>Claim SPL</button>
+                </div>
+              )}
+            </div>
           </div>
           {/* Leaderboard Link */}
-          <a href="/leaderboard" style={{ textDecoration: 'none', color: '#007bff', fontWeight: 'bold', fontSize: 20, marginLeft: 16 }}>🏆 Leaderboard</a>
+          <a href="/leaderboard" style={{ textDecoration: 'none', color: '#007bff', fontWeight: 'bold', fontSize: 20, marginLeft: 16, marginTop: 8 }}>🏆 Leaderboard</a>
         </div>
       </header>
       {/* Main Content */}

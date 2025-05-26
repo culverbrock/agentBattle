@@ -83,7 +83,7 @@ async function autoSpeakForDisconnectedAgent(gameId, state) {
   const agent = player.agent || { strategy: 'default', type: 'default' };
   const message = agentInvoker.generateNegotiationMessage(state, agent);
   let machine = createGameStateMachine(state);
-  const nextState = machine.transition(machine.initialState, { type: 'SPEAK', playerId: player.id, message });
+  const nextState = machine.transition(state, { type: 'SPEAK', playerId: player.id, message });
   machine = machine.withContext(nextState.context);
   await saveGameState(gameId, machine.context);
   broadcastGameEvent(gameId, { type: 'state_update', data: machine.context });
@@ -117,7 +117,7 @@ async function agentPhaseHandler(gameId, state) {
           console.error('Agent negotiation error:', err);
           message = `Agent (${agent.strategy || 'default'}): Let's cooperate for a fair split!`;
         }
-        const nextState = machine.transition(machine.initialState, { type: 'SPEAK', playerId, message });
+        const nextState = machine.transition(context, { type: 'SPEAK', playerId, message });
         await eventLogger.logEvent({ gameId, playerId, type: 'negotiation', content: message });
         machine = machine.withContext(nextState.context);
         context = nextState.context;
@@ -244,20 +244,6 @@ router.post('/:gameId/start', async (req, res) => {
   machines[gameId] = machine.withContext(newContext);
   broadcastGameEvent(gameId, { type: 'state_update', data: newContext });
   res.json({ gameId, state: newContext });
-});
-
-// Submit strategy
-router.post('/:gameId/strategy', async (req, res) => {
-  const { gameId } = req.params;
-  const { playerId, message } = req.body;
-  let state = await loadGameState(gameId);
-  if (!state) return res.status(404).json({ error: 'Game not found' });
-  const machine = createGameStateMachine(state);
-  const nextState = machine.transition(machine.initialState, { type: 'SUBMIT_STRATEGY', playerId, message });
-  await saveGameState(gameId, nextState.context);
-  machines[gameId] = machine.withContext(nextState.context);
-  broadcastGameEvent(gameId, { type: 'state_update', data: nextState.context });
-  res.json({ gameId, state: nextState.context });
 });
 
 // Speak (negotiation)

@@ -202,12 +202,20 @@ router.post('/:gameId/start', async (req, res) => {
   const machine = createGameStateMachine(state);
   let nextState = machine.transition(machine.initialState, { type: 'START_GAME' });
   let newContext = nextState.context;
+  console.log(`[START_GAME] After START_GAME event, phase: ${newContext.phase}`);
   // If entering strategy phase, auto-submit for disconnected
   if (newContext.phase === 'strategy') {
     newContext = await autoSubmitDefaultStrategies(gameId, newContext);
-    // Immediately transition to the next phase (e.g., negotiation)
-    const afterStrategy = createGameStateMachine(newContext).transition(createGameStateMachine(newContext).initialState, { type: 'CONTINUE' });
-    newContext = afterStrategy.context;
+    // If all players have a strategy, immediately transition to negotiation
+    const allHaveStrategy = (newContext.players || []).every(p => newContext.strategyMessages && newContext.strategyMessages[p.id]);
+    if (allHaveStrategy) {
+      console.log('[START_GAME] All strategies present, skipping to negotiation');
+      const afterStrategy = createGameStateMachine(newContext).transition(createGameStateMachine(newContext).initialState, { type: 'ALL_STRATEGIES_SUBMITTED' });
+      newContext = afterStrategy.context;
+      console.log(`[START_GAME] After ALL_STRATEGIES_SUBMITTED, phase: ${newContext.phase}`);
+    } else {
+      console.log('[START_GAME] Waiting in strategy phase for missing strategies');
+    }
   }
   // Agent-driven phase progression
   newContext = await agentPhaseHandler(gameId, newContext);

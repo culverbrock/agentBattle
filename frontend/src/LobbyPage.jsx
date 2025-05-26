@@ -489,130 +489,110 @@ function LobbyPage() {
   };
 
   return (
-    <div style={{ maxWidth: 800, margin: '2rem auto', fontFamily: 'sans-serif', padding: 16, position: 'relative' }}>
-      {/* Leaderboard Link */}
-      <div style={{ position: 'absolute', top: 16, right: 16 }}>
-        <a href="/leaderboard" style={{ textDecoration: 'none', color: '#007bff', fontWeight: 'bold', fontSize: 18 }}>🏆 Leaderboard</a>
-      </div>
-      {/* Debug Panel (hidden/removed) */}
-      {/*
-      <div style={{ background: '#f5f5f5', border: '1px solid #ccc', borderRadius: 8, padding: 12, marginBottom: 16, fontSize: 13 }}>
-        <div><strong>Debug Info</strong></div>
-        <div>window.ethereum detected: {typeof window !== 'undefined' && window.ethereum ? 'Yes' : 'No'}</div>
-        <div>walletType: {walletType || 'None'}</div>
-        <div>walletAddress: {walletAddress || 'None'}</div>
-        <div>phantomAddress: {phantomAddress || 'None'}</div>
-        <div>network: {safeStringify(network)}</div>
-        <div>ABT balance: {abtBalance !== null ? abtBalance : 'N/A'}</div>
-        <div>SPL fetch error: {splFetchError || 'None'}</div>
-        <div style={{ color: debug.networkError ? 'red' : '#888' }}>Network error: {debug.networkError || 'None'}</div>
-        <div style={{ color: debug.balanceError ? 'red' : '#888' }}>Balance error: {debug.balanceError || 'None'}</div>
-      </div>
-      */}
-      {/* Wallet/Personal Info Section */}
-      <div style={{ marginBottom: 24 }}>
-        {walletInfoDisplay()}
-        {/* Disconnect Wallet button if connected */}
-        {walletType && (
-          <button
-            type="button"
-            onClick={async () => {
-              window.localStorage.removeItem('playerId');
-              if (window.solana && window.solana.isPhantom) {
-                try { await window.solana.disconnect(); } catch {}
-              }
-              window.location.reload();
-            }}
-            style={{ marginRight: 8, padding: '6px 12px', background: '#dc3545', color: '#fff', border: 'none', borderRadius: 4 }}
-          >
-            Disconnect Wallet
-          </button>
-        )}
-        {/* Wallet connect buttons if not connected */}
-        {!walletType && (
+    <div style={{ minHeight: '100vh', background: '#f7f9fb' }}>
+      {/* Header Bar */}
+      <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '24px 40px 16px 40px', background: '#fff', boxShadow: '0 2px 8px rgba(0,0,0,0.04)', borderBottom: '1px solid #eee' }}>
+        <div style={{ fontSize: 32, fontWeight: 800, color: '#222', letterSpacing: 1 }}>Agent Battle Lobby</div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 24 }}>
+          {/* Wallet Info & Connect/Disconnect */}
           <div>
-            <button type="button" onClick={connectWallet} style={{ marginRight: 8, padding: '6px 12px', background: '#f6851b', color: '#fff', border: 'none', borderRadius: 4 }}>Connect MetaMask</button>
-            <button type="button" onClick={connectPhantom} style={{ marginRight: 8, padding: '6px 12px', background: '#8e44ad', color: '#fff', border: 'none', borderRadius: 4 }}>Connect Phantom</button>
-          </div>
-        )}
-      </div>
-      <h1>Agent Battle Lobby</h1>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
-        <button onClick={() => setShowCreateModal(true)} style={{ fontSize: 18, padding: '8px 16px' }}>+ Create Table</button>
-      </div>
-      {/* Game List */}
-      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 16 }}>
-        {games.map(game => (
-          <div key={game.id} style={{ border: '1px solid #ccc', borderRadius: 8, padding: 16, minWidth: 220, flex: '1 1 220px', background: '#fafafa', boxShadow: selectedGameId === game.id ? '0 0 8px #007bff' : 'none' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <div style={{ fontWeight: 'bold', fontSize: 18 }}>{game.name}</div>
-              {getStatusBadge(game)}
-            </div>
-            <div style={{ margin: '8px 0' }}>Players: {game.players.length} / 10</div>
-            <button
-              onClick={() => handleJoinGame(game.id)}
-              disabled={!isJoinable(game) || (!walletAddress && !phantomAddress) || isAlreadyJoined(game)}
-              style={{ width: '100%', padding: 8, background: isJoinable(game) && (walletAddress || phantomAddress) && !isAlreadyJoined(game) ? '#007bff' : '#ccc', color: '#fff', border: 'none', borderRadius: 4, cursor: isJoinable(game) && (walletAddress || phantomAddress) && !isAlreadyJoined(game) ? 'pointer' : 'not-allowed', marginBottom: 8 }}
-            >
-              {isAlreadyJoined(game) ? 'Joined' : 'Join'}
-            </button>
-            {/* Show Enter Room/Play Game button if already joined */}
-            {isAlreadyJoined(game) && (
+            {walletInfoDisplay()}
+            {walletType && (
               <button
-                onClick={() => handleEnterRoom(game.id)}
-                style={{ width: '100%', padding: 8, background: '#28a745', color: '#fff', border: 'none', borderRadius: 4, cursor: 'pointer', marginBottom: 8 }}
+                type="button"
+                onClick={async () => {
+                  window.localStorage.removeItem('playerId');
+                  if (window.solana && window.solana.isPhantom) {
+                    try { await window.solana.disconnect(); } catch {}
+                  }
+                  window.location.reload();
+                }}
+                style={{ marginRight: 8, padding: '6px 12px', background: '#dc3545', color: '#fff', border: 'none', borderRadius: 4 }}
               >
-                Enter Room
+                Disconnect Wallet
               </button>
             )}
-            {/* Show View History button for completed games */}
-            {game.status && game.status !== 'lobby' && game.status !== 'in_progress' && (
-              <Link to={`/history/${game.id}`} style={{ display: 'block', width: '100%', padding: 8, background: '#007bff', color: '#fff', borderRadius: 4, textAlign: 'center', textDecoration: 'none', marginBottom: 8 }}>
-                View History
-              </Link>
-            )}
-            <button
-              onClick={() => handleDeleteGame(game.id)}
-              style={{ width: '100%', padding: 8, background: '#dc3545', color: '#fff', border: 'none', borderRadius: 4, cursor: 'pointer', marginTop: 4 }}
-            >
-              Delete
-            </button>
-            <button
-              onClick={() => setExpandedGameId(expandedGameId === game.id ? null : game.id)}
-              style={{ width: '100%', padding: 4, background: '#eee', border: 'none', borderRadius: 4, cursor: 'pointer' }}
-            >
-              {expandedGameId === game.id ? 'Hide Players' : 'Show Players'}
-            </button>
-            {expandedGameId === game.id && (
-              <ul style={{ marginTop: 8 }}>
-                {game.players.map(player => (
-                  <li key={player.id}>{player.name} ({player.status})</li>
-                ))}
-              </ul>
+            {!walletType && (
+              <>
+                <button type="button" onClick={connectWallet} style={{ marginRight: 8, padding: '6px 12px', background: '#f6851b', color: '#fff', border: 'none', borderRadius: 4 }}>Connect MetaMask</button>
+                <button type="button" onClick={connectPhantom} style={{ marginRight: 8, padding: '6px 12px', background: '#8e44ad', color: '#fff', border: 'none', borderRadius: 4 }}>Connect Phantom</button>
+              </>
             )}
           </div>
-        ))}
-      </div>
-      {/* Create Table Modal */}
-      {showCreateModal && (
-        <div style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', background: 'rgba(0,0,0,0.3)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000 }}>
-          <form onSubmit={handleCreateGame} style={{ background: '#fff', padding: 32, borderRadius: 8, minWidth: 320, boxShadow: '0 2px 16px rgba(0,0,0,0.2)' }}>
-            <h2>Create New Table</h2>
-            <input
-              type="text"
-              placeholder="Table name"
-              value={newGameName}
-              onChange={e => setNewGameName(e.target.value)}
-              style={{ width: '100%', marginBottom: 16, padding: 8 }}
-            />
-            {/* Future: Add max players, stakes, etc. */}
-            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 8 }}>
-              <button type="button" onClick={() => setShowCreateModal(false)} style={{ padding: '8px 16px' }}>Cancel</button>
-              <button type="submit" style={{ padding: '8px 16px', background: '#007bff', color: '#fff', border: 'none', borderRadius: 4 }}>Create</button>
-            </div>
-          </form>
+          {/* Leaderboard Link */}
+          <a href="/leaderboard" style={{ textDecoration: 'none', color: '#007bff', fontWeight: 'bold', fontSize: 20, marginLeft: 16 }}>🏆 Leaderboard</a>
         </div>
-      )}
+      </header>
+      {/* Main Content */}
+      <main style={{ maxWidth: 1200, margin: '0 auto', padding: '32px 24px 64px 24px' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 32 }}>
+          <button onClick={() => setShowCreateModal(true)} style={{ fontSize: 20, padding: '10px 24px', fontWeight: 600, background: '#007bff', color: '#fff', border: 'none', borderRadius: 6, boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}>+ Create Table</button>
+        </div>
+        {/* Game List as Responsive Grid */}
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: 24, justifyItems: 'center' }}>
+          {games.map(game => (
+            <div key={game.id} style={{ border: '1px solid #ccc', borderRadius: 12, padding: 20, minWidth: 240, maxWidth: 340, width: '100%', background: '#fff', boxShadow: selectedGameId === game.id ? '0 0 12px #007bff44' : '0 1px 6px rgba(0,0,0,0.03)', transition: 'box-shadow 0.2s' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
+                <div style={{ fontWeight: 700, fontSize: 20 }}>{game.name}</div>
+                {getStatusBadge(game)}
+              </div>
+              <div style={{ margin: '8px 0 12px 0', color: '#555' }}>Players: {game.players.length} / 10</div>
+              <button
+                onClick={() => handleJoinGame(game.id)}
+                disabled={!isJoinable(game) || (!walletAddress && !phantomAddress) || isAlreadyJoined(game)}
+                style={{ width: '100%', padding: 10, background: isJoinable(game) && (walletAddress || phantomAddress) && !isAlreadyJoined(game) ? '#007bff' : '#ccc', color: '#fff', border: 'none', borderRadius: 5, cursor: isJoinable(game) && (walletAddress || phantomAddress) && !isAlreadyJoined(game) ? 'pointer' : 'not-allowed', marginBottom: 10, fontWeight: 600, fontSize: 16 }}
+              >
+                {isAlreadyJoined(game) ? 'Joined' : 'Join'}
+              </button>
+              {isAlreadyJoined(game) && (
+                <button
+                  onClick={() => handleEnterRoom(game.id)}
+                  style={{ width: '100%', padding: 10, background: '#28a745', color: '#fff', border: 'none', borderRadius: 5, cursor: 'pointer', marginBottom: 10, fontWeight: 600, fontSize: 16 }}
+                >
+                  Enter Room
+                </button>
+              )}
+              {game.status && game.status !== 'lobby' && game.status !== 'in_progress' && (
+                <Link to={`/history/${game.id}`} style={{ display: 'block', width: '100%', padding: 10, background: '#007bff', color: '#fff', borderRadius: 5, textAlign: 'center', textDecoration: 'none', marginBottom: 10, fontWeight: 600, fontSize: 16 }}>
+                  View History
+                </Link>
+              )}
+              <button
+                onClick={() => handleDeleteGame(game.id)}
+                style={{ width: '100%', padding: 8, background: '#dc3545', color: '#fff', border: 'none', borderRadius: 5, cursor: 'pointer', marginTop: 4, fontWeight: 600 }}
+              >
+                Delete
+              </button>
+              <button
+                onClick={() => setExpandedGameId(expandedGameId === game.id ? null : game.id)}
+                style={{ width: '100%', padding: 6, background: '#eee', border: 'none', borderRadius: 5, cursor: 'pointer', marginTop: 6, fontWeight: 500 }}
+              >
+                {expandedGameId === game.id ? 'Hide Players' : 'Show Players'}
+              </button>
+              {expandedGameId === game.id && (
+                <ul style={{ marginTop: 10, paddingLeft: 16 }}>
+                  {game.players.map(player => (
+                    <li key={player.id} style={{ color: '#333', fontSize: 15 }}>{player.name} ({player.status})</li>
+                  ))}
+                </ul>
+              )}
+            </div>
+          ))}
+        </div>
+        {/* Create Table Modal */}
+        {showCreateModal && (
+          <div style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', background: 'rgba(0,0,0,0.3)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000 }}>
+            <form onSubmit={handleCreateGame} style={{ background: '#fff', padding: 32, borderRadius: 8, minWidth: 320, boxShadow: '0 2px 16px rgba(0,0,0,0.2)' }}>
+              <h2>Create New Table</h2>
+              <input type="text" value={newGameName} onChange={e => setNewGameName(e.target.value)} placeholder="Table Name" style={{ width: '100%', padding: 10, fontSize: 16, marginBottom: 16, borderRadius: 4, border: '1px solid #ccc' }} />
+              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 12 }}>
+                <button type="button" onClick={() => setShowCreateModal(false)} style={{ padding: '8px 18px', background: '#eee', border: 'none', borderRadius: 4, fontWeight: 600 }}>Cancel</button>
+                <button type="submit" style={{ padding: '8px 18px', background: '#007bff', color: '#fff', border: 'none', borderRadius: 4, fontWeight: 600 }}>Create</button>
+              </div>
+            </form>
+          </div>
+        )}
+      </main>
     </div>
   );
 }

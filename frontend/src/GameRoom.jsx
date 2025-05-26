@@ -73,7 +73,7 @@ function GameRoom() {
       .then(res => res.json())
       .then(data => {
         setGameState(data.state);
-        // Set isReady if this player is marked ready in backend
+        // Always update isReady from the latest gameState
         const me = data.state?.players?.find(p => p.id === playerId);
         setIsReady(!!me?.ready);
       });
@@ -94,6 +94,7 @@ function GameRoom() {
       const msg = JSON.parse(event.data);
       if (msg.type === 'state_update' || msg.type === 'end') {
         setGameState(msg.data);
+        // Always update isReady from the latest gameState
         const me = msg.data?.players?.find(p => p.id === playerId);
         setIsReady(!!me?.ready);
       } else if (msg.type === 'message') {
@@ -253,7 +254,7 @@ function GameRoom() {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ playerId, strategy: strategyInput, message, signature, walletType })
     });
-    setIsReady(true);
+    // Do NOT setIsReady(true) here; let WebSocket/gameState update handle it
   };
   const startGame = async () => {
     await fetch(`${API_URL}/api/game-state/${gameId}/start`, { method: 'POST' });

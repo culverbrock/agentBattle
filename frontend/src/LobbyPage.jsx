@@ -32,12 +32,16 @@ function safeStringify(obj) {
 
 // Helper to get the MetaMask provider (not Phantom)
 function getMetaMaskProvider() {
-  if (window.ethereum && window.ethereum.isMetaMask) {
-    return window.ethereum;
-  }
-  // If multiple providers, try to find MetaMask
+  // EIP-5749: Multiple injected providers
   if (window.ethereum?.providers) {
-    return window.ethereum.providers.find((p) => p.isMetaMask) || null;
+    // Prefer MetaMask that is NOT Phantom
+    return window.ethereum.providers.find(
+      (p) => p.isMetaMask && !p.isPhantom
+    ) || null;
+  }
+  // Single provider fallback
+  if (window.ethereum && window.ethereum.isMetaMask && !window.ethereum.isPhantom) {
+    return window.ethereum;
   }
   return null;
 }

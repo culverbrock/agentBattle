@@ -273,6 +273,7 @@ router.post('/game-state/:gameId/ready', async (req, res) => {
     const machine = createGameStateMachine(state);
     const nextState = machine.transition(machine.initialState, { type: 'PLAYER_READY', playerId, strategy });
     await saveGameState(gameId, nextState.context);
+    console.log('[WS BROADCAST] Broadcasting state_update for game', gameId);
     broadcastGameRoomState(gameId, nextState.context);
     broadcastGameEvent(gameId, { type: 'state_update', data: nextState.context });
     res.json({ gameId, state: nextState.context });

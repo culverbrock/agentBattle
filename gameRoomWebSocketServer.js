@@ -17,6 +17,7 @@ function broadcastGameEvent(gameId, event) {
   const clients = gameClientsMap.get(gameId);
   if (!clients) return;
   const message = JSON.stringify(event);
+  console.log('[WS SEND] broadcastGameEvent', { gameId, event });
   for (const client of clients) {
     if (client.readyState === WebSocket.OPEN) {
       client.send(message);
@@ -35,6 +36,7 @@ function getOnlinePlayerIds(gameId) {
 
 function broadcastGameRoomState(gameId, state) {
   if (!wss) return;
+  console.log('[WS SEND] broadcastGameRoomState', { gameId, state });
   wss.clients.forEach((client) => {
     if (client.readyState === WebSocket.OPEN && client.gameId === gameId) {
       client.send(JSON.stringify({ type: 'state_update', data: state }));

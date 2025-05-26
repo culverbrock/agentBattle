@@ -199,6 +199,12 @@ router.post('/:gameId/start', async (req, res) => {
   const { gameId } = req.params;
   let state = await loadGameState(gameId);
   if (!state) return res.status(404).json({ error: 'Game not found' });
+  // --- PATCH: Ensure all players with a strategy are marked ready ---
+  if (state.players && state.strategyMessages) {
+    state.players = state.players.map(p =>
+      state.strategyMessages[p.id] ? { ...p, ready: true } : p
+    );
+  }
   const machine = createGameStateMachine(state);
   let nextState = machine.transition(machine.initialState, { type: 'START_GAME' });
   let newContext = nextState.context;

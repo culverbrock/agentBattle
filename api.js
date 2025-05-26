@@ -234,6 +234,9 @@ router.post('/game-state/:gameId/ready', async (req, res) => {
   try {
     if (walletType === 'eth') {
       try {
+        console.log('[READY][ETH] message:', message);
+        console.log('[READY][ETH] signature:', signature);
+        console.log('[READY][ETH] playerId:', playerId);
         const recovered = ethers.utils.verifyMessage(message, signature);
         console.log('[READY][ETH] Recovered:', recovered, 'Expected:', playerId);
         valid = (recovered.toLowerCase() === playerId.toLowerCase());

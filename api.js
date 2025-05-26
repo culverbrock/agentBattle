@@ -56,18 +56,22 @@ router.post('/games/:gameId/join', async (req, res) => {
   }
   try {
     // Check current player count
-    const countQ = `SELECT COUNT(*) FROM players WHERE game_id = $1 AND status = 'connected'`;
+    const countQ = `SELECT COUNT(*) FROM player_games WHERE game_id = $1`;
     const { rows: countRows } = await pool.query(countQ, [gameId]);
     const playerCount = parseInt(countRows[0].count, 10);
     if (playerCount >= 10) {
       return res.status(400).json({ error: 'Game is full (max 10 players)' });
     }
-    // Upsert player into the players table (name is now nullable, use playerId as name fallback)
-    const query = `INSERT INTO players (id, name, status, game_id) VALUES ($1, $2, 'connected', $3)
-      ON CONFLICT (id) DO UPDATE SET name = $2, status = 'connected', game_id = $3 RETURNING *`;
-    const { rows } = await pool.query(query, [playerId, playerId, gameId]);
+    // Upsert player into the players table (if not exists)
+    const playerQ = `INSERT INTO players (id, name, status) VALUES ($1, $2, 'connected')
+      ON CONFLICT (id) DO UPDATE SET name = $2, status = 'connected' RETURNING *`;
+    await pool.query(playerQ, [playerId, playerId]);
+    // Insert into player_games (if not already present)
+    const joinQ = `INSERT INTO player_games (player_id, game_id) VALUES ($1, $2) ON CONFLICT DO NOTHING`;
+    await pool.query(joinQ, [playerId, gameId]);
     // Fetch all players for this game
-    const playersQ = `SELECT id, name, status FROM players WHERE game_id = $1`;
+    const playersQ = `SELECT p.id, p.name, p.status FROM players p
+      JOIN player_games pg ON p.id = pg.player_id WHERE pg.game_id = $1`;
     const { rows: players } = await pool.query(playersQ, [gameId]);
     // Update and persist game state
     let state = await loadGameState(gameId);
@@ -93,7 +97,7 @@ router.post('/games/:gameId/join', async (req, res) => {
       };
       await saveGameState(gameId, state);
     }
-    res.status(200).json(rows[0]);
+    res.status(200).json(players.find(p => p.id === playerId));
     // Broadcast lobby state after player joins
     broadcastLobbyState();
   } catch (err) {
@@ -158,13 +162,20 @@ router.post('/games/:gameId/leave', async (req, res) => {
     return res.status(400).json({ error: 'playerId is required' });
   }
   try {
-    // Set player status to 'disconnected' and remove game_id
-    const query = `UPDATE players SET status = 'disconnected', game_id = NULL WHERE id = $1 AND game_id = $2 RETURNING *`;
-    const { rows } = await pool.query(query, [playerId, gameId]);
-    if (rows.length === 0) {
-      return res.status(404).json({ error: 'Player not found in this game' });
+    // Remove from player_games
+    const leaveQ = `DELETE FROM player_games WHERE player_id = $1 AND game_id = $2`;
+    await pool.query(leaveQ, [playerId, gameId]);
+    // Optionally, set player status to 'disconnected' if not in any games
+    const checkQ = `SELECT COUNT(*) FROM player_games WHERE player_id = $1`;
+    const { rows: checkRows } = await pool.query(checkQ, [playerId]);
+    if (parseInt(checkRows[0].count, 10) === 0) {
+      await pool.query(`UPDATE players SET status = 'disconnected' WHERE id = $1`, [playerId]);
     }
-    res.status(200).json(rows[0]);
+    // Fetch all players for this game
+    const playersQ = `SELECT p.id, p.name, p.status FROM players p
+      JOIN player_games pg ON p.id = pg.player_id WHERE pg.game_id = $1`;
+    const { rows: players } = await pool.query(playersQ, [gameId]);
+    res.status(200).json({ success: true });
     // Broadcast lobby state after player leaves
     broadcastLobbyState();
   } catch (err) {
@@ -184,7 +195,8 @@ router.get('/games/lobby', async (req, res) => {
     const { rows: games } = await pool.query(gamesQ);
     console.log('Lobby games:', games);
     for (const game of games) {
-      const playersQ = `SELECT id, name, status FROM players WHERE game_id = $1`;
+      const playersQ = `SELECT p.id, p.name, p.status FROM players p
+        JOIN player_games pg ON p.id = pg.player_id WHERE pg.game_id = $1`;
       const { rows: players } = await pool.query(playersQ, [game.id]);
       game.players = players;
       console.log(`Players for game ${game.id}:`, players);

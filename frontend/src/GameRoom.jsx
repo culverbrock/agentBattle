@@ -3,7 +3,7 @@ import { useParams, Link, useNavigate } from 'react-router-dom';
 import { ethers } from 'ethers';
 
 const API_URL = import.meta.env.VITE_API_URL || '';
-const WS_URL = API_URL.replace(/^http/, 'ws') + '/game-room';
+const WS_URL = API_URL.replace(/^http/, 'ws') + '/ws/game';
 
 function phaseInstruction(phase, isMyTurn) {
   switch (phase) {

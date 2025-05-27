@@ -26,8 +26,8 @@ async function generateNegotiationMessage(context, agent) {
         return `${agentName} (${entry.playerId}): ${entry.message}`;
       })
       .join('\n');
-    // Add word limit instruction
-    const prompt = `You are an agent in a negotiation game. Your strategy: "${agent.strategy || ''}". Respond in 20 words or fewer. If you exceed 20 words, your message will be cut off.\nNegotiation history so far:\n${history}\nGame state: ${JSON.stringify(context)}. What is your negotiation message to the other agents?`;
+    // Add word limit and urgency instruction
+    const prompt = `You are an agent in a negotiation game. Your strategy: "${agent.strategy || ''}". Respond in 20 words or fewer. If you exceed 20 words, your message will be cut off.\nYou will only have 5 turns to speak before proposals are voted on. Use your time wisely.\nNegotiation history so far:\n${history}\nGame state: ${JSON.stringify(context)}. What is your negotiation message to the other agents?`;
     let response = await callLLM(prompt, { system: 'You are a negotiation agent.' });
     // Truncate to 20 words if needed
     const words = response.split(/\s+/);

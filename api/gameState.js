@@ -120,48 +120,57 @@ async function agentPhaseHandler(gameId, state) {
   let machine = createGameStateMachine(state);
   let currentState = State.create({ value: state.phase, context: state, _event: { type: 'xstate.init' } });
   let context = state;
-  // Negotiation phase: each agent (one per player) takes a turn, regardless of connection status
+  // Negotiation phase: loop through all rounds, each agent speaks in turn each round
   if (context.phase === 'negotiation') {
-    const players = context.players; // All players, not filtered by connection
-    let idx = 0;
-    // Gather negotiation history for context
-    const negotiationHistory = [];
-    // Loop through all players in speakingOrder
-    while (idx < context.speakingOrder.length) {
-      const playerId = context.speakingOrder[idx];
-      const player = players.find(p => p.id === playerId);
-      if (player) {
-        const agent = player.agent || { strategy: '', type: 'llm' };
-        let message;
-        try {
-          // Pass negotiation history and context to the agent
-          message = await agentInvoker.generateNegotiationMessage({ ...context, negotiationHistory }, agent);
-        } catch (err) {
-          console.error('Agent negotiation error:', err);
-          message = `[ERROR] Agent failed to generate negotiation message.`;
+    const players = context.players;
+    let round = context.round || 1;
+    let negotiationHistory = context.negotiationHistory || [];
+    const maxRounds = context.maxRounds || 5;
+    while (round <= maxRounds) {
+      // Randomize speaking order each round
+      const speakingOrder = (context.speakingOrder && context.speakingOrder.length === players.length)
+        ? context.speakingOrder
+        : players.map(p => p.id);
+      for (let idx = 0; idx < speakingOrder.length; idx++) {
+        const playerId = speakingOrder[idx];
+        const player = players.find(p => p.id === playerId);
+        if (player) {
+          const agent = player.agent || { strategy: '', type: 'llm' };
+          let message;
+          try {
+            message = await agentInvoker.generateNegotiationMessage({ ...context, negotiationHistory }, agent);
+          } catch (err) {
+            console.error('Agent negotiation error:', err);
+            message = '[ERROR] Agent failed to generate negotiation message.';
+          }
+          negotiationHistory.push({
+            playerId,
+            message,
+            round,
+            turn: idx,
+            context: { ...context }
+          });
+          await eventLogger.logEvent({ gameId, playerId, type: 'negotiation', content: message });
+          // Advance state machine
+          const nextState = machine.transition(currentState, { type: 'SPEAK', playerId, message });
+          machine = machine.withContext(nextState.context);
+          currentState = nextState;
+          context = nextState.context;
         }
-        // Store negotiation message in negotiationHistory
-        negotiationHistory.push({
-          playerId,
-          message,
-          round: context.round,
-          turn: idx,
-          context: { ...context }
-        });
-        // Log event as agent action (not chat)
-        await eventLogger.logEvent({ gameId, playerId, type: 'negotiation', content: message });
-        // Advance state machine
-        const nextState = machine.transition(currentState, { type: 'SPEAK', playerId, message });
-        machine = machine.withContext(nextState.context);
-        currentState = nextState;
-        context = nextState.context;
-        idx++;
-      } else {
-        idx++;
       }
+      round++;
+      // Prepare for next round: shuffle speaking order
+      context.speakingOrder = players.map(p => p.id).sort(() => Math.random() - 0.5);
+      context.round = round;
+      context.negotiationHistory = negotiationHistory;
+      // If phase has changed (e.g., proposal), break
+      if (context.phase !== 'negotiation') break;
     }
-    // Save negotiation history in context for future rounds
-    context.negotiationHistory = negotiationHistory;
+    // After all rounds, move to proposal phase if still in negotiation
+    if (context.phase === 'negotiation') {
+      context.phase = 'proposal';
+      context.currentSpeakerIdx = 0;
+    }
     await saveGameState(gameId, context);
     broadcastGameEvent(gameId, { type: 'state_update', data: context });
     return context;

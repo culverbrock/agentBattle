@@ -147,8 +147,7 @@ async function agentPhaseHandler(gameId, state) {
             playerId,
             message,
             round,
-            turn: idx,
-            context: { ...context }
+            turn: idx
           });
           await eventLogger.logEvent({ gameId, playerId, type: 'negotiation', content: message });
           // Advance state machine

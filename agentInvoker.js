@@ -87,19 +87,42 @@ async function generateProposal(context, agent, players) {
  * @returns {object} The vote (e.g., { proposalIndex: 0 })
  */
 async function generateVote(context, agent) {
+  const numProposals = (context.proposals?.length || 1);
   switch (agent.type) {
     case 'llm': {
-      const prompt = `You are an agent in a negotiation game. Your strategy: "${agent.strategy}". Game state: ${JSON.stringify(context)}. Which proposal do you vote for? Respond with a JSON object.`;
+      const prompt = `You are an agent in a negotiation game. There are several proposals for splitting the prize pool. You have 100 votes to split among the proposals as you see fit. Respond ONLY with a JSON object where each key is the proposal index and each value is the number of votes you assign to that proposal. The total must sum to 100. Example: {"0": 60, "1": 40}`;
       const response = await callLLM(prompt, { system: 'You are a negotiation agent.' });
-      try { return JSON.parse(response); } catch { return { proposalIndex: 0, details: response }; }
+      try {
+        const parsed = JSON.parse(response);
+        // Validate sum to 100
+        const sum = Object.values(parsed).reduce((a, b) => a + Number(b), 0);
+        if (sum === 100) return parsed;
+      } catch {}
+      // Fallback: all votes to first proposal
+      return { 0: 100 };
     }
-    case 'random':
-      return { proposalIndex: Math.floor(Math.random() * (context.proposals?.length || 1)) };
-    case 'greedy':
-      return { proposalIndex: 0 };
+    case 'random': {
+      // Randomly split 100 votes among proposals
+      let remaining = 100;
+      const votes = {};
+      for (let i = 0; i < numProposals; i++) {
+        if (i === numProposals - 1) {
+          votes[i] = remaining;
+        } else {
+          const v = Math.floor(Math.random() * (remaining + 1));
+          votes[i] = v;
+          remaining -= v;
+        }
+      }
+      return votes;
+    }
+    case 'greedy': {
+      // All votes to first proposal
+      return { 0: 100 };
+    }
     case 'default':
     default:
-      return { proposalIndex: 0 };
+      return { 0: 100 };
   }
 }
 

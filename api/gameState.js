@@ -230,6 +230,8 @@ async function agentPhaseHandler(gameId, state) {
   // Voting phase: each player submits a vote
   if (context.phase === 'voting') {
     const players = context.players.filter(p => !context.eliminated.includes(p.id));
+    const numProposals = context.proposals?.length || 1;
+    const allVotes = [];
     for (const player of players) {
       const agent = player.agent || { strategy: 'default', type: 'default' };
       let votes;
@@ -237,12 +239,35 @@ async function agentPhaseHandler(gameId, state) {
         votes = await agentInvoker.generateVote(context, agent);
       } catch (err) {
         console.error('Agent vote error:', err);
-        votes = { proposalIndex: 0 };
+        votes = { 0: 100 };
       }
+      allVotes.push({ playerId: player.id, votes });
       const nextState = machine.transition(machine.initialState, { type: 'SUBMIT_VOTE', playerId: player.id, votes });
       await eventLogger.logEvent({ gameId, playerId: player.id, type: 'vote', content: JSON.stringify(votes) });
       machine = machine.withContext(nextState.context);
       context = nextState.context;
+      broadcastGameEvent(gameId, { type: 'vote', data: { playerId: player.id, votes, state: context } });
+    }
+    // Tally votes
+    const proposalTotals = Array(numProposals).fill(0);
+    for (const v of allVotes) {
+      for (const [idx, count] of Object.entries(v.votes)) {
+        proposalTotals[Number(idx)] += Number(count);
+      }
+    }
+    const totalVotes = proposalTotals.reduce((a, b) => a + b, 0);
+    let winnerIdx = -1;
+    for (let i = 0; i < proposalTotals.length; i++) {
+      if (proposalTotals[i] / totalVotes >= 0.61) {
+        winnerIdx = i;
+        break;
+      }
+    }
+    if (winnerIdx >= 0) {
+      context.winnerProposal = context.proposals[winnerIdx];
+      context.ended = true;
+      context.phase = 'endgame';
+      broadcastGameEvent(gameId, { type: 'winner', data: { winnerProposal: context.winnerProposal, state: context } });
     }
     await saveGameState(gameId, context);
     broadcastGameEvent(gameId, { type: 'state_update', data: context });

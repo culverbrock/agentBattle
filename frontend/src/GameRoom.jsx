@@ -530,8 +530,8 @@ function GameRoom() {
             </ul>
           </div>
         )}
-        {/* Votes and eliminations remain phase-specific for now */}
-        {phase === 'voting' && gameState?.votes && gameState.votes.length > 0 && (
+        {/* Always show votes if any */}
+        {gameState?.votes && gameState.votes.length > 0 && (
           <div style={{ marginBottom: 12 }}>
             <b>Votes:</b>
             <ul style={{ margin: 0, paddingLeft: 20 }}>

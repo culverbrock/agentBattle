@@ -45,22 +45,38 @@ async function generateNegotiationMessage(context, agent) {
  * Generate a proposal for a player/agent.
  * @param {object} context
  * @param {object} agent
+ * @param {array} players
  * @returns {string|object} The proposal
  */
-async function generateProposal(context, agent) {
-  switch (agent.type) {
-    case 'llm': {
-      const prompt = `You are an agent in a negotiation game. Your strategy: "${agent.strategy}". Game state: ${JSON.stringify(context)}. What proposal do you make? Respond with a JSON object.`;
-      const response = await callLLM(prompt, { system: 'You are a negotiation agent.' });
-      try { return JSON.parse(response); } catch { return { split: 'llm', details: response }; }
+async function generateProposal(context, agent, players) {
+  // Always use LLM for proposals, using negotiation history and context
+  try {
+    const history = (context.negotiationHistory || [])
+      .map(entry => {
+        const player = (context.players || []).find(p => p.id === entry.playerId);
+        const agentName = player ? (player.name || player.id) : entry.playerId;
+        return `${agentName} (${entry.playerId}): ${entry.message}`;
+      })
+      .join('\n');
+    const agentIds = (players || context.players || []).map(p => p.id);
+    const formatExample = '{"agentId1": 50, "agentId2": 50}';
+    const prompt = `You are an agent in a negotiation game. Your strategy: "${agent.strategy || ''}".\nNegotiation history so far:\n${history}\nGame state: ${JSON.stringify(context)}.\nNow, propose how to split the prize pool among all agents.\nRespond ONLY with a JSON object where each key is an agent's ID and each value is the percentage of the prize they should get.\nAll agent IDs: ${agentIds.join(', ')}\nThe percentages must sum to 100.\nIf your proposal does not get at least 61% of the votes, it will not pass and you will have to renegotiate.\nExample format: ${formatExample}`;
+    let response = await callLLM(prompt, { system: 'You are a negotiation agent.' });
+    // Try to parse JSON from response
+    let proposal;
+    try {
+      proposal = JSON.parse(response);
+    } catch {
+      // Try to extract JSON substring if LLM added extra text
+      const match = response.match(/\{[\s\S]*\}/);
+      if (match) {
+        try { proposal = JSON.parse(match[0]); } catch {}
+      }
     }
-    case 'random':
-      return { split: Math.random() > 0.5 ? 'equal' : 'unequal', details: 'Random agent proposal.' };
-    case 'greedy':
-      return { split: 'greedy', details: 'Greedy agent wants most for self.' };
-    case 'default':
-    default:
-      return { split: 'equal', details: 'Even split for all remaining players.' };
+    return proposal;
+  } catch (err) {
+    console.error('LLM proposal error:', err);
+    return null;
   }
 }
 

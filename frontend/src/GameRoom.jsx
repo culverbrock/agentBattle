@@ -356,10 +356,12 @@ function GameRoom() {
         )}
       </div>
       {/* Debug panel for raw game state */}
+      {/*
       <div style={{ background: '#f5f5f5', border: '1px solid #ccc', borderRadius: 8, padding: 12, marginBottom: 16, fontSize: 13 }}>
         <div><strong>Debug: Raw gameState</strong></div>
         <pre style={{ fontSize: 12, margin: 0, background: 'none', border: 'none' }}>{JSON.stringify(gameState, null, 2)}</pre>
       </div>
+      */}
       {gameState?.strategyMessages && (
         <div style={{ background: '#e9f7ef', border: '1px solid #b2dfdb', borderRadius: 8, padding: 12, marginBottom: 16 }}>
           <b>Strategy Panel:</b>

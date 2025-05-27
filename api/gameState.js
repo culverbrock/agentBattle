@@ -126,11 +126,12 @@ async function agentPhaseHandler(gameId, state) {
     let round = context.round || 1;
     let negotiationHistory = context.negotiationHistory || [];
     const maxRounds = context.maxRounds || 5;
+    // Randomize speaking order only for the first round
+    if (!context.speakingOrder || context.speakingOrder.length !== players.length) {
+      context.speakingOrder = players.map(p => p.id).sort(() => Math.random() - 0.5);
+    }
+    const speakingOrder = context.speakingOrder;
     while (round <= maxRounds) {
-      // Randomize speaking order each round
-      const speakingOrder = (context.speakingOrder && context.speakingOrder.length === players.length)
-        ? context.speakingOrder
-        : players.map(p => p.id);
       for (let idx = 0; idx < speakingOrder.length; idx++) {
         const playerId = speakingOrder[idx];
         const player = players.find(p => p.id === playerId);
@@ -150,19 +151,17 @@ async function agentPhaseHandler(gameId, state) {
             turn: idx
           });
           await eventLogger.logEvent({ gameId, playerId, type: 'negotiation', content: message });
-          // Advance state machine
           const nextState = machine.transition(currentState, { type: 'SPEAK', playerId, message });
           machine = machine.withContext(nextState.context);
           currentState = nextState;
           context = nextState.context;
+          broadcastGameEvent(gameId, { type: 'state_update', data: context });
+          await new Promise(res => setTimeout(res, 1000));
         }
       }
       round++;
-      // Prepare for next round: shuffle speaking order
-      context.speakingOrder = players.map(p => p.id).sort(() => Math.random() - 0.5);
       context.round = round;
       context.negotiationHistory = negotiationHistory;
-      // If phase has changed (e.g., proposal), break
       if (context.phase !== 'negotiation') break;
     }
     // After all rounds, move to proposal phase if still in negotiation
@@ -174,23 +173,41 @@ async function agentPhaseHandler(gameId, state) {
     broadcastGameEvent(gameId, { type: 'state_update', data: context });
     return context;
   }
-  // Proposal phase: each player submits a proposal
+  // Proposal phase: each agent submits a proposal (auto, LLM, with validation and broadcast)
   if (context.phase === 'proposal') {
     const players = context.players.filter(p => !context.eliminated.includes(p.id));
+    const negotiationHistory = context.negotiationHistory || [];
+    const proposals = [];
     for (const player of players) {
-      const agent = player.agent || { strategy: 'default', type: 'default' };
+      const agent = player.agent || { strategy: '', type: 'llm' };
       let proposal;
-      try {
-        proposal = await agentInvoker.generateProposal(context, agent);
-      } catch (err) {
-        console.error('Agent proposal error:', err);
-        proposal = { split: 'equal', details: 'Even split for all remaining players.' };
+      let attempts = 0;
+      while (attempts < 2) { // Try twice if invalid
+        attempts++;
+        try {
+          proposal = await agentInvoker.generateProposal({ ...context, negotiationHistory }, agent, players);
+        } catch (err) {
+          console.error('Agent proposal error:', err);
+          proposal = null;
+        }
+        // Validate proposal
+        if (proposal && validateProposal(proposal, players)) {
+          break;
+        } else {
+          proposal = null;
+        }
       }
-      const nextState = machine.transition(machine.initialState, { type: 'SUBMIT_PROPOSAL', playerId: player.id, proposal });
-      await eventLogger.logEvent({ gameId, playerId: player.id, type: 'proposal', content: JSON.stringify(proposal) });
-      machine = machine.withContext(nextState.context);
-      context = nextState.context;
+      if (proposal) {
+        proposals.push({ playerId: player.id, proposal });
+        await eventLogger.logEvent({ gameId, playerId: player.id, type: 'proposal', content: JSON.stringify(proposal) });
+        // Broadcast proposal as it is made
+        broadcastGameEvent(gameId, { type: 'proposal', data: { playerId: player.id, proposal, state: context } });
+        await new Promise(res => setTimeout(res, 1000));
+      } else {
+        console.error(`Invalid proposal from agent ${player.id}, skipping.`);
+      }
     }
+    context.proposals = proposals;
     await saveGameState(gameId, context);
     broadcastGameEvent(gameId, { type: 'state_update', data: context });
     return context;
@@ -242,6 +259,22 @@ async function agentPhaseHandler(gameId, state) {
   }
   // ...
   return context;
+}
+
+// Proposal validation helper
+function validateProposal(proposal, players) {
+  if (!proposal || typeof proposal !== 'object') return false;
+  const agentIds = players.map(p => p.id);
+  const keys = Object.keys(proposal);
+  // Proposal must have all agent IDs as keys
+  if (!agentIds.every(id => keys.includes(id))) return false;
+  // All values must be numbers between 0 and 100
+  const values = agentIds.map(id => Number(proposal[id]));
+  if (values.some(v => isNaN(v) || v < 0 || v > 100)) return false;
+  // Sum must be 100±1 (allowing for rounding)
+  const sum = values.reduce((a, b) => a + b, 0);
+  if (sum < 99 || sum > 101) return false;
+  return true;
 }
 
 // Start game

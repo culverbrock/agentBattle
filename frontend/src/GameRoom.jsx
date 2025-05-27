@@ -478,7 +478,7 @@ function GameRoom() {
       <div style={{ margin: '16px 0', padding: 16, background: '#fff', borderRadius: 8, minHeight: 200 }}>
         <h2>Chat</h2>
         <div style={{ maxHeight: 200, overflowY: 'auto', marginBottom: 8 }}>
-          {messages.map(msg => (
+          {messages.filter(msg => msg.type === 'chat').map(msg => (
             <div key={msg.id} style={{ marginBottom: 4 }}>
               <b>{getPlayerName(msg.player_id) || 'System'}:</b> {msg.content}
               {msg.created_at && <span style={{ color: '#888', fontSize: 11, marginLeft: 8 }}>{new Date(msg.created_at).toLocaleTimeString()}</span>}
@@ -501,41 +501,41 @@ function GameRoom() {
       <div style={{ marginTop: 24, background: '#f9f9f9', borderRadius: 8, padding: 16 }}>
         <h3>Agent Actions</h3>
         {/* Negotiation messages */}
-        {phase === 'negotiation' && (
+        {phase === 'negotiation' && gameState?.negotiationHistory && (
           <div style={{ marginBottom: 12 }}>
             <b>Negotiation:</b>
             <ul style={{ margin: 0, paddingLeft: 20 }}>
-              {messages.filter(m => m.type === 'negotiation').map((msg, i) => (
+              {gameState.negotiationHistory.map((msg, i) => (
                 <li key={i}>
-                  <span style={{ color: '#007bff' }}>{getPlayerName(msg.player_id)}</span>
-                  <span style={{ color: '#888', marginLeft: 6, fontSize: 13 }}>({players.find(p => p.id === msg.player_id)?.agent?.strategy || 'default'} agent)</span>:
-                  <span style={{ marginLeft: 8 }}>{msg.content}</span>
+                  <span style={{ color: '#007bff' }}>{getPlayerName(msg.playerId)}</span>
+                  <span style={{ color: '#888', marginLeft: 6, fontSize: 13 }}>({players.find(p => p.id === msg.playerId)?.agent?.strategy || 'default'} agent)</span>:
+                  <span style={{ marginLeft: 8 }}>{msg.message}</span>
                 </li>
               ))}
             </ul>
           </div>
         )}
         {/* Proposals */}
-        {phase === 'proposal' && proposals.length > 0 && (
+        {phase === 'proposal' && gameState?.proposals && gameState.proposals.length > 0 && (
           <div style={{ marginBottom: 12 }}>
             <b>Proposals:</b>
             <ul style={{ margin: 0, paddingLeft: 20 }}>
-              {proposals.map((pr, i) => (
+              {gameState.proposals.map((pr, i) => (
                 <li key={i}>
                   <span style={{ color: '#007bff' }}>{getPlayerName(pr.playerId)}</span>
                   <span style={{ color: '#888', marginLeft: 6, fontSize: 13 }}>({players.find(p => p.id === pr.playerId)?.agent?.strategy || 'default'} agent)</span>:
-                  <span style={{ marginLeft: 8 }}>{pr.proposal ? JSON.stringify(pr.proposal) : JSON.stringify(pr)}</span>
+                  <span style={{ marginLeft: 8 }}>{typeof pr.proposal === 'object' ? JSON.stringify(pr.proposal) : String(pr.proposal)}</span>
                 </li>
               ))}
             </ul>
           </div>
         )}
         {/* Votes */}
-        {phase === 'voting' && votes.length > 0 && (
+        {phase === 'voting' && gameState?.votes && gameState.votes.length > 0 && (
           <div style={{ marginBottom: 12 }}>
             <b>Votes:</b>
             <ul style={{ margin: 0, paddingLeft: 20 }}>
-              {votes.map((v, i) => (
+              {gameState.votes.map((v, i) => (
                 <li key={i}>
                   <span style={{ color: '#007bff' }}>{getPlayerName(v.playerId)}</span>
                   <span style={{ color: '#888', marginLeft: 6, fontSize: 13 }}>({players.find(p => p.id === v.playerId)?.agent?.strategy || 'default'} agent)</span>:

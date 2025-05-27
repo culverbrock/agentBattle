@@ -168,6 +168,10 @@ async function agentPhaseHandler(gameId, state) {
     if (context.phase === 'negotiation') {
       context.phase = 'proposal';
       context.currentSpeakerIdx = 0;
+      await saveGameState(gameId, context);
+      broadcastGameEvent(gameId, { type: 'state_update', data: context });
+      // Immediately process proposal phase
+      return await agentPhaseHandler(gameId, context);
     }
     await saveGameState(gameId, context);
     broadcastGameEvent(gameId, { type: 'state_update', data: context });
@@ -175,9 +179,17 @@ async function agentPhaseHandler(gameId, state) {
   }
   // Proposal phase: each agent submits a proposal (auto, LLM, with validation and broadcast)
   if (context.phase === 'proposal') {
+    console.log(`[PROPOSAL PHASE] Starting proposal phase for game ${gameId}`);
     const players = context.players.filter(p => !context.eliminated.includes(p.id));
     const negotiationHistory = context.negotiationHistory || [];
     const proposals = [];
+    // Log prize pool info
+    if (context.prizePool) {
+      console.log(`[PROPOSAL PHASE] Prize pool:`, context.prizePool);
+    } else {
+      console.warn(`[PROPOSAL PHASE] No prize pool found in context! Setting dummy prize pool for debugging.`);
+      context.prizePool = { total: 100, currency: 'DEBUG' };
+    }
     for (const player of players) {
       const agent = player.agent || { strategy: '', type: 'llm' };
       let proposal;
@@ -185,12 +197,14 @@ async function agentPhaseHandler(gameId, state) {
       while (attempts < 2) { // Try twice if invalid
         attempts++;
         try {
+          console.log(`[PROPOSAL PHASE] Agent ${player.id} generating proposal (attempt ${attempts})...`);
           proposal = await agentInvoker.generateProposal({ ...context, negotiationHistory }, agent, players);
+          console.log(`[PROPOSAL PHASE] Agent ${player.id} raw proposal:`, proposal);
         } catch (err) {
-          console.error('Agent proposal error:', err);
+          console.error(`[PROPOSAL PHASE] Agent proposal error for ${player.id}:`, err);
           proposal = null;
         }
-        // Validate proposal
+        // Validate proposal (currently always true)
         if (proposal && validateProposal(proposal, players)) {
           break;
         } else {
@@ -204,9 +218,10 @@ async function agentPhaseHandler(gameId, state) {
         broadcastGameEvent(gameId, { type: 'proposal', data: { playerId: player.id, proposal, state: context } });
         await new Promise(res => setTimeout(res, 1000));
       } else {
-        console.error(`Invalid proposal from agent ${player.id}, skipping.`);
+        console.error(`[PROPOSAL PHASE] Invalid proposal from agent ${player.id}, skipping.`);
       }
     }
+    console.log(`[PROPOSAL PHASE] Final proposals array:`, proposals);
     context.proposals = proposals;
     await saveGameState(gameId, context);
     broadcastGameEvent(gameId, { type: 'state_update', data: context });

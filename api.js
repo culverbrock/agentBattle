@@ -14,7 +14,7 @@ app.use(cors());
 const router = express.Router();
 
 const leaderboardHandler = require('./api/leaderboard');
-const gameStateRouter = require('./api/gameState');
+const { router: gameStateRouter } = require('./api/gameState');
 const { startGameRoomWebSocketServer } = require('./gameRoomWebSocketServer');
 const { saveGameState, loadGameState } = require('./gameStatePersistence');
 const claimSplHandler = require('./api/claim-spl');

@@ -28,6 +28,29 @@ router.post('/create', async (req, res) => {
   res.json({ gameId, state: machine.context });
 });
 
+// Join a game (ensure agent is created for each player)
+router.post('/:gameId/join', async (req, res) => {
+  const { gameId } = req.params;
+  const { playerId, name, strategy } = req.body;
+  let state = await loadGameState(gameId);
+  if (!state) return res.status(404).json({ error: 'Game not found' });
+  // Add player if not already present
+  if (!state.players.some(p => p.id === playerId)) {
+    state.players.push({
+      id: playerId,
+      name: name || playerId,
+      status: 'connected',
+      ready: false,
+      agent: { strategy: strategy || '', type: 'llm' }
+    });
+  }
+  await saveGameState(gameId, state);
+  machines[gameId] = createGameStateMachine(state);
+  broadcastGameRoomState(gameId, state);
+  broadcastGameEvent(gameId, { type: 'state_update', data: state });
+  res.json({ gameId, state });
+});
+
 // Get current game state
 router.get('/:gameId', async (req, res) => {
   const { gameId } = req.params;
@@ -97,30 +120,38 @@ async function agentPhaseHandler(gameId, state) {
   let machine = createGameStateMachine(state);
   let currentState = State.create({ value: state.phase, context: state, _event: { type: 'xstate.init' } });
   let context = state;
-  // Negotiation phase: each player in speaking order speaks in turn
+  // Negotiation phase: each agent (one per player) takes a turn, regardless of connection status
   if (context.phase === 'negotiation') {
-    const players = context.players.filter(p => !context.eliminated.includes(p.id));
-    let idx = context.currentSpeakerIdx || 0;
+    const players = context.players; // All players, not filtered by connection
+    let idx = 0;
+    // Gather negotiation history for context
+    const negotiationHistory = [];
+    // Loop through all players in speakingOrder
     while (idx < context.speakingOrder.length) {
-      // Guard: break if phase is no longer negotiation
-      if (context.phase !== 'negotiation') {
-        console.log(`[AGENT] Breaking negotiation loop: phase is now ${context.phase}`);
-        break;
-      }
       const playerId = context.speakingOrder[idx];
       const player = players.find(p => p.id === playerId);
-      console.log(`[AGENT] Negotiation phase, idx=${idx}, playerId=${playerId}, phase=${context.phase}`);
       if (player) {
-        const agent = player.agent || { strategy: 'default', type: 'default' };
+        const agent = player.agent || { strategy: '', type: 'llm' };
         let message;
         try {
-          message = await agentInvoker.generateNegotiationMessage(context, agent);
+          // Pass negotiation history and context to the agent
+          message = await agentInvoker.generateNegotiationMessage({ ...context, negotiationHistory }, agent);
         } catch (err) {
           console.error('Agent negotiation error:', err);
-          message = `Agent (${agent.strategy || 'default'}): Let's cooperate for a fair split!`;
+          message = `[ERROR] Agent failed to generate negotiation message.`;
         }
-        const nextState = machine.transition(currentState, { type: 'SPEAK', playerId, message });
+        // Store negotiation message in negotiationHistory
+        negotiationHistory.push({
+          playerId,
+          message,
+          round: context.round,
+          turn: idx,
+          context: { ...context }
+        });
+        // Log event as agent action (not chat)
         await eventLogger.logEvent({ gameId, playerId, type: 'negotiation', content: message });
+        // Advance state machine
+        const nextState = machine.transition(currentState, { type: 'SPEAK', playerId, message });
         machine = machine.withContext(nextState.context);
         currentState = nextState;
         context = nextState.context;
@@ -129,6 +160,8 @@ async function agentPhaseHandler(gameId, state) {
         idx++;
       }
     }
+    // Save negotiation history in context for future rounds
+    context.negotiationHistory = negotiationHistory;
     await saveGameState(gameId, context);
     broadcastGameEvent(gameId, { type: 'state_update', data: context });
     return context;

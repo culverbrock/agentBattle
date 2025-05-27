@@ -15,18 +15,13 @@ const { callLLM } = require('./llmApi');
  * @returns {string} The negotiation message
  */
 async function generateNegotiationMessage(context, agent) {
-  switch (agent.type) {
-    case 'llm': {
-      const prompt = `You are an agent in a negotiation game. Your strategy: "${agent.strategy}". Game state: ${JSON.stringify(context)}. What is your negotiation message?`;
-      return await callLLM(prompt, { system: 'You are a negotiation agent.' });
-    }
-    case 'random':
-      return `Agent (${agent.strategy || 'random'}): ${['Let\'s split!', 'I want more!', 'Can we cooperate?'][Math.floor(Math.random()*3)]}`;
-    case 'greedy':
-      return `Agent (${agent.strategy || 'greedy'}): I want the biggest share!`;
-    case 'default':
-    default:
-      return `Agent (${agent.strategy || 'default'}): Let's cooperate for a fair split!`;
+  // Always use LLM for negotiation, using the provided strategy (may be empty) and negotiation history/context
+  try {
+    const prompt = `You are an agent in a negotiation game. Your strategy: "${agent.strategy || ''}". Here is the negotiation history so far: ${JSON.stringify(context.negotiationHistory || [])}. Game state: ${JSON.stringify(context)}. What is your negotiation message to the other agents?`;
+    return await callLLM(prompt, { system: 'You are a negotiation agent.' });
+  } catch (err) {
+    console.error('LLM negotiation error:', err);
+    return '[ERROR] Agent failed to generate negotiation message.';
   }
 }
 

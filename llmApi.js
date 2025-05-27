@@ -34,7 +34,8 @@ async function callLLM(prompt, options = {}) {
     body: JSON.stringify(body)
   });
   if (!res.ok) {
-    throw new Error('LLM API error: ' + res.status);
+    const errorText = await res.text();  // Log full body to catch error message
+    throw new Error(`LLM API error: ${res.status} - ${errorText}`);
   }
   const data = await res.json();
   return data.choices?.[0]?.message?.content?.trim() || '';

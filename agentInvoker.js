@@ -17,8 +17,24 @@ const { callLLM } = require('./llmApi');
 async function generateNegotiationMessage(context, agent) {
   // Always use LLM for negotiation, using the provided strategy (may be empty) and negotiation history/context
   try {
-    const prompt = `You are an agent in a negotiation game. Your strategy: "${agent.strategy || ''}". Here is the negotiation history so far: ${JSON.stringify(context.negotiationHistory || [])}. Game state: ${JSON.stringify(context)}. What is your negotiation message to the other agents?`;
-    return await callLLM(prompt, { system: 'You are a negotiation agent.' });
+    // Format negotiation history for LLM
+    const history = (context.negotiationHistory || [])
+      .map(entry => {
+        // Try to get agent name from context.players
+        const player = (context.players || []).find(p => p.id === entry.playerId);
+        const agentName = player ? (player.name || player.id) : entry.playerId;
+        return `${agentName} (${entry.playerId}): ${entry.message}`;
+      })
+      .join('\n');
+    // Add word limit instruction
+    const prompt = `You are an agent in a negotiation game. Your strategy: "${agent.strategy || ''}". Respond in 20 words or fewer. If you exceed 20 words, your message will be cut off.\nNegotiation history so far:\n${history}\nGame state: ${JSON.stringify(context)}. What is your negotiation message to the other agents?`;
+    let response = await callLLM(prompt, { system: 'You are a negotiation agent.' });
+    // Truncate to 20 words if needed
+    const words = response.split(/\s+/);
+    if (words.length > 20) {
+      response = words.slice(0, 20).join(' ');
+    }
+    return response;
   } catch (err) {
     console.error('LLM negotiation error:', err);
     return '[ERROR] Agent failed to generate negotiation message.';

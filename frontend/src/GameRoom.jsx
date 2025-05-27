@@ -500,8 +500,8 @@ function GameRoom() {
       {/* Agent action log display */}
       <div style={{ marginTop: 24, background: '#f9f9f9', borderRadius: 8, padding: 16 }}>
         <h3>Agent Actions</h3>
-        {/* Negotiation messages */}
-        {phase === 'negotiation' && gameState?.negotiationHistory && (
+        {/* Always show negotiation history */}
+        {gameState?.negotiationHistory && gameState.negotiationHistory.length > 0 && (
           <div style={{ marginBottom: 12 }}>
             <b>Negotiation:</b>
             <ul style={{ margin: 0, paddingLeft: 20 }}>
@@ -515,8 +515,8 @@ function GameRoom() {
             </ul>
           </div>
         )}
-        {/* Proposals */}
-        {phase === 'proposal' && gameState?.proposals && gameState.proposals.length > 0 && (
+        {/* Always show proposals if any */}
+        {gameState?.proposals && gameState.proposals.length > 0 && (
           <div style={{ marginBottom: 12 }}>
             <b>Proposals:</b>
             <ul style={{ margin: 0, paddingLeft: 20 }}>
@@ -530,7 +530,7 @@ function GameRoom() {
             </ul>
           </div>
         )}
-        {/* Votes */}
+        {/* Votes and eliminations remain phase-specific for now */}
         {phase === 'voting' && gameState?.votes && gameState.votes.length > 0 && (
           <div style={{ marginBottom: 12 }}>
             <b>Votes:</b>
@@ -545,7 +545,6 @@ function GameRoom() {
             </ul>
           </div>
         )}
-        {/* Eliminations */}
         {phase === 'elimination' && (
           <div style={{ marginBottom: 12 }}>
             <b>Eliminations:</b>

@@ -69,7 +69,7 @@ function createGameStateMachine(initialContext) {
               // Mark player as ready and store their strategy
               const updatedPlayers = ctx.players.map(p =>
                 p.id === event.playerId
-                  ? { ...p, ready: true, agent: { strategy: event.strategy || 'default', type: 'default' } }
+                  ? { ...p, ready: true, agent: { strategy: event.strategy || 'default', type: 'llm' } }
                   : p
               );
               return {

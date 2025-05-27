@@ -13,8 +13,16 @@ const OPENAI_API_URL = process.env.OPENAI_API_URL || 'https://api.openai.com/v1/
  */
 async function callLLM(prompt, options = {}) {
   if (!OPENAI_API_KEY) {
-    // Stub for dev/testing
-    return '[LLM STUB] ' + prompt.slice(0, 80) + '...';
+    // Stub for dev/testing: return a valid JSON proposal for proposals
+    if (prompt.includes('propose how to split the prize pool')) {
+      return '{"p1": 50, "p2": 50}';
+    }
+    // For votes, return a valid vote split
+    if (prompt.includes('100 votes to split')) {
+      return '{"0": 50, "1": 50}';
+    }
+    // For negotiation, return a short message
+    return 'Let\'s split evenly.';
   }
   const body = {
     model: options.model || 'gpt-3.5-turbo',

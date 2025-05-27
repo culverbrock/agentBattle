@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const { saveGameState, loadGameState } = require('../gameStatePersistence');
-const createGameStateMachine = require('../gameStateMachine');
+const { createGameStateMachine } = require('../gameStateMachine');
 const { v4: uuidv4 } = require('uuid');
 const pool = require('../database');
 const { broadcastGameEvent, broadcastGameRoomState } = require('../gameRoomWebSocketServer');
@@ -117,6 +117,7 @@ async function autoSpeakForDisconnectedAgent(gameId, state) {
 
 // Helper: Agent-driven phase progression
 async function agentPhaseHandler(gameId, state) {
+  console.log(`[AGENT PHASE HANDLER] Entered with phase: ${state.phase} for game ${gameId}`);
   let machine = createGameStateMachine(state);
   let currentState = State.create({ value: state.phase, context: state, _event: { type: 'xstate.init' } });
   let context = state;
@@ -164,14 +165,22 @@ async function agentPhaseHandler(gameId, state) {
       context.negotiationHistory = negotiationHistory;
       if (context.phase !== 'negotiation') break;
     }
+    // Add detailed logging before transition
+    console.log('[NEGOTIATION END] round:', round, 'phase:', context.phase);
+    console.log('[NEGOTIATION END] negotiationHistory:', JSON.stringify(context.negotiationHistory, null, 2));
+    console.log('[NEGOTIATION END] speakingOrder:', context.speakingOrder);
     // After all rounds, move to proposal phase if still in negotiation
     if (context.phase === 'negotiation') {
+      console.log('[NEGOTIATION->PROPOSAL] Transitioning to proposal phase...');
       context.phase = 'proposal';
       context.currentSpeakerIdx = 0;
       await saveGameState(gameId, context);
       broadcastGameEvent(gameId, { type: 'state_update', data: context });
+      console.log('[NEGOTIATION->PROPOSAL] Saved and broadcasted proposal phase. Calling agentPhaseHandler again.');
       // Immediately process proposal phase
       return await agentPhaseHandler(gameId, context);
+    } else {
+      console.log('[NEGOTIATION END] Not transitioning to proposal. Current phase:', context.phase);
     }
     await saveGameState(gameId, context);
     broadcastGameEvent(gameId, { type: 'state_update', data: context });
@@ -179,8 +188,14 @@ async function agentPhaseHandler(gameId, state) {
   }
   // Proposal phase: each agent submits a proposal (auto, LLM, with validation and broadcast)
   if (context.phase === 'proposal') {
-    console.log(`[PROPOSAL PHASE] Starting proposal phase for game ${gameId}`);
+    console.log(`[PROPOSAL PHASE] Entered proposal phase for game ${gameId}`);
+    console.log(`[PROPOSAL PHASE] Players:`, context.players.map(p => p.id));
+    console.log(`[PROPOSAL PHASE] Eliminated:`, context.eliminated);
+    console.log(`[PROPOSAL PHASE] Negotiation history:`, context.negotiationHistory);
     const players = context.players.filter(p => !context.eliminated.includes(p.id));
+    if (players.length === 0) {
+      console.warn(`[PROPOSAL PHASE] No eligible players to propose for game ${gameId}`);
+    }
     const negotiationHistory = context.negotiationHistory || [];
     const proposals = [];
     // Log prize pool info
@@ -510,4 +525,7 @@ router.post('/:gameId/ready', async (req, res) => {
   res.json({ gameId, state: nextState.context });
 });
 
-module.exports = router; 
+module.exports = {
+  agentPhaseHandler,
+  router
+}; 

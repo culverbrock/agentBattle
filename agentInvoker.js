@@ -62,6 +62,7 @@ async function generateProposal(context, agent, players) {
     const formatExample = '{"agentId1": 50, "agentId2": 50}';
     const prompt = `You are an agent in a negotiation game. Your strategy: "${agent.strategy || ''}".\nNegotiation history so far:\n${history}\nGame state: ${JSON.stringify(context)}.\nNow, propose how to split the prize pool among all agents.\nRespond ONLY with a JSON object where each key is an agent's ID and each value is the percentage of the prize they should get.\nAll agent IDs: ${agentIds.join(', ')}\nThe percentages must sum to 100.\nIf your proposal does not get at least 61% of the votes, it will not pass and you will have to renegotiate.\nExample format: ${formatExample}`;
     let response = await callLLM(prompt, { system: 'You are a negotiation agent.' });
+    console.log('[generateProposal] Raw LLM response:', response);
     // Try to parse JSON from response
     let proposal;
     try {
@@ -73,6 +74,7 @@ async function generateProposal(context, agent, players) {
         try { proposal = JSON.parse(match[0]); } catch {}
       }
     }
+    console.log('[generateProposal] Parsed proposal:', proposal);
     return proposal;
   } catch (err) {
     console.error('LLM proposal error:', err);

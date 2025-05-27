@@ -287,4 +287,7 @@ async function invokeAgentAction(agent, context) {
   }
 }
 
-module.exports = createGameStateMachine; 
+module.exports = {
+  createGameStateMachine,
+  // ...other exports if needed...
+}; 

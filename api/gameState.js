@@ -7,6 +7,7 @@ const pool = require('../database');
 const { broadcastGameEvent, broadcastGameRoomState } = require('../gameRoomWebSocketServer');
 const agentInvoker = require('../agentInvoker');
 const eventLogger = require('../eventLogger');
+const { State } = require('xstate');
 
 // In-memory cache for active state machines (for demo/dev)
 const machines = {};
@@ -94,7 +95,7 @@ async function autoSpeakForDisconnectedAgent(gameId, state) {
 // Helper: Agent-driven phase progression
 async function agentPhaseHandler(gameId, state) {
   let machine = createGameStateMachine(state);
-  let currentState = machine.initialState;
+  let currentState = State.create({ value: state.phase, context: state });
   let context = state;
   // Negotiation phase: each player in speaking order speaks in turn
   if (context.phase === 'negotiation') {
@@ -123,7 +124,7 @@ async function agentPhaseHandler(gameId, state) {
         machine = machine.withContext(nextState.context);
         currentState = nextState;
         context = nextState.context;
-        idx = context.currentSpeakerIdx || 0;
+        idx++;
       } else {
         idx++;
       }

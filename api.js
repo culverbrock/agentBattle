@@ -199,7 +199,7 @@ router.get('/games/lobby', async (req, res) => {
         JOIN player_games pg ON p.id = pg.player_id WHERE pg.game_id = $1`;
       const { rows: players } = await pool.query(playersQ, [game.id]);
       game.players = players;
-      console.log(`Players for game ${game.id}:`, players);
+      // console.log(`Players for game ${game.id}:`, players); // Removed to reduce log noise
     }
     res.status(200).json({ games });
   } catch (err) {

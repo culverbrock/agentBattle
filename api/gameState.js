@@ -94,6 +94,7 @@ async function autoSpeakForDisconnectedAgent(gameId, state) {
 // Helper: Agent-driven phase progression
 async function agentPhaseHandler(gameId, state) {
   let machine = createGameStateMachine(state);
+  let currentState = machine.initialState;
   let context = state;
   // Negotiation phase: each player in speaking order speaks in turn
   if (context.phase === 'negotiation') {
@@ -117,9 +118,10 @@ async function agentPhaseHandler(gameId, state) {
           console.error('Agent negotiation error:', err);
           message = `Agent (${agent.strategy || 'default'}): Let's cooperate for a fair split!`;
         }
-        const nextState = machine.transition(context, { type: 'SPEAK', playerId, message });
+        const nextState = machine.transition(currentState, { type: 'SPEAK', playerId, message });
         await eventLogger.logEvent({ gameId, playerId, type: 'negotiation', content: message });
         machine = machine.withContext(nextState.context);
+        currentState = nextState;
         context = nextState.context;
         idx = context.currentSpeakerIdx || 0;
       } else {

@@ -95,7 +95,7 @@ async function autoSpeakForDisconnectedAgent(gameId, state) {
 // Helper: Agent-driven phase progression
 async function agentPhaseHandler(gameId, state) {
   let machine = createGameStateMachine(state);
-  let currentState = State.create({ value: state.phase, context: state });
+  let currentState = State.create({ value: state.phase, context: state, _event: { type: 'xstate.init' } });
   let context = state;
   // Negotiation phase: each player in speaking order speaks in turn
   if (context.phase === 'negotiation') {

@@ -276,8 +276,7 @@ router.post('/game-state/:gameId/ready', async (req, res) => {
       return res.status(401).json({ error: 'Signature does not match playerId' });
     }
     // --- Mark player as ready and broadcast update ---
-    const { saveGameState, loadGameState } = require('./gameStatePersistence');
-    const createGameStateMachine = require('./gameStateMachine');
+    const { createGameStateMachine } = require('./gameStateMachine');
     const { broadcastGameRoomState, broadcastGameEvent } = require('./gameRoomWebSocketServer');
     // Load current state
     let state = await loadGameState(gameId);

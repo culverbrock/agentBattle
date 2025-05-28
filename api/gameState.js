@@ -171,12 +171,13 @@ async function agentPhaseHandler(gameId, state) {
     console.log('[NEGOTIATION END] speakingOrder:', context.speakingOrder);
     // After all rounds, move to proposal phase if still in negotiation
     if (context.phase === 'negotiation') {
-      console.log('[NEGOTIATION->PROPOSAL] Transitioning to proposal phase...');
-      context.phase = 'proposal';
-      context.currentSpeakerIdx = 0;
+      console.log('[NEGOTIATION->PROPOSAL] Transitioning to proposal phase via state machine event...');
+      // Use state machine event to transition
+      const nextState = machine.transition(currentState, { type: 'SPEAK', playerId: null, message: null });
+      machine = machine.withContext(nextState.context);
+      context = nextState.context;
       await saveGameState(gameId, context);
       broadcastGameEvent(gameId, { type: 'state_update', data: context });
-      console.log('[NEGOTIATION->PROPOSAL] Saved and broadcasted proposal phase. Calling agentPhaseHandler again.');
       // Immediately process proposal phase
       return await agentPhaseHandler(gameId, context);
     } else {
@@ -227,7 +228,7 @@ async function agentPhaseHandler(gameId, state) {
         }
       }
       if (proposal) {
-        proposals.push({ playerId: player.id, proposal });
+        proposals.push(proposal); // Only push the proposal object, not {playerId, proposal}
         await eventLogger.logEvent({ gameId, playerId: player.id, type: 'proposal', content: JSON.stringify(proposal) });
         // Broadcast proposal as it is made
         broadcastGameEvent(gameId, { type: 'proposal', data: { playerId: player.id, proposal, state: context } });
@@ -238,6 +239,10 @@ async function agentPhaseHandler(gameId, state) {
     }
     console.log(`[PROPOSAL PHASE] Final proposals array:`, proposals);
     context.proposals = proposals;
+    // Use state machine event to transition to voting
+    const nextState = machine.transition(machine.initialState, { type: 'ALL_PROPOSALS_SUBMITTED' });
+    machine = machine.withContext({ ...nextState.context, proposals });
+    context = machine.context;
     await saveGameState(gameId, context);
     broadcastGameEvent(gameId, { type: 'state_update', data: context });
     return context;

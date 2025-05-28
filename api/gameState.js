@@ -232,7 +232,7 @@ async function agentPhaseHandler(gameId, state) {
         }
       }
       if (proposal) {
-        proposals.push(proposal); // Only push the proposal object, not {playerId, proposal}
+        proposals.push({ playerId: player.id, proposal }); // Attach proposer
         await eventLogger.logEvent({ gameId, playerId: player.id, type: 'proposal', content: JSON.stringify(proposal) });
         // Broadcast proposal as it is made
         broadcastGameEvent(gameId, { type: 'proposal', data: { playerId: player.id, proposal, state: context } });
@@ -288,7 +288,7 @@ async function agentPhaseHandler(gameId, state) {
       }
     }
     if (winnerIdx >= 0) {
-      context.winnerProposal = context.proposals[winnerIdx];
+      context.winnerProposal = context.proposals[winnerIdx]; // winnerProposal now includes playerId
       context.ended = true;
       context.phase = 'endgame';
       broadcastGameEvent(gameId, { type: 'winner', data: { winnerProposal: context.winnerProposal, state: context } });

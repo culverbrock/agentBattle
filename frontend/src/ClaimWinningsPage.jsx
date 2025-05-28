@@ -3,7 +3,7 @@ import { BrowserProvider, Contract, formatUnits } from 'ethers';
 import { Connection as SolConnection, PublicKey } from '@solana/web3.js';
 import { getAssociatedTokenAddress, getAccount, TOKEN_PROGRAM_ID } from '@solana/spl-token';
 import { Buffer } from 'buffer';
-import { ethers } from "ethers";
+import { ethers, keccak256, toUtf8Bytes } from "ethers";
 window.Buffer = Buffer;
 
 const API_URL = import.meta.env.VITE_API_URL || '';
@@ -167,7 +167,7 @@ function ClaimWinningsPage() {
       const signer = await provider.getSigner();
       const contract = new ethers.Contract(ABT_PRIZE_POOL_V3, ABT_PRIZE_POOL_ABI, signer);
       // Convert gameId (UUID) to bytes32
-      const gameIdBytes32 = ethers.utils.keccak256(ethers.utils.toUtf8Bytes(win.game_id));
+      const gameIdBytes32 = keccak256(toUtf8Bytes(win.game_id));
       const tx = await contract.withdraw(gameIdBytes32);
       log(`[ClaimWinningsPage] withdraw(${win.game_id}) tx: ${tx.hash}`);
       await tx.wait();

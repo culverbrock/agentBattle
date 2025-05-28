@@ -405,7 +405,7 @@ function GameRoom() {
         {proposals.length > 0 && (
           <div style={{ marginTop: 8 }}>
             <b>Proposals:</b>
-            <ul>{proposals.map((pr, i) => <li key={i}>{getPlayerName(pr.playerId)}: {pr.proposal || JSON.stringify(pr)}</li>)}</ul>
+            <ul>{proposals.map((pr, i) => <li key={i}>{getPlayerName(pr.playerId)}: {typeof pr.proposal === 'object' ? JSON.stringify(pr.proposal) : String(pr.proposal)}</li>)}</ul>
           </div>
         )}
         {votes.length > 0 && (

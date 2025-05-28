@@ -179,6 +179,18 @@ function ClaimWinningsPage() {
     }
   };
 
+  // Deduplicate winnings: only show the latest unclaimed winning per game
+  const dedupedWinnings = Object.values(
+    winnings
+      .filter(w => !w.claimed) // Only unclaimed
+      .reduce((acc, w) => {
+        if (!acc[w.game_id] || new Date(w.created_at) > new Date(acc[w.game_id].created_at)) {
+          acc[w.game_id] = w;
+        }
+        return acc;
+      }, {})
+  );
+
   return (
     <div style={{ maxWidth: 700, margin: '2rem auto', fontFamily: 'sans-serif', padding: 16 }}>
       <h1>Claim Winnings</h1>
@@ -204,7 +216,7 @@ function ClaimWinningsPage() {
       {error && <div style={{ color: 'red', marginBottom: 8 }}>{error}</div>}
       {successMsg && <div style={{ color: 'green' }}>{successMsg}</div>}
       {!loading && winnings.length === 0 && <div style={{ color: '#888' }}>No claimable winnings at this time.</div>}
-      {winnings.length > 0 && (
+      {dedupedWinnings.length > 0 && (
         <table style={{ width: '100%', borderCollapse: 'collapse', marginTop: 16 }}>
           <thead>
             <tr style={{ background: '#f5f5f5' }}>
@@ -212,35 +224,20 @@ function ClaimWinningsPage() {
               <th style={{ padding: 8, border: '1px solid #ccc' }}>Amount</th>
               <th style={{ padding: 8, border: '1px solid #ccc' }}>Currency</th>
               <th style={{ padding: 8, border: '1px solid #ccc' }}>Created At</th>
+              <th style={{ padding: 8, border: '1px solid #ccc' }}>Claimed</th>
               <th style={{ padding: 8, border: '1px solid #ccc' }}>Action</th>
             </tr>
           </thead>
           <tbody>
-            {winnings.map(win => (
-              <tr key={win.id}>
-                <td style={{ padding: 8, border: '1px solid #ccc', fontFamily: 'monospace' }}>{win.game_id}</td>
-                <td style={{ padding: 8, border: '1px solid #ccc' }}>{win.amount}</td>
-                <td style={{ padding: 8, border: '1px solid #ccc' }}>{win.currency}</td>
-                <td style={{ padding: 8, border: '1px solid #ccc' }}>{new Date(win.created_at).toLocaleString()}</td>
-                <td style={{ padding: 8, border: '1px solid #ccc' }}>
-                  <button
-                    onClick={() => handleClaim(win)}
-                    disabled={claiming[win.id]}
-                    style={{ padding: '6px 16px', background: '#007bff', color: '#fff', border: 'none', borderRadius: 4 }}
-                  >
-                    {claiming[win.id] ? 'Claiming...' : 'Claim'}
-                  </button>
-                </td>
-              </tr>
-            ))}
-            {winnings.filter(w => w.currency === 'ABT' && !w.claimed).map((win, i) => (
+            {dedupedWinnings.map((win, i) => (
               <tr key={win.id}>
                 <td>{win.game_id}</td>
                 <td>{win.amount}</td>
                 <td>{win.currency}</td>
                 <td>{new Date(win.created_at).toLocaleString()}</td>
+                <td>{win.claimed ? 'Yes' : 'No'}</td>
                 <td>
-                  {walletType === 'metamask' && (
+                  {walletType === 'metamask' && !win.claimed && (
                     <button onClick={() => claimOnChain(win)} disabled={claiming[win.id]}>Claim On-Chain (MetaMask)</button>
                   )}
                 </td>

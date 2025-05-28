@@ -16,7 +16,7 @@ const SOL_DEVNET_URL = 'https://api.devnet.solana.com';
 const ABT_PRIZE_POOL_V2 = "0x94006Fb7D2fb9E6F2826214EdEC0Fd45fd30f67B";
 const ABT_PRIZE_POOL_V3 = "0xa2852c3da70A7A481cE97a1E5bde7Da37EFB0c36";
 const ABT_PRIZE_POOL_ABI = [
-  "function withdraw() external"
+  "function withdraw(bytes32 gameId) external"
 ];
 
 function ClaimWinningsPage() {

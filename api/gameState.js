@@ -180,6 +180,10 @@ async function agentPhaseHandler(gameId, state) {
       broadcastGameEvent(gameId, { type: 'state_update', data: context });
       // Immediately process proposal phase
       return await agentPhaseHandler(gameId, context);
+    } else if (context.phase === 'proposal') {
+      // If phase is already proposal, immediately process proposal phase
+      console.log('[NEGOTIATION->PROPOSAL] Phase is already proposal after negotiation loop, processing proposals...');
+      return await agentPhaseHandler(gameId, context);
     } else {
       console.log('[NEGOTIATION END] Not transitioning to proposal. Current phase:', context.phase);
     }

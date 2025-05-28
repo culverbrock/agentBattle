@@ -245,7 +245,7 @@ async function agentPhaseHandler(gameId, state) {
     context.proposals = proposals; // Set proposals in context before transition
     console.log('[PROPOSAL PHASE] About to fire ALL_PROPOSALS_SUBMITTED. Current phase:', context.phase, 'Proposals:', JSON.stringify(context.proposals));
     // Use state machine event to transition to voting
-    const currentState = State.create({ value: context.phase, context });
+    const currentState = State.from(context, context.phase);
     const nextState = machine.transition(currentState, { type: 'ALL_PROPOSALS_SUBMITTED' });
     console.log('[PROPOSAL PHASE] After ALL_PROPOSALS_SUBMITTED transition. Next phase:', nextState.context.phase, 'Proposals:', JSON.stringify(nextState.context.proposals));
     machine = machine.withContext(nextState.context);

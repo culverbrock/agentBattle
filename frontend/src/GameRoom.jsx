@@ -520,13 +520,29 @@ function GameRoom() {
           <div style={{ marginBottom: 12 }}>
             <b>Proposals:</b>
             <ul style={{ margin: 0, paddingLeft: 20 }}>
-              {gameState.proposals.map((pr, i) => (
-                <li key={i}>
-                  <span style={{ color: '#007bff' }}>{getPlayerName(pr.playerId)}</span>
-                  <span style={{ color: '#888', marginLeft: 6, fontSize: 13 }}>({players.find(p => p.id === pr.playerId)?.agent?.strategy || 'default'} agent)</span>:
-                  <span style={{ marginLeft: 8 }}>{typeof pr.proposal === 'object' ? JSON.stringify(pr.proposal) : String(pr.proposal)}</span>
-                </li>
-              ))}
+              {gameState.proposals.map((pr, i) => {
+                // Tally votes for this proposal (by proposerId)
+                let voteTotal = 0;
+                if (gameState.votes && Array.isArray(gameState.votes)) {
+                  for (const v of gameState.votes) {
+                    if (v.votes && typeof v.votes === 'object' && v.votes[pr.playerId] !== undefined) {
+                      voteTotal += Number(v.votes[pr.playerId]);
+                    }
+                  }
+                }
+                return (
+                  <li key={i}>
+                    <span style={{ color: '#007bff' }}>{getPlayerName(pr.playerId)}</span>
+                    <span style={{ color: '#888', marginLeft: 6, fontSize: 13 }}>({players.find(p => p.id === pr.playerId)?.agent?.strategy || 'default'} agent)</span>:
+                    <span style={{ marginLeft: 8 }}>{typeof pr.proposal === 'object' ? JSON.stringify(pr.proposal) : String(pr.proposal)}</span>
+                    {gameState.votes && gameState.votes.length > 0 && (
+                      <span style={{ marginLeft: 12, color: '#28a745', fontWeight: 'bold' }}>
+                        Votes received: {voteTotal}
+                      </span>
+                    )}
+                  </li>
+                );
+              })}
             </ul>
           </div>
         )}

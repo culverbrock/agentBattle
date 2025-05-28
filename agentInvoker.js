@@ -89,42 +89,97 @@ async function generateProposal(context, agent, players) {
  * @returns {object} The vote (e.g., { proposalIndex: 0 })
  */
 async function generateVote(context, agent) {
-  const numProposals = (context.proposals?.length || 1);
+  const proposals = context.proposals || [];
+  const proposerIds = proposals.map(p => p.playerId);
   switch (agent.type) {
     case 'llm': {
-      const prompt = `You are an agent in a negotiation game. There are several proposals for splitting the prize pool. You have 100 votes to split among the proposals as you see fit. Respond ONLY with a JSON object where each key is the proposal index and each value is the number of votes you assign to that proposal. The total must sum to 100. Example: {"0": 60, "1": 40}`;
+      // Format proposals for LLM
+      const proposalList = proposals.map((p, i) => `Proposer: ${p.playerId}, Proposal: ${JSON.stringify(p.proposal)}`).join('\n');
+      const history = (context.negotiationHistory || [])
+        .map(entry => {
+          const player = (context.players || []).find(p => p.id === entry.playerId);
+          const agentName = player ? (player.name || player.id) : entry.playerId;
+          return `${agentName} (${entry.playerId}): ${entry.message}`;
+        })
+        .join('\n');
+      const prompt = `You are an agent in a negotiation game. Your strategy: "${agent.strategy || ''}".\n\nThere are several proposals for splitting the prize pool. Each proposal is made by a proposer.\n\nProposals:\n${proposalList}\n\nNegotiation history so far:\n${history}\n\nYou have 100 votes to split among the proposals as you see fit. Respond ONLY with a JSON object where each key is the proposerId and each value is the number of votes you assign to that proposal. The total must sum to 100.\n\nExample: {"p1": 60, "p2": 40}`;
       const response = await callLLM(prompt, { system: 'You are a negotiation agent.' });
+      console.log('[generateVote] Raw LLM response:', response);
       try {
         const parsed = JSON.parse(response);
-        // Validate sum to 100
+        // Validate keys and sum
+        const keys = Object.keys(parsed);
+        const validKeys = keys.every(k => proposerIds.includes(k));
         const sum = Object.values(parsed).reduce((a, b) => a + Number(b), 0);
-        if (sum === 100) return parsed;
-      } catch {}
-      // Fallback: all votes to first proposal
-      return { 0: 100 };
+        if (validKeys && sum === 100) {
+          console.log('[generateVote] Parsed and validated vote:', parsed);
+          return parsed;
+        } else {
+          console.error('[generateVote] Invalid vote keys or sum:', parsed, 'Expected proposerIds:', proposerIds, 'Sum:', sum);
+        }
+      } catch (err) {
+        console.error('[generateVote] Failed to parse or validate LLM vote response:', err, response);
+      }
+      // Fallback: all votes to own proposal if present, else split evenly
+      const selfId = agent.id || (context.players?.find(p => p.agent === agent)?.id);
+      if (selfId && proposerIds.includes(selfId)) {
+        return { [selfId]: 100 };
+      } else if (proposerIds.length > 0) {
+        // Split evenly
+        const even = Math.floor(100 / proposerIds.length);
+        const votes = {};
+        let remainder = 100;
+        proposerIds.forEach((pid, idx) => {
+          if (idx === proposerIds.length - 1) {
+            votes[pid] = remainder;
+          } else {
+            votes[pid] = even;
+            remainder -= even;
+          }
+        });
+        return votes;
+      } else {
+        return {};
+      }
     }
     case 'random': {
-      // Randomly split 100 votes among proposals
+      // Randomly split 100 votes among proposerIds
       let remaining = 100;
       const votes = {};
-      for (let i = 0; i < numProposals; i++) {
-        if (i === numProposals - 1) {
-          votes[i] = remaining;
+      for (let i = 0; i < proposerIds.length; i++) {
+        if (i === proposerIds.length - 1) {
+          votes[proposerIds[i]] = remaining;
         } else {
           const v = Math.floor(Math.random() * (remaining + 1));
-          votes[i] = v;
+          votes[proposerIds[i]] = v;
           remaining -= v;
         }
       }
       return votes;
     }
     case 'greedy': {
-      // All votes to first proposal
-      return { 0: 100 };
+      // All votes to own proposal if present, else first
+      const selfId = agent.id || (context.players?.find(p => p.agent === agent)?.id);
+      if (selfId && proposerIds.includes(selfId)) {
+        return { [selfId]: 100 };
+      } else if (proposerIds.length > 0) {
+        return { [proposerIds[0]]: 100 };
+      } else {
+        return {};
+      }
     }
     case 'default':
-    default:
-      return { 0: 100 };
+    default: {
+      // All votes to own proposal if present, else first
+      const selfId = agent.id || (context.players?.find(p => p.agent === agent)?.id);
+      if (selfId && proposerIds.includes(selfId)) {
+        return { [selfId]: 100 };
+      } else if (proposerIds.length > 0) {
+        return { [proposerIds[0]]: 100 };
+      } else {
+        return {};
+      }
+    }
   }
 }
 

@@ -262,13 +262,18 @@ async function agentPhaseHandler(gameId, state) {
     await saveGameState(gameId, context);
     broadcastGameEvent(gameId, { type: 'state_update', data: context });
     console.log('[PROPOSAL PHASE] Saved and broadcasted after ALL_PROPOSALS_SUBMITTED. Final phase:', context.phase);
+    if (context.phase === 'voting') {
+      console.log('[PROPOSAL->VOTING] Phase is voting after proposal, processing votes...');
+      return await agentPhaseHandler(gameId, context);
+    }
     return context;
   }
   // Voting phase: each player submits a vote
   if (context.phase === 'voting') {
     const players = context.players.filter(p => !context.eliminated.includes(p.id));
-    const numProposals = context.proposals?.length || 1;
+    const proposals = context.proposals || [];
     const allVotes = [];
+    let currentState = machine.initialState;
     for (const player of players) {
       const agent = player.agent || { strategy: 'default', type: 'default' };
       let votes;
@@ -276,35 +281,47 @@ async function agentPhaseHandler(gameId, state) {
         votes = await agentInvoker.generateVote(context, agent);
       } catch (err) {
         console.error('Agent vote error:', err);
-        votes = { 0: 100 };
+        // Default: vote for own proposal if possible, else first proposal
+        votes = { [proposals[0]?.playerId || 0]: 100 };
       }
       allVotes.push({ playerId: player.id, votes });
-      const nextState = machine.transition(machine.initialState, { type: 'SUBMIT_VOTE', playerId: player.id, votes });
+      const nextState = machine.transition(currentState, { type: 'SUBMIT_VOTE', playerId: player.id, votes });
       await eventLogger.logEvent({ gameId, playerId: player.id, type: 'vote', content: JSON.stringify(votes) });
       machine = machine.withContext(nextState.context);
       context = nextState.context;
+      currentState = nextState;
       broadcastGameEvent(gameId, { type: 'vote', data: { playerId: player.id, votes, state: context } });
     }
-    // Tally votes
-    const proposalTotals = Array(numProposals).fill(0);
+    // Tally votes by proposer playerId
+    const proposalVoteTotals = {};
+    for (const proposal of proposals) {
+      proposalVoteTotals[proposal.playerId] = 0;
+    }
     for (const v of allVotes) {
-      for (const [idx, count] of Object.entries(v.votes)) {
-        proposalTotals[Number(idx)] += Number(count);
+      for (const [pid, count] of Object.entries(v.votes)) {
+        if (proposalVoteTotals.hasOwnProperty(pid)) {
+          proposalVoteTotals[pid] += Number(count);
+        }
       }
     }
-    const totalVotes = proposalTotals.reduce((a, b) => a + b, 0);
-    let winnerIdx = -1;
-    for (let i = 0; i < proposalTotals.length; i++) {
-      if (proposalTotals[i] / totalVotes >= 0.61) {
-        winnerIdx = i;
+    const totalVotes = Object.values(proposalVoteTotals).reduce((a, b) => a + b, 0);
+    console.log('[VOTING PHASE] Proposal vote totals by playerId:', proposalVoteTotals, 'Total votes:', totalVotes);
+    let winnerPlayerId = null;
+    for (const [pid, count] of Object.entries(proposalVoteTotals)) {
+      if (count / totalVotes >= 0.61) {
+        winnerPlayerId = pid;
         break;
       }
     }
-    if (winnerIdx >= 0) {
-      context.winnerProposal = context.proposals[winnerIdx]; // winnerProposal now includes playerId
+    if (winnerPlayerId) {
+      const winnerProposal = proposals.find(p => p.playerId === winnerPlayerId);
+      console.log(`[VOTING PHASE] Proposal by ${winnerPlayerId} is the winner with ${(proposalVoteTotals[winnerPlayerId] / totalVotes * 100).toFixed(2)}% of votes.`);
+      context.winnerProposal = winnerProposal;
       context.ended = true;
       context.phase = 'endgame';
       broadcastGameEvent(gameId, { type: 'winner', data: { winnerProposal: context.winnerProposal, state: context } });
+    } else {
+      console.log('[VOTING PHASE] No proposal reached 61% threshold. No winner this round.');
     }
     await saveGameState(gameId, context);
     broadcastGameEvent(gameId, { type: 'state_update', data: context });

@@ -244,10 +244,19 @@ async function agentPhaseHandler(gameId, state) {
     console.log(`[PROPOSAL PHASE] Final proposals array:`, proposals);
     context.proposals = proposals; // Set proposals in context before transition
     console.log('[PROPOSAL PHASE] About to fire ALL_PROPOSALS_SUBMITTED. Current phase:', context.phase, 'Proposals:', JSON.stringify(context.proposals));
-    // Use state machine event to transition to voting
-    const currentState = State.from(context, context.phase);
+    // Guard: Ensure context.phase is a string and valid
+    if (typeof context.phase !== 'string' || !['lobby','strategy','negotiation','proposal','voting','elimination','endgame'].includes(context.phase)) {
+      console.error('[PROPOSAL PHASE] ERROR: context.phase is not a valid string state:', context.phase, 'Full context:', JSON.stringify(context));
+      throw new Error('Invalid context.phase for state machine transition: ' + context.phase);
+    }
+    // Use the current XState State object for transition, as in earlier phases
+    console.log('[PROPOSAL PHASE] Transitioning to voting:');
+    console.log('  currentState.value:', currentState.value);
+    console.log('  currentState.context:', JSON.stringify(currentState.context));
+    console.log('  Event: { type: ALL_PROPOSALS_SUBMITTED }');
     const nextState = machine.transition(currentState, { type: 'ALL_PROPOSALS_SUBMITTED' });
-    console.log('[PROPOSAL PHASE] After ALL_PROPOSALS_SUBMITTED transition. Next phase:', nextState.context.phase, 'Proposals:', JSON.stringify(nextState.context.proposals));
+    console.log('  nextState.value:', nextState.value);
+    console.log('  nextState.context:', JSON.stringify(nextState.context));
     machine = machine.withContext(nextState.context);
     context = machine.context;
     await saveGameState(gameId, context);
@@ -333,6 +342,20 @@ async function agentPhaseHandler(gameId, state) {
 function validateProposal(proposal, players) {
   // TEMP: Disable validation for debugging
   return true;
+}
+
+// Helper: Extract only valid state machine context keys
+function getStateMachineContext(state) {
+  const {
+    round, maxRounds, players, eliminated, strategyMessages,
+    negotiationHistory, proposals, votes, speakingOrder, currentSpeakerIdx,
+    winnerProposal, ended
+  } = state;
+  return {
+    round, maxRounds, players, eliminated, strategyMessages,
+    negotiationHistory, proposals, votes, speakingOrder, currentSpeakerIdx,
+    winnerProposal, ended
+  };
 }
 
 // Start game

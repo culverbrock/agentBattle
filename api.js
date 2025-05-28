@@ -306,9 +306,12 @@ router.post('/claim-abt', claimAbtHandler);
 router.get('/winnings/:playerId', async (req, res) => {
   const { playerId } = req.params;
   try {
+    // Determine wallet type
+    const isEth = playerId.startsWith('0x');
+    const currency = isEth ? 'ABT' : 'SPL';
     const { rows } = await pool.query(
-      `SELECT * FROM winnings WHERE player_id = $1 AND claimed = false ORDER BY created_at DESC`,
-      [playerId]
+      `SELECT * FROM winnings WHERE LOWER(player_id) = LOWER($1) AND claimed = false AND currency = $2 ORDER BY created_at DESC`,
+      [playerId, currency]
     );
     res.json({ winnings: rows });
   } catch (err) {

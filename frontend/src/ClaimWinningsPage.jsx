@@ -3,6 +3,7 @@ import { BrowserProvider, Contract, formatUnits } from 'ethers';
 import { Connection as SolConnection, PublicKey } from '@solana/web3.js';
 import { getAssociatedTokenAddress, getAccount, TOKEN_PROGRAM_ID } from '@solana/spl-token';
 import { Buffer } from 'buffer';
+import { ethers } from "ethers";
 window.Buffer = Buffer;
 
 const API_URL = import.meta.env.VITE_API_URL || '';
@@ -12,6 +13,10 @@ const ABT_DECIMALS = 18;
 const SPL_MINT_ADDRESS = '7iJY63ffm5Q7QC6mxb6v3QECMv2Ss4E5UcMmmdaMfFCb';
 const SPL_DECIMALS = 6;
 const SOL_DEVNET_URL = 'https://api.devnet.solana.com';
+const ABT_PRIZE_POOL_V2 = "0x94006Fb7D2fb9E6F2826214EdEC0Fd45fd30f67B";
+const ABT_PRIZE_POOL_ABI = [
+  "function withdraw() external"
+];
 
 function ClaimWinningsPage() {
   // Wallet state
@@ -152,6 +157,28 @@ function ClaimWinningsPage() {
     setClaiming(c => ({ ...c, [win.id]: false }));
   };
 
+  const claimOnChain = async () => {
+    setError("");
+    setSuccessMsg("");
+    try {
+      if (!window.ethereum) throw new Error("MetaMask required");
+      const provider = new ethers.BrowserProvider(window.ethereum);
+      const signer = await provider.getSigner();
+      const contract = new ethers.Contract(ABT_PRIZE_POOL_V2, ABT_PRIZE_POOL_ABI, signer);
+      const tx = await contract.withdraw();
+      log(`[ClaimWinningsPage] withdraw() tx: ${tx.hash}`);
+      await tx.wait();
+      setSuccessMsg("Claimed on-chain! Check your wallet balance.");
+      // Optionally, call backend to mark as claimed
+      // await fetch(`${API_URL}/api/mark-claimed`, { method: 'POST', ... })
+      // Refresh winnings
+      fetchWinnings();
+    } catch (err) {
+      log(`[ClaimWinningsPage] On-chain claim error: ${err.message}`);
+      setError(err.message);
+    }
+  };
+
   return (
     <div style={{ maxWidth: 700, margin: '2rem auto', fontFamily: 'sans-serif', padding: 16 }}>
       <h1>Claim Winnings</h1>
@@ -175,7 +202,7 @@ function ClaimWinningsPage() {
       </div>
       {loading && <div>Loading...</div>}
       {error && <div style={{ color: 'red', marginBottom: 8 }}>{error}</div>}
-      {successMsg && <div style={{ color: '#28a745', marginBottom: 8 }}>{successMsg}</div>}
+      {successMsg && <div style={{ color: 'green' }}>{successMsg}</div>}
       {!loading && winnings.length === 0 && <div style={{ color: '#888' }}>No claimable winnings at this time.</div>}
       {winnings.length > 0 && (
         <table style={{ width: '100%', borderCollapse: 'collapse', marginTop: 16 }}>
@@ -203,6 +230,19 @@ function ClaimWinningsPage() {
                   >
                     {claiming[win.id] ? 'Claiming...' : 'Claim'}
                   </button>
+                </td>
+              </tr>
+            ))}
+            {winnings.filter(w => w.currency === 'ABT' && !w.claimed).map((win, i) => (
+              <tr key={win.id}>
+                <td>{win.game_id}</td>
+                <td>{win.amount}</td>
+                <td>{win.currency}</td>
+                <td>{new Date(win.created_at).toLocaleString()}</td>
+                <td>
+                  {walletType === 'metamask' && (
+                    <button onClick={claimOnChain} disabled={claiming[win.id]}>Claim On-Chain (MetaMask)</button>
+                  )}
                 </td>
               </tr>
             ))}

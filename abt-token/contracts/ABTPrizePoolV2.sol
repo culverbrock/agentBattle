@@ -42,12 +42,11 @@ contract ABTPrizePoolV2 {
     function setWinners(address[] calldata winnerAddresses, uint256[] calldata amounts) external onlyOwner {
         require(!winnersSet, "Winners already set");
         require(winnerAddresses.length == amounts.length, "Mismatched arrays");
-        uint256 sum;
         for (uint256 i = 0; i < winnerAddresses.length; i++) {
             winnings[winnerAddresses[i]] = amounts[i];
-            sum += amounts[i];
         }
-        require(sum == totalPool, "Payouts must sum to total pool");
+        // No longer require sum == totalPool; contract can be used for multiple games and cross-chain payouts.
+        // Owner is responsible for ensuring sufficient balance for payouts.
         winnersSet = true;
         emit WinnersSet(winnerAddresses, amounts);
     }

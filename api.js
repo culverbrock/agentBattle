@@ -327,16 +327,7 @@ router.post('/claim', async (req, res) => {
     return res.status(400).json({ error: 'playerId, gameId, and currency are required' });
   }
   try {
-    // Find unclaimed winnings
-    const { rows } = await pool.query(
-      `SELECT * FROM winnings WHERE player_id = $1 AND game_id = $2 AND currency = $3 AND claimed = false`,
-      [playerId, gameId, currency]
-    );
-    if (rows.length === 0) {
-      return res.status(404).json({ error: 'No claimable winnings found' });
-    }
-    const win = rows[0];
-    let payoutSuccess = false;
+    console.log(`[CLAIM] Attempting claim for playerId: ${playerId}, gameId: ${gameId}, currency: ${currency}`);
     if (currency === 'ABT') {
       // --- ABT payout: call withdraw() on ABTPrizePoolV2 as relayer ---
       try {
@@ -356,10 +347,12 @@ router.post('/claim', async (req, res) => {
         if (alreadyWithdrawn) {
           return res.status(400).json({ error: 'Winnings already withdrawn on-chain' });
         }
-        // Use relayer to call withdraw() on behalf of the player (relayer pattern)
-        // This requires the contract to allow relayer withdrawal, or you must use a meta-tx pattern
-        // For now, we assume relayer can call withdraw() for the player
-        const tx = await abtPrizePool.withdraw({ from: playerId });
+        console.log(`[CLAIM] Relayer address for withdraw: ${relayer.address}`);
+        // The relayer can only withdraw its own winnings unless the contract supports relayer withdrawal for others
+        if (relayer.address.toLowerCase() !== playerId.toLowerCase()) {
+          return res.status(400).json({ error: 'Relayer cannot withdraw for this player. Use the player wallet to claim.' });
+        }
+        const tx = await abtPrizePool.withdraw();
         await tx.wait();
         payoutSuccess = true;
         console.log(`[CLAIM] ABT withdraw() tx sent for ${playerId}:`, tx.hash);

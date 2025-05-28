@@ -8,6 +8,7 @@ const { broadcastGameEvent, broadcastGameRoomState } = require('../gameRoomWebSo
 const agentInvoker = require('../agentInvoker');
 const eventLogger = require('../eventLogger');
 const { State } = require('xstate');
+const bridgeUtils = require('../bridgeUtils');
 
 // In-memory cache for active state machines (for demo/dev)
 const machines = {};
@@ -197,7 +198,9 @@ async function agentPhaseHandler(gameId, state) {
     console.log(`[PROPOSAL PHASE] Players:`, context.players.map(p => p.id));
     console.log(`[PROPOSAL PHASE] Eliminated:`, context.eliminated);
     console.log(`[PROPOSAL PHASE] Negotiation history:`, context.negotiationHistory);
-    const players = context.players.filter(p => !context.eliminated.includes(p.id));
+    // Only allow eligible proposers (not ineligibleProposers)
+    const ineligibleProposers = context.ineligibleProposers || [];
+    const players = context.players.filter(p => !context.eliminated.includes(p.id) && !ineligibleProposers.includes(p.id));
     if (players.length === 0) {
       console.warn(`[PROPOSAL PHASE] No eligible players to propose for game ${gameId}`);
     }
@@ -268,10 +271,40 @@ async function agentPhaseHandler(gameId, state) {
     }
     return context;
   }
+  // Strategy phase: allow new strategy messages, auto-progress after 15s
+  if (context.phase === 'strategy') {
+    console.log(`[STRATEGY PHASE] Entered strategy phase for game ${gameId}`);
+    // Allow 15s for new strategies
+    let strategiesSubmitted = context.strategyMessages ? Object.keys(context.strategyMessages).length : 0;
+    const totalPlayers = context.players ? context.players.length : 0;
+    let waited = 0;
+    const waitMs = 15000;
+    const intervalMs = 1000;
+    while (waited < waitMs) {
+      // Check if all players have submitted
+      strategiesSubmitted = context.strategyMessages ? Object.keys(context.strategyMessages).length : 0;
+      if (strategiesSubmitted >= totalPlayers) {
+        console.log('[STRATEGY PHASE] All strategies submitted, progressing to negotiation.');
+        break;
+      }
+      await new Promise(res => setTimeout(res, intervalMs));
+      waited += intervalMs;
+    }
+    if (waited >= waitMs) {
+      console.log('[STRATEGY PHASE] 15s elapsed, auto-progressing to negotiation.');
+    }
+    // Progress to negotiation
+    context.phase = 'negotiation';
+    await saveGameState(gameId, context);
+    broadcastGameEvent(gameId, { type: 'state_update', data: context });
+    return await agentPhaseHandler(gameId, context);
+  }
   // Voting phase: each player submits a vote
   if (context.phase === 'voting') {
     const players = context.players.filter(p => !context.eliminated.includes(p.id));
     const proposals = context.proposals || [];
+    // Initialize ineligibleProposers if not present
+    if (!context.ineligibleProposers) context.ineligibleProposers = [];
     const allVotes = [];
     let currentState = machine.initialState;
     for (const player of players) {
@@ -320,8 +353,97 @@ async function agentPhaseHandler(gameId, state) {
       context.ended = true;
       context.phase = 'endgame';
       broadcastGameEvent(gameId, { type: 'winner', data: { winnerProposal: context.winnerProposal, state: context } });
+      // --- NEW: Aggregate prize pool and handle cross-currency payout ---
+      try {
+        // 1. Aggregate entry fees by currency
+        const { rows: paymentRows } = await pool.query(
+          `SELECT currency, SUM(amount) as total FROM payments WHERE game_id = $1 GROUP BY currency`,
+          [gameId]
+        );
+        const poolByCurrency = {};
+        for (const row of paymentRows) {
+          poolByCurrency[row.currency] = Number(row.total);
+        }
+        // 2. Determine payout currency from proposal (use first nonzero winner's currency)
+        let payoutCurrency = null;
+        let payoutPlayers = Object.keys(winnerProposal.proposal || {});
+        for (const pid of payoutPlayers) {
+          // Find the currency this player paid in
+          const { rows: payRows } = await pool.query(
+            `SELECT currency FROM payments WHERE game_id = $1 AND player_id = $2 LIMIT 1`,
+            [gameId, pid]
+          );
+          if (payRows.length > 0) {
+            payoutCurrency = payRows[0].currency;
+            break;
+          }
+        }
+        if (!payoutCurrency) payoutCurrency = Object.keys(poolByCurrency)[0] || 'ABT';
+        // 3. If all entry fees are in payoutCurrency, proceed as before
+        const allSameCurrency = Object.keys(poolByCurrency).length === 1 && Object.keys(poolByCurrency)[0] === payoutCurrency;
+        if (!allSameCurrency) {
+          // 4. Cross-currency: burn losing side, mint payoutCurrency
+          for (const [cur, amt] of Object.entries(poolByCurrency)) {
+            if (cur !== payoutCurrency && amt > 0) {
+              // Burn tokens (implement burn logic for ABT/SPL)
+              console.log(`[BRIDGE] Burning ${amt} ${cur} for game ${gameId}`);
+              if (cur === 'ABT') {
+                await bridgeUtils.burnABT(amt /*, provider, signer */);
+              } else if (cur === 'SPL') {
+                await bridgeUtils.burnSPL(amt /*, payer, connection */);
+              }
+            }
+          }
+          // Mint payoutCurrency (implement mint logic for ABT/SPL)
+          const totalToMint = Object.values(poolByCurrency).reduce((a, b) => a + b, 0);
+          console.log(`[BRIDGE] Minting ${totalToMint} ${payoutCurrency} for game ${gameId}`);
+          if (payoutCurrency === 'ABT') {
+            // TODO: Provide recipient address and signer
+            // await bridgeUtils.mintABT(to, totalToMint, provider, signer);
+          } else if (payoutCurrency === 'SPL') {
+            // TODO: Provide recipient address and payer/connection
+            // await bridgeUtils.mintSPL(to, totalToMint, payer, connection);
+          }
+        }
+        // 5. Record payouts in winnings table
+        const total = Object.values(poolByCurrency).reduce((a, b) => a + b, 0);
+        const proposalDist = winnerProposal.proposal || {};
+        for (const [playerId, percent] of Object.entries(proposalDist)) {
+          const amount = (Number(percent) / 100) * total;
+          if (amount > 0) {
+            await pool.query(
+              `INSERT INTO winnings (game_id, player_id, amount, currency, claimed, created_at) VALUES ($1, $2, $3, $4, false, NOW())`,
+              [gameId, playerId, amount, payoutCurrency]
+            );
+            console.log(`[WINNINGS] Recorded: player ${playerId} gets ${amount} ${payoutCurrency} for game ${gameId}`);
+          }
+        }
+      } catch (err) {
+        console.error('[WINNINGS/BRIDGE] Error recording payouts or handling bridge:', err);
+      }
     } else {
-      console.log('[VOTING PHASE] No proposal reached 61% threshold. No winner this round.');
+      // No winner: eliminate the proposal with the fewest votes
+      let minVotes = Infinity;
+      let eliminatedProposer = null;
+      for (const [pid, count] of Object.entries(proposalVoteTotals)) {
+        if (count < minVotes) {
+          minVotes = count;
+          eliminatedProposer = pid;
+        }
+      }
+      if (eliminatedProposer) {
+        context.ineligibleProposers.push(eliminatedProposer);
+        context.proposals = context.proposals.filter(p => p.playerId !== eliminatedProposer);
+        console.log(`[VOTING PHASE] No proposal reached 61% threshold. Eliminating proposal by ${eliminatedProposer} (received ${minVotes} votes).`);
+        broadcastGameEvent(gameId, { type: 'proposal_eliminated', data: { eliminatedProposer, minVotes, state: context } });
+      }
+      // Go back to strategy phase for new round
+      context.phase = 'strategy';
+      // Optionally, reset strategyMessages for new input
+      // context.strategyMessages = {};
+      await saveGameState(gameId, context);
+      broadcastGameEvent(gameId, { type: 'state_update', data: context });
+      return context;
     }
     await saveGameState(gameId, context);
     broadcastGameEvent(gameId, { type: 'state_update', data: context });

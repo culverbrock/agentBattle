@@ -85,7 +85,12 @@ module.exports = async function handler(req, res) {
       res.status(400).json({ error: 'Payment not confirmed on-chain' });
       return;
     }
-    // Store payment record (optional: insert into a payments table)
+    // Store payment record in payments table
+    const currency = chain === 'eth' ? 'ABT' : 'SPL';
+    await pool.query(
+      `INSERT INTO payments (game_id, player_id, amount, currency, tx_hash, chain, created_at) VALUES ($1, $2, $3, $4, $5, $6, NOW())`,
+      [gameId, playerId, amount, currency, tx, chain]
+    );
     // Add player to game
     const query = `INSERT INTO players (id, name, status, game_id) VALUES ($1, $2, 'connected', $3)
       ON CONFLICT (id) DO UPDATE SET name = $2, status = 'connected', game_id = $3 RETURNING *`;

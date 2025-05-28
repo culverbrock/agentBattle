@@ -66,6 +66,8 @@ function GameRoom() {
     if (id.length > 32) return 'phantom';
     return '';
   });
+  // Add state for strategy countdown
+  const [strategyCountdown, setStrategyCountdown] = useState(15);
 
   // Fetch initial state and messages
   useEffect(() => {
@@ -328,6 +330,21 @@ function GameRoom() {
     return p ? (p.name || p.id) : id;
   };
 
+  // Countdown effect for strategy phase
+  useEffect(() => {
+    if (phase === 'strategy') {
+      setStrategyCountdown(15);
+      const interval = setInterval(() => {
+        setStrategyCountdown(prev => {
+          if (prev > 0) return prev - 1;
+          clearInterval(interval);
+          return 0;
+        });
+      }, 1000);
+      return () => clearInterval(interval);
+    }
+  }, [phase, gameId]);
+
   return (
     <div style={{ maxWidth: 800, margin: '2rem auto', fontFamily: 'sans-serif', padding: 16 }}>
       <button onClick={() => navigate('/')} style={{ marginBottom: 16, padding: '8px 16px', background: '#eee', border: 'none', borderRadius: 4, cursor: 'pointer' }}>← Leave Room</button>
@@ -429,6 +446,15 @@ function GameRoom() {
           {phase === 'elimination' && (
             <div style={{ color: '#888' }}>Agents are eliminating a player...</div>
           )}
+          {(phase === 'endgame' || phase === 'end') && gameState?.winnerProposal && (
+            <div style={{ marginTop: 16, padding: 16, background: '#e9f7ef', border: '2px solid #28a745', borderRadius: 8 }}>
+              <b style={{ color: '#28a745', fontSize: 18 }}>Game Over! A proposal has won with &ge;61% of the votes.</b>
+              <div style={{ marginTop: 8 }}>
+                <b>Winning Proposal by {getPlayerName(gameState.winnerProposal.playerId)}:</b>
+                <pre style={{ background: '#f5f5f5', padding: 8, borderRadius: 4, marginTop: 4 }}>{JSON.stringify(gameState.winnerProposal.proposal, null, 2)}</pre>
+              </div>
+            </div>
+          )}
           {(phase === 'endgame' || phase === 'end') && (
             <div style={{ marginTop: 16 }}>
               <b>Game Over!</b>
@@ -472,6 +498,12 @@ function GameRoom() {
           {/* Continue button for next round or phase */}
           {gameState?.canContinue && (
             <button onClick={continueGame} style={{ marginTop: 16, padding: '8px 16px' }}>Continue</button>
+          )}
+          {phase === 'strategy' && (
+            <div style={{ color: '#888', marginBottom: 8 }}>
+              You have <b style={{ color: '#007bff' }}>{strategyCountdown}</b> seconds to submit an additional strategy message for your agent.<br />
+              If you do not submit, the game will auto-progress to negotiation.
+            </div>
           )}
         </div>
       </div>
@@ -540,6 +572,29 @@ function GameRoom() {
                         Votes received: {voteTotal}
                       </span>
                     )}
+                  </li>
+                );
+              })}
+            </ul>
+          </div>
+        )}
+        {/* Show vote totals for each proposal after proposals list */}
+        {gameState?.proposals && gameState.proposals.length > 0 && gameState?.votes && gameState.votes.length > 0 && (
+          <div style={{ marginBottom: 12 }}>
+            <b>Proposal Vote Totals:</b>
+            <ul style={{ margin: 0, paddingLeft: 20 }}>
+              {gameState.proposals.map((pr, i) => {
+                let voteTotal = 0;
+                if (gameState.votes && Array.isArray(gameState.votes)) {
+                  for (const v of gameState.votes) {
+                    if (v.votes && typeof v.votes === 'object' && v.votes[pr.playerId] !== undefined) {
+                      voteTotal += Number(v.votes[pr.playerId]);
+                    }
+                  }
+                }
+                return (
+                  <li key={i}>
+                    <span style={{ color: '#007bff' }}>{getPlayerName(pr.playerId)}</span>: <b>{voteTotal}</b> votes
                   </li>
                 );
               })}

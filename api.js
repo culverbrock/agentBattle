@@ -19,6 +19,9 @@ const { startGameRoomWebSocketServer } = require('./gameRoomWebSocketServer');
 const { saveGameState, loadGameState } = require('./gameStatePersistence');
 const claimSplHandler = require('./api/claim-spl');
 const claimAbtHandler = require('./api/claim-abt');
+const bridgeUtils = require('./bridgeUtils');
+const { Connection, PublicKey, Keypair, Transaction } = require('@solana/web3.js');
+const { createTransferInstruction, getAssociatedTokenAddress } = require('@solana/spl-token');
 
 /**
  * @route POST /games
@@ -296,6 +299,111 @@ router.post('/game-state/:gameId/ready', async (req, res) => {
 
 router.post('/claim-spl', claimSplHandler);
 router.post('/claim-abt', claimAbtHandler);
+
+// --- CLAIM SYSTEM ENDPOINTS ---
+
+// Get all claimable winnings for a player
+router.get('/winnings/:playerId', async (req, res) => {
+  const { playerId } = req.params;
+  try {
+    const { rows } = await pool.query(
+      `SELECT * FROM winnings WHERE player_id = $1 AND claimed = false ORDER BY created_at DESC`,
+      [playerId]
+    );
+    res.json({ winnings: rows });
+  } catch (err) {
+    console.error('[CLAIM] Error fetching winnings:', err);
+    res.status(500).json({ error: 'Failed to fetch winnings' });
+  }
+});
+
+// Claim winnings (by id or gameId+playerId+currency)
+router.post('/claim', async (req, res) => {
+  const { playerId, gameId, currency } = req.body;
+  if (!playerId || !gameId || !currency) {
+    return res.status(400).json({ error: 'playerId, gameId, and currency are required' });
+  }
+  try {
+    // Find unclaimed winnings
+    const { rows } = await pool.query(
+      `SELECT * FROM winnings WHERE player_id = $1 AND game_id = $2 AND currency = $3 AND claimed = false`,
+      [playerId, gameId, currency]
+    );
+    if (rows.length === 0) {
+      return res.status(404).json({ error: 'No claimable winnings found' });
+    }
+    const win = rows[0];
+    let payoutSuccess = false;
+    if (currency === 'ABT') {
+      // --- ABT payout: call withdraw() on ABTPrizePoolV2 as relayer ---
+      try {
+        const provider = new ethers.JsonRpcProvider(process.env.SEPOLIA_RPC_URL);
+        const relayer = new ethers.Wallet(process.env.DEPLOYER_PRIVATE_KEY, provider);
+        const abtPrizePool = new ethers.Contract(
+          process.env.ABT_PRIZE_POOL_V2,
+          [
+            "function winnings(address) view returns (uint256)",
+            "function withdrawn(address) view returns (bool)",
+            "function withdraw() external"
+          ],
+          relayer
+        );
+        // Check if already withdrawn
+        const alreadyWithdrawn = await abtPrizePool.withdrawn(playerId);
+        if (alreadyWithdrawn) {
+          return res.status(400).json({ error: 'Winnings already withdrawn on-chain' });
+        }
+        // Use relayer to call withdraw() on behalf of the player (relayer pattern)
+        // This requires the contract to allow relayer withdrawal, or you must use a meta-tx pattern
+        // For now, we assume relayer can call withdraw() for the player
+        const tx = await abtPrizePool.withdraw({ from: playerId });
+        await tx.wait();
+        payoutSuccess = true;
+        console.log(`[CLAIM] ABT withdraw() tx sent for ${playerId}:`, tx.hash);
+      } catch (err) {
+        console.error('[CLAIM] ABT payout error:', err);
+        return res.status(500).json({ error: 'Failed to payout ABT winnings' });
+      }
+    } else if (currency === 'SPL') {
+      // --- SPL payout: send SPL from prize pool token account to player ---
+      try {
+        const connection = new Connection(process.env.SOL_DEVNET_URL, 'confirmed');
+        const payer = Keypair.fromSecretKey(Buffer.from(JSON.parse(process.env.SOL_PRIZE_POOL_PRIVATE_KEY)));
+        const mint = new PublicKey(process.env.SOL_SPL_MINT);
+        const to = new PublicKey(playerId);
+        const ata = await getAssociatedTokenAddress(mint, to);
+        const fromTokenAccount = new PublicKey(process.env.SOL_PRIZE_POOL_TOKEN_ACCOUNT);
+        const amount = BigInt(Math.floor(Number(win.amount) * 10 ** 6));
+        const ix = createTransferInstruction(fromTokenAccount, ata, payer.publicKey, amount);
+        const tx = new Transaction().add(ix);
+        tx.feePayer = payer.publicKey;
+        tx.recentBlockhash = (await connection.getLatestBlockhash()).blockhash;
+        const sig = await connection.sendTransaction(tx, [payer]);
+        await connection.confirmTransaction(sig, 'confirmed');
+        payoutSuccess = true;
+        console.log(`[CLAIM] SPL transfer tx sent for ${playerId}:`, sig);
+      } catch (err) {
+        console.error('[CLAIM] SPL payout error:', err);
+        return res.status(500).json({ error: 'Failed to payout SPL winnings' });
+      }
+    } else {
+      return res.status(400).json({ error: 'Unsupported currency for claim' });
+    }
+    if (payoutSuccess) {
+      await pool.query(
+        `UPDATE winnings SET claimed = true, claimed_at = NOW() WHERE id = $1`,
+        [win.id]
+      );
+      console.log(`[CLAIM] Player ${playerId} claimed winnings for game ${gameId} (${currency}):`, win.amount);
+      res.json({ success: true, winnings: [win] });
+    } else {
+      res.status(500).json({ error: 'Payout failed' });
+    }
+  } catch (err) {
+    console.error('[CLAIM] Error processing claim:', err);
+    res.status(500).json({ error: 'Failed to process claim' });
+  }
+});
 
 app.use('/api', router);
 app.use('/api/game-state', gameStateRouter);

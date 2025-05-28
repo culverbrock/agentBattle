@@ -14,6 +14,7 @@ const SPL_MINT_ADDRESS = '7iJY63ffm5Q7QC6mxb6v3QECMv2Ss4E5UcMmmdaMfFCb';
 const SPL_DECIMALS = 6;
 const SOL_DEVNET_URL = 'https://api.devnet.solana.com';
 const ABT_PRIZE_POOL_V2 = "0x94006Fb7D2fb9E6F2826214EdEC0Fd45fd30f67B";
+const ABT_PRIZE_POOL_V3 = "0xa2852c3da70A7A481cE97a1E5bde7Da37EFB0c36";
 const ABT_PRIZE_POOL_ABI = [
   "function withdraw() external"
 ];
@@ -157,21 +158,20 @@ function ClaimWinningsPage() {
     setClaiming(c => ({ ...c, [win.id]: false }));
   };
 
-  const claimOnChain = async () => {
+  const claimOnChain = async (win) => {
     setError("");
     setSuccessMsg("");
     try {
       if (!window.ethereum) throw new Error("MetaMask required");
       const provider = new ethers.BrowserProvider(window.ethereum);
       const signer = await provider.getSigner();
-      const contract = new ethers.Contract(ABT_PRIZE_POOL_V2, ABT_PRIZE_POOL_ABI, signer);
-      const tx = await contract.withdraw();
-      log(`[ClaimWinningsPage] withdraw() tx: ${tx.hash}`);
+      const contract = new ethers.Contract(ABT_PRIZE_POOL_V3, ABT_PRIZE_POOL_ABI, signer);
+      // Convert gameId (UUID) to bytes32
+      const gameIdBytes32 = ethers.utils.keccak256(ethers.utils.toUtf8Bytes(win.game_id));
+      const tx = await contract.withdraw(gameIdBytes32);
+      log(`[ClaimWinningsPage] withdraw(${win.game_id}) tx: ${tx.hash}`);
       await tx.wait();
       setSuccessMsg("Claimed on-chain! Check your wallet balance.");
-      // Optionally, call backend to mark as claimed
-      // await fetch(`${API_URL}/api/mark-claimed`, { method: 'POST', ... })
-      // Refresh winnings
       fetchWinnings();
     } catch (err) {
       log(`[ClaimWinningsPage] On-chain claim error: ${err.message}`);
@@ -241,7 +241,7 @@ function ClaimWinningsPage() {
                 <td>{new Date(win.created_at).toLocaleString()}</td>
                 <td>
                   {walletType === 'metamask' && (
-                    <button onClick={claimOnChain} disabled={claiming[win.id]}>Claim On-Chain (MetaMask)</button>
+                    <button onClick={() => claimOnChain(win)} disabled={claiming[win.id]}>Claim On-Chain (MetaMask)</button>
                   )}
                 </td>
               </tr>

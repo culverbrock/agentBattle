@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
+    "start": "node api.js",
     "test": "jest --verbose",
     "test:manual:player": "node testPlayerStateManagement.js",
     "test:manual:game": "node testGameStateMachine.js",

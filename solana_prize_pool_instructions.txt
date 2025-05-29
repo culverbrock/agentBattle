@@ -1,0 +1,179 @@
+# Solana Prize Pool System Documentation
+
+## Overview
+The Solana prize pool contract mirrors the ETH smart contract functionality, allowing:
+- Setting multiple winners and prize amounts when a game ends
+- Players claiming their winnings on-chain with SPL token transfers
+- On-chain verification to prevent double claims
+
+## Contract Structure
+
+### Instructions:
+1. **set_winners(game_id, winners[], amounts[])**: Sets winners for a game (called by backend)
+2. **claim(game_id)**: Allows winners to claim their prize (called by frontend)
+
+### Accounts:
+- **Game**: Stores game_id, winners list, amounts, claimed status, winners_set flag
+- **Prize Pool Token Account**: Holds SPL tokens for payouts
+- **Winner Token Account**: Recipient account for claimed winnings
+
+## Setup Issues & Solutions
+
+### "Invalid Base58 string" Error
+**Problem**: This error occurs when Anchor tries to parse an invalid program ID or Base58 string in config files.
+
+**Root Causes**:
+- `declare_id!("REPLACE_WITH_YOUR_PROGRAM_ID")` - placeholder text is not valid Base58
+- Mismatched program IDs between `lib.rs` and `Anchor.toml`
+- Invalid wallet paths or environment variables containing public keys instead of keypair file paths
+
+**Solution**:
+1. Generate valid program ID: `solana-keygen pubkey wallet.json`
+2. Update `lib.rs`: `declare_id!("YOUR_ACTUAL_PROGRAM_ID");`
+3. Update `Anchor.toml`: `solana_prize_pool = "YOUR_ACTUAL_PROGRAM_ID"`
+4. Ensure wallet path points to keypair file (JSON array), not public key string
+
+### Toolchain Requirements
+**Required Tools**:
+- Rust 1.70+ (compatible with Anchor)
+- Anchor CLI 0.29.0+
+- Solana CLI 2.2.7+ (includes build tools)
+- Node.js/Yarn for JavaScript client
+
+**Installation**:
+```bash
+# Install Solana CLI with build tools
+cargo install solana-cli
+
+# Update PATH to prioritize cargo-installed tools
+export PATH="$HOME/.cargo/bin:$PATH"
+
+# Verify installation
+solana --version
+anchor --version
+```
+
+## Environment Variables
+```bash
+# Optional: Override default wallet
+export ANCHOR_WALLET="/path/to/keypair.json"
+
+# Solana cluster
+export SOLANA_URL="https://api.devnet.solana.com"  # or mainnet-beta
+```
+
+## Configuration Files
+
+### Anchor.toml
+```toml
+[programs.localnet]
+solana_prize_pool = "YOUR_PROGRAM_ID_HERE"
+
+[provider]
+cluster = "localnet"  # or "devnet", "mainnet-beta"
+wallet = "~/.config/solana/id.json"  # Path to keypair file
+
+[scripts]
+test = "mocha -t 1000000 tests/"
+```
+
+### lib.rs Key Points
+- Must have valid program ID in `declare_id!()`
+- Program ID must match Anchor.toml
+- Includes proper error handling for invalid claims, already claimed, etc.
+
+## Development Workflow
+
+### Building
+```bash
+cd /path/to/project
+export PATH="$HOME/.cargo/bin:$PATH"
+anchor build
+```
+
+### Deploying
+```bash
+# Deploy to devnet
+anchor deploy --provider.cluster devnet
+
+# Deploy to mainnet (requires SOL for deployment)
+anchor deploy --provider.cluster mainnet-beta
+```
+
+### Testing
+```bash
+# Run tests
+anchor test
+
+# Test specific function
+anchor test --grep "claim"
+```
+
+## Integration with Backend
+
+### Setting Winners (when game ends)
+```javascript
+// In gameStateMachine.js or similar
+const { Connection, PublicKey } = require('@solana/web3.js');
+const anchor = require('@coral-xyz/anchor');
+
+async function setWinnersOnChain(gameId, winners, amounts) {
+    const connection = new Connection('https://api.devnet.solana.com');
+    const program = new anchor.Program(IDL, programId, provider);
+    
+    await program.methods
+        .setWinners(gameId, winners, amounts)
+        .accounts({
+            game: gameAccount,
+            authority: authority.publicKey,
+            systemProgram: SystemProgram.programId,
+        })
+        .rpc();
+}
+```
+
+### Frontend Claiming
+```javascript
+// In ClaimWinningsPage.jsx
+const claimOnChain = async (gameId) => {
+    await program.methods
+        .claim(gameId)
+        .accounts({
+            game: gameAccount,
+            winner: wallet.publicKey,
+            prizePoolTokenAccount: prizePoolAccount,
+            winnerTokenAccount: winnerAccount,
+            tokenProgram: TOKEN_PROGRAM_ID,
+        })
+        .rpc();
+};
+```
+
+## Troubleshooting
+
+### Build Errors
+1. **"no such command: build-sbf"**: Install full Solana CLI with `cargo install solana-cli`
+2. **"Invalid Base58 string"**: Check program IDs in lib.rs and Anchor.toml
+3. **Wallet errors**: Ensure wallet file is JSON array of 64 numbers, not a string
+
+### Deployment Issues
+1. **Insufficient SOL**: Fund deployer account with SOL for transaction fees
+2. **Network errors**: Check cluster URL and connection
+3. **Authority errors**: Ensure deployer has proper permissions
+
+## Working Project Location
+- **Functional version**: `/tmp/test_solana_prize_pool/`
+- **Original (broken)**: `/Users/brockculver/agentBattle/agentBattle/solana_prize_pool/`
+- **Difference**: Clean Anchor.toml and proper program ID configuration
+
+## Future Updates
+1. **Program upgrades**: Use `anchor upgrade` with proper authority
+2. **Testing**: Add comprehensive tests for edge cases
+3. **Security**: Audit for re-entrancy, overflow, and access control
+4. **Optimization**: Reduce transaction costs and improve efficiency
+
+## Key Success Factors
+- Valid program ID in both lib.rs and Anchor.toml
+- Proper Solana toolchain installation with PATH configuration
+- Keypair files as JSON arrays, not public key strings
+- Matching anchor and solana CLI versions 

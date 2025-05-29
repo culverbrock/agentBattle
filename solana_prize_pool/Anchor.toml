@@ -1,0 +1,9 @@
+[programs.localnet]
+solana_prize_pool = "target/deploy/solana_prize_pool.so"
+
+[provider]
+cluster = "localnet"
+wallet = "./prizepool.json"
+
+[scripts]
+test = "mocha -t 1000000 tests/" 

@@ -1,7 +1,8 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { BrowserProvider, Contract, formatUnits } from 'ethers';
-import { Connection as SolConnection, PublicKey } from '@solana/web3.js';
+import { Connection as SolConnection, PublicKey, Keypair, SystemProgram, Transaction } from '@solana/web3.js';
 import { getAssociatedTokenAddress, getAccount, TOKEN_PROGRAM_ID } from '@solana/spl-token';
+import { Program, AnchorProvider, web3, BN } from '@coral-xyz/anchor';
 import { Buffer } from 'buffer';
 import { ethers, keccak256, toUtf8Bytes } from "ethers";
 window.Buffer = Buffer;
@@ -18,6 +19,52 @@ const ABT_PRIZE_POOL_V3 = "0xa2852c3da70A7A481cE97a1E5bde7Da37EFB0c36";
 const ABT_PRIZE_POOL_ABI = [
   "function withdraw(bytes32 gameId) external"
 ];
+
+// Solana Prize Pool Program
+const SOLANA_PRIZE_POOL_PROGRAM_ID = "DFZn8wUy1m63ky68XtMx4zSQsy3K56HVrshhWeToyNzc";
+const SOLANA_PRIZE_POOL_IDL = {
+  "version": "0.1.0",
+  "name": "test_solana_prize_pool",
+  "instructions": [
+    {
+      "name": "claim",
+      "accounts": [
+        { "name": "game", "isMut": true, "isSigner": false },
+        { "name": "poolTokenAccount", "isMut": true, "isSigner": false },
+        { "name": "claimerTokenAccount", "isMut": true, "isSigner": false },
+        { "name": "poolAuthority", "isMut": false, "isSigner": false },
+        { "name": "claimer", "isMut": false, "isSigner": true },
+        { "name": "tokenProgram", "isMut": false, "isSigner": false }
+      ],
+      "args": [
+        { "name": "gameId", "type": { "array": ["u8", 32] } }
+      ]
+    }
+  ],
+  "accounts": [
+    {
+      "name": "Game",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          { "name": "gameId", "type": { "array": ["u8", 32] } },
+          { "name": "winners", "type": { "vec": "publicKey" } },
+          { "name": "amounts", "type": { "vec": "u64" } },
+          { "name": "claimed", "type": { "vec": "bool" } },
+          { "name": "winnersSet", "type": "bool" }
+        ]
+      }
+    }
+  ],
+  "errors": [
+    { "code": 6000, "name": "InvalidInput", "msg": "Invalid input" },
+    { "code": 6001, "name": "WinnersAlreadySet", "msg": "Winners already set" },
+    { "code": 6002, "name": "WinnersNotSet", "msg": "Winners not set" },
+    { "code": 6003, "name": "AlreadyClaimed", "msg": "Already claimed" },
+    { "code": 6004, "name": "NotAWinner", "msg": "Not a winner" }
+  ],
+  "metadata": { "address": "DFZn8wUy1m63ky68XtMx4zSQsy3K56HVrshhWeToyNzc" }
+};
 
 function ClaimWinningsPage() {
   // Wallet state
@@ -48,8 +95,11 @@ function ClaimWinningsPage() {
   const [claiming, setClaiming] = useState({});
   const [successMsg, setSuccessMsg] = useState('');
 
+  // On-chain claimed status cache
+  const [onChainClaimed, setOnChainClaimed] = useState({});
+
   // Fetch winnings
-  useEffect(() => {
+  const fetchWinnings = () => {
     const playerId = walletType === 'phantom' ? phantomAddress : walletAddress;
     log(`[ClaimWinningsPage] playerId: ${playerId}`);
     if (!playerId) {
@@ -73,6 +123,11 @@ function ClaimWinningsPage() {
         setLoading(false);
         log(`[ClaimWinningsPage] Fetch error: ${err}`);
       });
+  };
+
+  useEffect(() => {
+    fetchWinnings();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [walletAddress, phantomAddress, walletType]);
 
   // Wallet connect logic (copied from LobbyPage)
@@ -179,6 +234,67 @@ function ClaimWinningsPage() {
     }
   };
 
+  const claimSplOnChain = async (win) => {
+    setError("");
+    setSuccessMsg("");
+    try {
+      if (!window.solana) throw new Error("Phantom wallet required");
+      
+      // For now, we'll use the backend claim since the on-chain program needs to be deployed
+      // In the future, this would call the Solana prize pool program directly
+      log(`[ClaimWinningsPage] Claiming SPL via backend for game ${win.game_id}...`);
+      
+      const res = await fetch(`${API_URL}/api/claim`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+          playerId: phantomAddress, 
+          gameId: win.game_id, 
+          currency: win.currency 
+        })
+      });
+      
+      const data = await res.json();
+      if (data.success) {
+        setSuccessMsg(`Claimed ${win.amount} ${win.currency} for game ${win.game_id}!`);
+        setWinnings(winnings.filter(w => w.id !== win.id));
+        log(`[ClaimWinningsPage] SPL claimed successfully: ${JSON.stringify(win)}`);
+      } else {
+        setError(data.error || 'Failed to claim SPL winnings');
+        log(`[ClaimWinningsPage] SPL claim error: ${data.error}`);
+      }
+    } catch (err) {
+      log(`[ClaimWinningsPage] SPL claim error: ${err.message}`);
+      setError(err.message);
+    }
+  };
+
+  // Check on-chain claimed status for ABT winnings
+  const checkOnChainClaimed = useCallback(async (win) => {
+    if (win.currency !== 'ABT' || !walletAddress) return;
+    try {
+      const provider = new ethers.BrowserProvider(window.ethereum);
+      const contract = new ethers.Contract(ABT_PRIZE_POOL_V3, [
+        "function withdrawn(bytes32 gameId, address player) view returns (bool)"
+      ], provider);
+      const gameIdBytes32 = keccak256(toUtf8Bytes(win.game_id));
+      const withdrawn = await contract.withdrawn(gameIdBytes32, walletAddress);
+      setOnChainClaimed(c => ({ ...c, [win.id]: withdrawn }));
+    } catch (err) {
+      log(`[ClaimWinningsPage] On-chain claimed check error: ${err.message}`);
+    }
+  }, [walletAddress]);
+
+  // Check on-chain claimed status when winnings change
+  useEffect(() => {
+    dedupedWinnings.forEach(win => {
+      if (win.currency === 'ABT' && walletType === 'metamask') {
+        checkOnChainClaimed(win);
+      }
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [dedupedWinnings, walletType, walletAddress]);
+
   // Deduplicate winnings: only show the latest unclaimed winning per game
   const dedupedWinnings = Object.values(
     winnings
@@ -235,10 +351,13 @@ function ClaimWinningsPage() {
                 <td>{win.amount}</td>
                 <td>{win.currency}</td>
                 <td>{new Date(win.created_at).toLocaleString()}</td>
-                <td>{win.claimed ? 'Yes' : 'No'}</td>
+                <td>{win.currency === 'ABT' && walletType === 'metamask' ? (onChainClaimed[win.id] ? 'Yes' : 'No') : (win.claimed ? 'Yes' : 'No')}</td>
                 <td>
-                  {walletType === 'metamask' && !win.claimed && (
+                  {walletType === 'metamask' && win.currency === 'ABT' && !win.claimed && (
                     <button onClick={() => claimOnChain(win)} disabled={claiming[win.id]}>Claim On-Chain (MetaMask)</button>
+                  )}
+                  {walletType === 'phantom' && win.currency === 'SPL' && !win.claimed && (
+                    <button onClick={() => claimSplOnChain(win)} disabled={claiming[win.id]}>Claim SPL (Phantom)</button>
                   )}
                 </td>
               </tr>

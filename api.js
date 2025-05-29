@@ -405,103 +405,84 @@ router.post('/claim', async (req, res) => {
         // Program and account setup
         const programId = new PublicKey('DFZn8wUy1m63ky68XtMx4zSQsy3K56HVrshhWeToyNzc');
         const mint = new PublicKey(process.env.SOL_SPL_MINT);
-        const playerPubkey = new PublicKey(playerId);
+        const claimer = new PublicKey(playerId);
         
-        // Derive PDAs
-        const [poolPda] = await PublicKey.findProgramAddress(
+        // Derive PDAs  
+        const [poolAuthority] = await PublicKey.findProgramAddress(
           [Buffer.from('pool')],
           programId
         );
+        
+        // Convert gameId to bytes32 for program
+        const gameIdBytes = Buffer.alloc(32);
+        const gameIdStr = gameId.replace(/-/g, '');
+        const gameIdHex = Buffer.from(gameIdStr, 'hex');
+        gameIdHex.copy(gameIdBytes, 0, 0, Math.min(16, gameIdHex.length));
+        
         const [gamePda] = await PublicKey.findProgramAddress(
-          [Buffer.from('game'), Buffer.from(gameId.replace(/-/g, ''))],
-          programId
-        );
-        const [winnerPda] = await PublicKey.findProgramAddress(
-          [Buffer.from('winner'), gamePda.toBuffer(), playerPubkey.toBuffer()],
+          [Buffer.from('game'), gameIdBytes],
           programId
         );
         
         // Token accounts
-        const poolTokenAccount = await getAssociatedTokenAddress(mint, poolPda, true);
-        const playerTokenAccount = await getAssociatedTokenAddress(mint, playerPubkey);
+        const poolTokenAccount = await getAssociatedTokenAddress(mint, poolAuthority, true);
+        const claimerTokenAccount = await getAssociatedTokenAddress(mint, claimer);
         
         console.log(`[CLAIM] SPL program claim details:`, {
           gameId,
-          player: playerId,
+          claimer: playerId,
           amount: win.amount,
           payerWallet: payer.publicKey.toBase58(),
           gamePda: gamePda.toBase58(),
-          winnerPda: winnerPda.toBase58(),
+          poolAuthority: poolAuthority.toBase58(),
           poolTokenAccount: poolTokenAccount.toBase58(),
-          playerTokenAccount: playerTokenAccount.toBase58()
+          claimerTokenAccount: claimerTokenAccount.toBase58()
         });
         
-        // Create claim instruction (simplified - you'll need to implement the actual instruction encoding)
+        // First check if the game account exists
+        try {
+          const gameAccount = await connection.getAccountInfo(gamePda);
+          if (!gameAccount) {
+            console.error('[CLAIM] Game account does not exist - winners must be set first');
+            return res.status(400).json({ error: 'Game winners not set yet. Please contact support.' });
+          }
+          console.log('[CLAIM] Game account exists, proceeding with claim');
+        } catch (err) {
+          console.error('[CLAIM] Error checking game account:', err);
+          return res.status(500).json({ error: 'Failed to verify game state' });
+        }
+        
+        // Create claim instruction with correct format from IDL
+        const discriminator = Buffer.from([62, 198, 214, 193, 213, 159, 108, 210]); // claim instruction discriminator
+        const instructionData = Buffer.concat([
+          discriminator,
+          gameIdBytes
+        ]);
+        
         const claimIx = new solanaWeb3.TransactionInstruction({
           keys: [
-            { pubkey: playerPubkey, isSigner: false, isWritable: false },
             { pubkey: gamePda, isSigner: false, isWritable: true },
-            { pubkey: winnerPda, isSigner: false, isWritable: true },
-            { pubkey: poolPda, isSigner: false, isWritable: false },
             { pubkey: poolTokenAccount, isSigner: false, isWritable: true },
-            { pubkey: playerTokenAccount, isSigner: false, isWritable: true },
-            { pubkey: mint, isSigner: false, isWritable: false },
-            { pubkey: solanaWeb3.TOKEN_PROGRAM_ID, isSigner: false, isWritable: false },
-            { pubkey: payer.publicKey, isSigner: true, isWritable: true }
+            { pubkey: claimerTokenAccount, isSigner: false, isWritable: true },
+            { pubkey: poolAuthority, isSigner: false, isWritable: false },
+            { pubkey: claimer, isSigner: true, isWritable: false },
+            { pubkey: solanaWeb3.TOKEN_PROGRAM_ID, isSigner: false, isWritable: false }
           ],
           programId,
-          data: Buffer.from([2]) // Claim instruction discriminator (0x02)
+          data: instructionData
         });
         
-        const tx = new Transaction().add(claimIx);
-        tx.feePayer = payer.publicKey;
-        tx.recentBlockhash = (await connection.getLatestBlockhash()).blockhash;
+        // Since the user isn't signing this transaction, we need the payer to sign it
+        // But the program requires the claimer to be a signer, which creates a problem
+        // This means users need to sign their own claim transactions
+        console.error('[CLAIM] Program requires claimer to sign transaction - backend cannot claim on behalf of user');
+        return res.status(400).json({ 
+          error: 'On-chain claiming requires user signature. Please use the frontend claim button with your connected wallet.' 
+        });
         
-        const sig = await connection.sendTransaction(tx, [payer]);
-        await connection.confirmTransaction(sig, 'confirmed');
-        payoutSuccess = true;
-        console.log(`[CLAIM] SPL program claim tx sent for ${playerId}:`, sig);
       } catch (err) {
         console.error('[CLAIM] SPL program claim error:', err);
-        
-        // Fallback: Try direct transfer from backend wallet if program claim fails
-        console.log('[CLAIM] Attempting fallback to backend wallet transfer...');
-        try {
-          // Validate environment variables for fallback
-          if (!process.env.SOL_PRIZE_POOL_PRIVATE_KEY) {
-            throw new Error('Missing SOL_PRIZE_POOL_PRIVATE_KEY environment variable');
-          }
-          
-          let payer;
-          try {
-            const privateKeyArray = JSON.parse(process.env.SOL_PRIZE_POOL_PRIVATE_KEY);
-            payer = Keypair.fromSecretKey(Buffer.from(privateKeyArray));
-            console.log(`[CLAIM] Fallback using payer wallet: ${payer.publicKey.toBase58()}`);
-          } catch (keyErr) {
-            throw new Error(`Failed to parse SOL_PRIZE_POOL_PRIVATE_KEY: ${keyErr.message}`);
-          }
-          
-          const connection = new Connection(process.env.SOL_DEVNET_URL || 'https://api.devnet.solana.com', 'confirmed');
-          const mint = new PublicKey(process.env.SOL_SPL_MINT);
-          const to = new PublicKey(playerId);
-          const fromAta = await getAssociatedTokenAddress(mint, payer.publicKey);
-          const toAta = await getAssociatedTokenAddress(mint, to);
-          const amount = BigInt(Math.floor(Number(win.amount) * 10 ** 6));
-          
-          console.log(`[CLAIM] Fallback transfer from ${fromAta.toBase58()} to ${toAta.toBase58()}, amount: ${amount}`);
-          
-          const ix = createTransferInstruction(fromAta, toAta, payer.publicKey, amount);
-          const tx = new Transaction().add(ix);
-          tx.feePayer = payer.publicKey;
-          tx.recentBlockhash = (await connection.getLatestBlockhash()).blockhash;
-          const sig = await connection.sendTransaction(tx, [payer]);
-          await connection.confirmTransaction(sig, 'confirmed');
-          payoutSuccess = true;
-          console.log(`[CLAIM] SPL fallback transfer tx sent for ${playerId}:`, sig);
-        } catch (fallbackErr) {
-          console.error('[CLAIM] SPL fallback transfer error:', fallbackErr);
-          return res.status(500).json({ error: `Failed to payout SPL winnings: ${fallbackErr.message}` });
-        }
+        return res.status(500).json({ error: `Failed to process SPL claim: ${err.message}` });
       }
     } else {
       return res.status(400).json({ error: 'Unsupported currency for claim' });

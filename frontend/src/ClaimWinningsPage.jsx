@@ -239,30 +239,106 @@ function ClaimWinningsPage() {
     try {
       if (!window.solana) throw new Error("Phantom wallet required");
       
-      // Currently using backend claiming - will be upgraded to on-chain claiming later
-      log(`[ClaimWinningsPage] Claiming SPL via backend for game ${win.game_id}...`);
+      console.log(`[ClaimWinningsPage] Claiming SPL via Solana program for game ${win.game_id}...`);
       
+      const { Connection, PublicKey, Transaction, TransactionInstruction } = await import('@solana/web3.js');
+      const { getAssociatedTokenAddress } = await import('@solana/spl-token');
+      
+      const connection = new Connection('https://api.devnet.solana.com', 'confirmed');
+      const programId = new PublicKey('DFZn8wUy1m63ky68XtMx4zSQsy3K56HVrshhWeToyNzc');
+      const mint = new PublicKey('7iJY63ffm5Q7QC6mxb6v3QECMv2Ss4E5UcMmmdaMfFCb');
+      const claimer = new PublicKey(phantomAddress);
+      
+      // Derive PDAs
+      const [poolAuthority] = await PublicKey.findProgramAddress(
+        [Buffer.from('pool')],
+        programId
+      );
+      
+      // Convert gameId to bytes32
+      const gameIdBytes = Buffer.alloc(32);
+      const gameIdStr = win.game_id.replace(/-/g, '');
+      const gameIdHex = Buffer.from(gameIdStr, 'hex');
+      gameIdHex.copy(gameIdBytes, 0, 0, Math.min(16, gameIdHex.length));
+      
+      const [gamePda] = await PublicKey.findProgramAddress(
+        [Buffer.from('game'), gameIdBytes],
+        programId
+      );
+      
+      // Token accounts
+      const poolTokenAccount = await getAssociatedTokenAddress(mint, poolAuthority, true);
+      const claimerTokenAccount = await getAssociatedTokenAddress(mint, claimer);
+      
+      console.log('[ClaimWinningsPage] Solana program claim details:', {
+        gameId: win.game_id,
+        claimer: phantomAddress,
+        amount: win.amount,
+        gamePda: gamePda.toBase58(),
+        poolAuthority: poolAuthority.toBase58(),
+        poolTokenAccount: poolTokenAccount.toBase58(),
+        claimerTokenAccount: claimerTokenAccount.toBase58()
+      });
+      
+      // Check if game account exists
+      const gameAccount = await connection.getAccountInfo(gamePda);
+      if (!gameAccount) {
+        throw new Error('Game winners not set yet. Entry fees are still being held in the program. Please contact support.');
+      }
+      
+      // Create claim instruction with correct format from IDL
+      const discriminator = Buffer.from([62, 198, 214, 193, 213, 159, 108, 210]); // claim instruction discriminator
+      const instructionData = Buffer.concat([
+        discriminator,
+        gameIdBytes
+      ]);
+      
+      const claimIx = new TransactionInstruction({
+        keys: [
+          { pubkey: gamePda, isSigner: false, isWritable: true },
+          { pubkey: poolTokenAccount, isSigner: false, isWritable: true },
+          { pubkey: claimerTokenAccount, isSigner: false, isWritable: true },
+          { pubkey: poolAuthority, isSigner: false, isWritable: false },
+          { pubkey: claimer, isSigner: true, isWritable: false },
+          { pubkey: new PublicKey('TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA'), isSigner: false, isWritable: false }
+        ],
+        programId,
+        data: instructionData
+      });
+      
+      const tx = new Transaction().add(claimIx);
+      
+      // Sign and send with Phantom
+      const signed = await window.solana.signTransaction(tx);
+      const signature = await connection.sendRawTransaction(signed.serialize());
+      await connection.confirmTransaction(signature, 'confirmed');
+      
+      console.log(`[ClaimWinningsPage] On-chain claim successful:`, signature);
+      
+      // Update backend to mark as claimed
       const res = await fetch(`${API_URL}/api/claim`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 
           playerId: phantomAddress, 
           gameId: win.game_id, 
-          currency: win.currency 
+          currency: win.currency,
+          txSignature: signature
         })
       });
       
       const data = await res.json();
       if (data.success) {
-        setSuccessMsg(`Claimed ${win.amount} ${win.currency} for game ${win.game_id}!`);
+        setSuccessMsg(`Successfully claimed ${win.amount} ${win.currency} on-chain! Transaction: ${signature.slice(0, 8)}...`);
         setWinnings(winnings.filter(w => w.id !== win.id));
-        log(`[ClaimWinningsPage] SPL claimed successfully: ${JSON.stringify(win)}`);
+        log(`[ClaimWinningsPage] On-chain SPL claim successful: ${signature}`);
       } else {
-        setError(data.error || 'Failed to claim SPL winnings');
-        log(`[ClaimWinningsPage] SPL claim error: ${data.error}`);
+        // Transaction succeeded but backend update failed - that's ok
+        setSuccessMsg(`Claimed ${win.amount} ${win.currency} on-chain! Transaction: ${signature.slice(0, 8)}... (Note: Backend update failed but tokens were transferred)`);
+        log(`[ClaimWinningsPage] On-chain claim succeeded but backend update failed: ${data.error}`);
       }
     } catch (err) {
-      log(`[ClaimWinningsPage] SPL claim error: ${err.message}`);
+      log(`[ClaimWinningsPage] On-chain SPL claim error: ${err.message}`);
       setError(err.message);
     }
   };

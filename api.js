@@ -308,17 +308,157 @@ router.get('/winnings/:playerId', async (req, res) => {
   try {
     // Determine wallet type
     const isEth = playerId.startsWith('0x');
-    const currency = isEth ? 'ABT' : 'SPL';
-    const { rows } = await pool.query(
-      `SELECT * FROM winnings WHERE LOWER(player_id) = LOWER($1) AND claimed = false AND currency = $2 ORDER BY created_at DESC`,
-      [playerId, currency]
-    );
-    res.json({ winnings: rows });
+    
+    let allWinnings = [];
+    
+    if (isEth) {
+      // ETH: Pure on-chain, check smart contract directly
+      // (Database entries would be redundant - smart contract is source of truth)
+      console.log(`[WINNINGS] ETH wallet detected: ${playerId} - checking smart contract`);
+      
+      // Note: For ETH, the frontend handles on-chain checking directly
+      // This endpoint could fetch from smart contract here too, but frontend already does it
+      // For now, return empty since ETH frontend checks contract directly
+      allWinnings = [];
+      
+    } else {
+      // SPL: Pure on-chain, scan Solana blockchain directly
+      try {
+        console.log(`[WINNINGS] SPL wallet detected: ${playerId} - scanning Solana blockchain`);
+        
+        const onChainWinnings = await scanSolanaWinnings(playerId);
+        
+        // Only return real on-chain prizes
+        for (const onChainWin of onChainWinnings) {
+          allWinnings.push({
+            id: `onchain-${onChainWin.address}`,
+            player_id: playerId,
+            game_id: onChainWin.gameId || `onchain-${onChainWin.address}`,
+            amount: onChainWin.amount,
+            currency: 'SPL',
+            claimed: onChainWin.claimed,
+            created_at: new Date().toISOString(),
+            is_onchain: true,
+            account_address: onChainWin.address
+          });
+        }
+        
+        console.log(`[WINNINGS] Found ${onChainWinnings.length} real on-chain SPL prizes for ${playerId}`);
+      } catch (scanError) {
+        console.error('[WINNINGS] Error scanning Solana blockchain:', scanError);
+        // Don't fail the entire request if scanning fails
+      }
+    }
+    
+    res.json({ winnings: allWinnings });
   } catch (err) {
     console.error('[CLAIM] Error fetching winnings:', err);
     res.status(500).json({ error: 'Failed to fetch winnings' });
   }
 });
+
+// Helper function to scan Solana blockchain for winnings
+async function scanSolanaWinnings(walletAddress) {
+  const PROGRAM_ID = '6PtE7SKWtvFCUd4c2TfkkszEt1i6L3ho8wvmwWSAR7Vs';
+  const SOL_DEVNET_URL = process.env.SOL_DEVNET_URL || 'https://api.devnet.solana.com';
+  
+  const connection = new Connection(SOL_DEVNET_URL, 'confirmed');
+  const programId = new PublicKey(PROGRAM_ID);
+  
+  const winnings = [];
+  
+  try {
+    // Get all accounts owned by the program
+    const accounts = await connection.getProgramAccounts(programId, {
+      encoding: 'base64'
+    });
+    
+    for (const account of accounts) {
+      try {
+        const data = Buffer.from(account.account.data, 'base64');
+        
+        if (data.length < 40) continue; // Too small for game data
+        
+        let offset = 8; // Skip discriminator
+        
+        // Game ID (32 bytes)
+        const gameId = data.slice(offset, offset + 32);
+        offset += 32;
+        
+        // Winners vector length (4 bytes)
+        const winnersLength = data.readUInt32LE(offset);
+        offset += 4;
+        
+        if (winnersLength > 100) continue; // Suspicious
+        
+        // Check if we have enough data for all winners
+        const winnersDataSize = winnersLength * 32;
+        if (offset + winnersDataSize > data.length) continue;
+        
+        // Parse winners
+        const winners = [];
+        for (let j = 0; j < winnersLength; j++) {
+          const winnerPubkey = new PublicKey(data.slice(offset, offset + 32));
+          winners.push(winnerPubkey.toString());
+          offset += 32;
+        }
+        
+        // Check if this wallet is a winner
+        const yourIndex = winners.indexOf(walletAddress);
+        if (yourIndex !== -1) {
+          // Parse amounts
+          if (offset + 4 > data.length) continue;
+          
+          const amountsLength = data.readUInt32LE(offset);
+          offset += 4;
+          
+          if (offset + amountsLength * 8 > data.length) continue;
+          
+          const amounts = [];
+          for (let j = 0; j < amountsLength; j++) {
+            const amount = data.readBigUInt64LE(offset);
+            amounts.push(amount.toString());
+            offset += 8;
+          }
+          
+          if (yourIndex < amounts.length) {
+            const yourAmount = amounts[yourIndex];
+            const tokensAmount = Number(yourAmount) / 1_000_000;
+            
+            // Check claimed status
+            let claimed = false;
+            if (offset + 4 <= data.length) {
+              const claimedLength = data.readUInt32LE(offset);
+              offset += 4;
+              
+              if (yourIndex < claimedLength && offset + yourIndex < data.length) {
+                claimed = data.readUInt8(offset + yourIndex) === 1;
+              }
+            }
+            
+            // Convert game ID to string if possible
+            const gameIdString = gameId.toString().replace(/\0/g, '') || gameId.toString('hex');
+            
+            winnings.push({
+              address: account.pubkey.toString(),
+              gameId: gameIdString,
+              amount: tokensAmount,
+              claimed: claimed
+            });
+          }
+        }
+      } catch (parseError) {
+        // Skip malformed accounts
+        continue;
+      }
+    }
+  } catch (error) {
+    console.error('Error scanning Solana accounts:', error);
+    throw error;
+  }
+  
+  return winnings;
+}
 
 // Claim winnings (by id or gameId+playerId+currency)
 router.post('/claim', async (req, res) => {
@@ -403,7 +543,7 @@ router.post('/claim', async (req, res) => {
         const connection = new Connection(process.env.SOL_DEVNET_URL || 'https://api.devnet.solana.com', 'confirmed');
         
         // Program and account setup
-        const programId = new PublicKey('DFZn8wUy1m63ky68XtMx4zSQsy3K56HVrshhWeToyNzc');
+        const programId = new PublicKey('6PtE7SKWtvFCUd4c2TfkkszEt1i6L3ho8wvmwWSAR7Vs');
         const mint = new PublicKey(process.env.SOL_SPL_MINT);
         const claimer = new PublicKey(playerId);
         

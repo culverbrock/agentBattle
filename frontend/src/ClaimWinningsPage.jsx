@@ -20,7 +20,7 @@ const ABT_PRIZE_POOL_ABI = [
 ];
 
 // Solana Prize Pool Program
-const SOLANA_PRIZE_POOL_PROGRAM_ID = "DFZn8wUy1m63ky68XtMx4zSQsy3K56HVrshhWeToyNzc";
+const SOLANA_PRIZE_POOL_PROGRAM_ID = "6PtE7SKWtvFCUd4c2TfkkszEt1i6L3ho8wvmwWSAR7Vs";
 
 function ClaimWinningsPage() {
   console.log('[ClaimWinningsPage] Component initializing...');
@@ -239,13 +239,13 @@ function ClaimWinningsPage() {
     try {
       if (!window.solana) throw new Error("Phantom wallet required");
       
-      console.log(`[ClaimWinningsPage] Claiming SPL via Solana program for game ${win.game_id}...`);
+      console.log(`[ClaimWinningsPage] Claiming SPL prize for game ${win.game_id}...`);
       
       const { Connection, PublicKey, Transaction, TransactionInstruction } = await import('@solana/web3.js');
       const { getAssociatedTokenAddress } = await import('@solana/spl-token');
       
       const connection = new Connection('https://api.devnet.solana.com', 'confirmed');
-      const programId = new PublicKey('DFZn8wUy1m63ky68XtMx4zSQsy3K56HVrshhWeToyNzc');
+      const programId = new PublicKey('6PtE7SKWtvFCUd4c2TfkkszEt1i6L3ho8wvmwWSAR7Vs');
       const mint = new PublicKey('7iJY63ffm5Q7QC6mxb6v3QECMv2Ss4E5UcMmmdaMfFCb');
       const claimer = new PublicKey(phantomAddress);
       
@@ -255,22 +255,15 @@ function ClaimWinningsPage() {
         programId
       );
       
-      // Convert gameId to bytes32
-      const gameIdBytes = Buffer.alloc(32);
-      const gameIdStr = win.game_id.replace(/-/g, '');
-      const gameIdHex = Buffer.from(gameIdStr, 'hex');
-      gameIdHex.copy(gameIdBytes, 0, 0, Math.min(16, gameIdHex.length));
-      
-      const [gamePda] = await PublicKey.findProgramAddress(
-        [Buffer.from('game'), gameIdBytes],
-        programId
-      );
+      // All SPL winnings are now on-chain with known account addresses
+      const gamePda = new PublicKey(win.account_address);
+      console.log(`[ClaimWinningsPage] Using game account: ${gamePda.toBase58()}`);
       
       // Token accounts
       const poolTokenAccount = await getAssociatedTokenAddress(mint, poolAuthority, true);
       const claimerTokenAccount = await getAssociatedTokenAddress(mint, claimer);
       
-      console.log('[ClaimWinningsPage] Solana program claim details:', {
+      console.log('[ClaimWinningsPage] SPL claim details:', {
         gameId: win.game_id,
         claimer: phantomAddress,
         amount: win.amount,
@@ -283,11 +276,13 @@ function ClaimWinningsPage() {
       // Check if game account exists
       const gameAccount = await connection.getAccountInfo(gamePda);
       if (!gameAccount) {
-        throw new Error('Game winners not set yet. Entry fees are still being held in the program. Please contact support.');
+        throw new Error('Game account not found on blockchain.');
       }
       
-      // Create claim instruction with correct format from IDL
-      const discriminator = Buffer.from([62, 198, 214, 193, 213, 159, 108, 210]); // claim instruction discriminator
+      // Create claim instruction - use zero-filled game ID for direct account claiming
+      const discriminator = Buffer.from([62, 198, 214, 193, 213, 159, 108, 210]);
+      const gameIdBytes = Buffer.alloc(32); // Zero-filled since we're using direct account address
+      
       const instructionData = Buffer.concat([
         discriminator,
         gameIdBytes
@@ -313,32 +308,19 @@ function ClaimWinningsPage() {
       const signature = await connection.sendRawTransaction(signed.serialize());
       await connection.confirmTransaction(signature, 'confirmed');
       
-      console.log(`[ClaimWinningsPage] On-chain claim successful:`, signature);
+      console.log(`[ClaimWinningsPage] SPL claim successful:`, signature);
       
-      // Update backend to mark as claimed
-      const res = await fetch(`${API_URL}/api/claim`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ 
-          playerId: phantomAddress, 
-          gameId: win.game_id, 
-          currency: win.currency,
-          txSignature: signature
-        })
-      });
+      setSuccessMsg(`Successfully claimed ${win.amount} SPL! Transaction: ${signature.slice(0, 8)}...`);
       
-      const data = await res.json();
-      if (data.success) {
-        setSuccessMsg(`Successfully claimed ${win.amount} ${win.currency} on-chain! Transaction: ${signature.slice(0, 8)}...`);
-        setWinnings(winnings.filter(w => w.id !== win.id));
-        log(`[ClaimWinningsPage] On-chain SPL claim successful: ${signature}`);
-      } else {
-        // Transaction succeeded but backend update failed - that's ok
-        setSuccessMsg(`Claimed ${win.amount} ${win.currency} on-chain! Transaction: ${signature.slice(0, 8)}... (Note: Backend update failed but tokens were transferred)`);
-        log(`[ClaimWinningsPage] On-chain claim succeeded but backend update failed: ${data.error}`);
-      }
+      // Remove from local winnings list and refresh
+      setWinnings(winnings.filter(w => w.id !== win.id));
+      log(`[ClaimWinningsPage] SPL claim successful: ${signature}`);
+      
+      // Refresh winnings to get updated claimed status from blockchain
+      setTimeout(fetchWinnings, 2000);
+      
     } catch (err) {
-      log(`[ClaimWinningsPage] On-chain SPL claim error: ${err.message}`);
+      log(`[ClaimWinningsPage] SPL claim error: ${err.message}`);
       setError(err.message);
     }
   };
@@ -444,17 +426,19 @@ function ClaimWinningsPage() {
             <tbody>
               {dedupedWinnings.map((win, i) => (
                 <tr key={win.id}>
-                  <td>{win.game_id}</td>
-                  <td>{win.amount}</td>
-                  <td>{win.currency}</td>
-                  <td>{new Date(win.created_at).toLocaleString()}</td>
-                  <td>{win.currency === 'ABT' && walletType === 'metamask' ? (onChainClaimed[win.id] ? 'Yes' : 'No') : (win.claimed ? 'Yes' : 'No')}</td>
-                  <td>
+                  <td style={{ padding: 8, border: '1px solid #ccc' }}>{win.game_id}</td>
+                  <td style={{ padding: 8, border: '1px solid #ccc' }}>{win.amount}</td>
+                  <td style={{ padding: 8, border: '1px solid #ccc' }}>{win.currency}</td>
+                  <td style={{ padding: 8, border: '1px solid #ccc' }}>{new Date(win.created_at).toLocaleString()}</td>
+                  <td style={{ padding: 8, border: '1px solid #ccc' }}>{win.currency === 'ABT' && walletType === 'metamask' ? (onChainClaimed[win.id] ? 'Yes' : 'No') : (win.claimed ? 'Yes' : 'No')}</td>
+                  <td style={{ padding: 8, border: '1px solid #ccc' }}>
                     {walletType === 'metamask' && win.currency === 'ABT' && !win.claimed && (
-                      <button onClick={() => claimOnChain(win)} disabled={claiming[win.id]}>Claim On-Chain (MetaMask)</button>
+                      <button onClick={() => claimOnChain(win)} disabled={claiming[win.id]}>Claim ABT Prize</button>
                     )}
                     {walletType === 'phantom' && win.currency === 'SPL' && !win.claimed && (
-                      <button onClick={() => claimSplOnChain(win)} disabled={claiming[win.id]}>Claim SPL (Phantom)</button>
+                      <button onClick={() => claimSplOnChain(win)} disabled={claiming[win.id]}>
+                        Claim SPL Prize
+                      </button>
                     )}
                   </td>
                 </tr>

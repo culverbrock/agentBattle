@@ -279,6 +279,16 @@ function ClaimWinningsPage() {
         throw new Error('Game account not found on blockchain.');
       }
       
+      // Read the actual game ID from the account data
+      const gameAccountData = gameAccount.data;
+      if (gameAccountData.length < 40) {
+        throw new Error('Invalid game account data');
+      }
+      
+      // Extract the game ID from the account (skip 8-byte discriminator, then 32-byte game ID)
+      const actualGameId = gameAccountData.slice(8, 40);
+      console.log('[ClaimWinningsPage] Using actual game ID from account:', Array.from(actualGameId));
+      
       // Import createAssociatedTokenAccountInstruction
       const { createAssociatedTokenAccountInstruction } = await import('@solana/spl-token');
       
@@ -310,13 +320,12 @@ function ClaimWinningsPage() {
         instructions.push(createClaimerTokenAccountIx);
       }
       
-      // Create claim instruction - use zero-filled game ID for direct account claiming
+      // Create claim instruction - use the actual game ID from account data
       const discriminator = Buffer.from([62, 198, 214, 193, 213, 159, 108, 210]);
-      const gameIdBytes = Buffer.alloc(32); // Zero-filled since we're using direct account address
       
       const instructionData = Buffer.concat([
         discriminator,
-        gameIdBytes
+        actualGameId
       ]);
       
       const claimIx = new TransactionInstruction({

@@ -303,6 +303,11 @@ function ClaimWinningsPage() {
       
       const tx = new Transaction().add(claimIx);
       
+      // Set required transaction properties
+      const { blockhash } = await connection.getLatestBlockhash();
+      tx.recentBlockhash = blockhash;
+      tx.feePayer = claimer;
+      
       // Sign and send with Phantom
       const signed = await window.solana.signTransaction(tx);
       const signature = await connection.sendRawTransaction(signed.serialize());

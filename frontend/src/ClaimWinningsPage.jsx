@@ -23,26 +23,37 @@ const ABT_PRIZE_POOL_ABI = [
 const SOLANA_PRIZE_POOL_PROGRAM_ID = "DFZn8wUy1m63ky68XtMx4zSQsy3K56HVrshhWeToyNzc";
 
 function ClaimWinningsPage() {
+  console.log('[ClaimWinningsPage] Component initializing...');
+  
   // Wallet state
   const [walletAddress, setWalletAddress] = useState(() => {
     const id = window.localStorage.getItem('playerId');
-    return id && id.startsWith('0x') ? id : '';
+    const address = id && id.startsWith('0x') ? id : '';
+    console.log('[ClaimWinningsPage] Initial walletAddress:', address);
+    return address;
   });
   const [phantomAddress, setPhantomAddress] = useState(() => {
     const id = window.localStorage.getItem('playerId');
-    return id && !id.startsWith('0x') ? id : '';
+    const address = id && !id.startsWith('0x') ? id : '';
+    console.log('[ClaimWinningsPage] Initial phantomAddress:', address);
+    return address;
   });
   const [walletType, setWalletType] = useState(() => {
     const id = window.localStorage.getItem('playerId');
-    if (!id) return '';
-    if (id.startsWith('0x')) return 'metamask';
-    if (id.length > 32) return 'phantom';
-    return '';
+    let type = '';
+    if (!id) type = '';
+    else if (id.startsWith('0x')) type = 'metamask';
+    else if (id.length > 32) type = 'phantom';
+    console.log('[ClaimWinningsPage] Initial walletType:', type);
+    return type;
   });
 
   // Logging state
   const [logs, setLogs] = useState([]);
-  const log = (msg) => setLogs(l => [...l, msg]);
+  const log = (msg) => {
+    console.log('[ClaimWinningsPage]', msg);
+    setLogs(l => [...l, msg]);
+  };
 
   // Claim winnings state
   const [winnings, setWinnings] = useState([]);
@@ -54,11 +65,15 @@ function ClaimWinningsPage() {
   // On-chain claimed status cache
   const [onChainClaimed, setOnChainClaimed] = useState({});
 
+  console.log('[ClaimWinningsPage] State initialized, setting up functions...');
+
   // Fetch winnings
   const fetchWinnings = () => {
+    console.log('[ClaimWinningsPage] fetchWinnings called');
     const playerId = walletType === 'phantom' ? phantomAddress : walletAddress;
     log(`[ClaimWinningsPage] playerId: ${playerId}`);
     if (!playerId) {
+      console.log('[ClaimWinningsPage] No playerId, clearing winnings');
       setWinnings([]);
       setLoading(false);
       log('[ClaimWinningsPage] No playerId set.');
@@ -66,15 +81,22 @@ function ClaimWinningsPage() {
     }
     setLoading(true);
     const url = `${API_URL}/api/winnings/${playerId}`;
+    console.log('[ClaimWinningsPage] Fetching from URL:', url);
     log(`[ClaimWinningsPage] Fetching: ${url}`);
     fetch(url)
-      .then(res => res.json())
+      .then(res => {
+        console.log('[ClaimWinningsPage] Fetch response received, status:', res.status);
+        return res.json();
+      })
       .then(data => {
+        console.log('[ClaimWinningsPage] Data received:', data);
         log(`[ClaimWinningsPage] Raw winnings: ${JSON.stringify(data)}`);
         setWinnings(data.winnings || []);
         setLoading(false);
+        console.log('[ClaimWinningsPage] Winnings set, loading complete');
       })
       .catch(err => {
+        console.error('[ClaimWinningsPage] Fetch error:', err);
         setError('Failed to fetch winnings');
         setLoading(false);
         log(`[ClaimWinningsPage] Fetch error: ${err}`);
@@ -82,66 +104,87 @@ function ClaimWinningsPage() {
   };
 
   useEffect(() => {
+    console.log('[ClaimWinningsPage] useEffect triggered for fetchWinnings');
+    console.log('[ClaimWinningsPage] Current state - walletAddress:', walletAddress, 'phantomAddress:', phantomAddress, 'walletType:', walletType);
     fetchWinnings();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [walletAddress, phantomAddress, walletType]);
 
+  console.log('[ClaimWinningsPage] Setting up wallet functions...');
+
   // Wallet connect logic (copied from LobbyPage)
   function getMetaMaskProvider() {
+    console.log('[ClaimWinningsPage] getMetaMaskProvider called');
     if (window.ethereum?.providers) {
+      console.log('[ClaimWinningsPage] Multiple providers detected');
       return window.ethereum.providers.find(
         (p) => p.isMetaMask && !p.isPhantom
       ) || null;
     }
     if (window.ethereum && window.ethereum.isMetaMask && !window.ethereum.isPhantom) {
+      console.log('[ClaimWinningsPage] Single MetaMask provider detected');
       return window.ethereum;
     }
+    console.log('[ClaimWinningsPage] No MetaMask provider found');
     return null;
   }
   const connectWallet = async () => {
+    console.log('[ClaimWinningsPage] connectWallet called');
     const provider = getMetaMaskProvider();
     if (provider) {
       try {
+        console.log('[ClaimWinningsPage] Requesting MetaMask accounts...');
         const accounts = await provider.request({ method: 'eth_requestAccounts' });
+        console.log('[ClaimWinningsPage] MetaMask accounts received:', accounts);
         setWalletAddress(accounts[0]);
         setWalletType('metamask');
         setPhantomAddress('');
         window.localStorage.setItem('playerId', accounts[0]);
         log(`[ClaimWinningsPage] Connected MetaMask: ${accounts[0]}`);
       } catch (err) {
+        console.error('[ClaimWinningsPage] MetaMask connection error:', err);
         alert('Wallet connection failed');
         log(`[ClaimWinningsPage] MetaMask connect error: ${err}`);
       }
     } else {
+      console.log('[ClaimWinningsPage] MetaMask not detected');
       alert('MetaMask not detected. Please install MetaMask.');
       log('[ClaimWinningsPage] MetaMask not detected.');
     }
   };
   const connectPhantom = async () => {
+    console.log('[ClaimWinningsPage] connectPhantom called');
     if (window.solana && window.solana.isPhantom) {
       try {
+        console.log('[ClaimWinningsPage] Connecting to Phantom...');
         const resp = await window.solana.connect();
+        console.log('[ClaimWinningsPage] Phantom connected:', resp.publicKey.toString());
         setPhantomAddress(resp.publicKey.toString());
         setWalletType('phantom');
         setWalletAddress('');
         window.localStorage.setItem('playerId', resp.publicKey.toString());
         log(`[ClaimWinningsPage] Connected Phantom: ${resp.publicKey.toString()}`);
       } catch (err) {
+        console.error('[ClaimWinningsPage] Phantom connection error:', err);
         alert('Phantom connection failed');
         log(`[ClaimWinningsPage] Phantom connect error: ${err}`);
       }
     } else {
+      console.log('[ClaimWinningsPage] Phantom not detected');
       alert('Phantom not detected. Please install Phantom.');
       log('[ClaimWinningsPage] Phantom not detected.');
     }
   };
   const disconnectWallet = () => {
+    console.log('[ClaimWinningsPage] disconnectWallet called');
     setWalletAddress('');
     setPhantomAddress('');
     setWalletType('');
     window.localStorage.removeItem('playerId');
     log('[ClaimWinningsPage] Disconnected wallet.');
   };
+
+  console.log('[ClaimWinningsPage] Setting up claim functions...');
 
   const handleClaim = async (win) => {
     setClaiming(c => ({ ...c, [win.id]: true }));
@@ -252,21 +295,35 @@ function ClaimWinningsPage() {
       }, {})
   );
 
+  console.log('[ClaimWinningsPage] Deduplication complete');
+  console.log('[ClaimWinningsPage] Original winnings count:', winnings.length);
+  console.log('[ClaimWinningsPage] Deduped winnings count:', dedupedWinnings.length);
+  console.log('[ClaimWinningsPage] Deduped winnings:', dedupedWinnings);
+
   // Check on-chain claimed status when winnings change
   useEffect(() => {
+    console.log('[ClaimWinningsPage] useEffect for on-chain check triggered');
+    console.log('[ClaimWinningsPage] Checking', dedupedWinnings.length, 'deduped winnings');
     dedupedWinnings.forEach(win => {
       if (win.currency === 'ABT' && walletType === 'metamask') {
+        console.log('[ClaimWinningsPage] Checking on-chain claimed status for ABT winning:', win.id);
         checkOnChainClaimed(win);
       }
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dedupedWinnings, walletType, walletAddress]);
 
+  console.log('[ClaimWinningsPage] About to render component');
+  console.log('[ClaimWinningsPage] Render state - loading:', loading, 'error:', error, 'winnings.length:', winnings.length);
+
   return (
     <div style={{ maxWidth: 700, margin: '2rem auto', fontFamily: 'sans-serif', padding: 16 }}>
+      {console.log('[ClaimWinningsPage] Rendering JSX...')}
       <h1>Claim Winnings</h1>
+      {console.log('[ClaimWinningsPage] Rendered header')}
       {/* Wallet connect UI */}
       <div style={{ marginBottom: 16, padding: 12, background: '#f3f6fa', borderRadius: 8 }}>
+        {console.log('[ClaimWinningsPage] Rendering wallet connect UI')}
         <div style={{ marginBottom: 8 }}>
           <b>Wallet:</b> {walletType ? (
             <span style={{ color: '#007bff' }}>{walletType === 'metamask' ? 'MetaMask' : 'Phantom'}: {(walletType === 'metamask' ? walletAddress : phantomAddress) || '(none)'}</span>
@@ -276,50 +333,62 @@ function ClaimWinningsPage() {
         <button onClick={connectPhantom} style={{ marginRight: 8, padding: '6px 16px' }}>Connect Phantom</button>
         <button onClick={disconnectWallet} style={{ padding: '6px 16px' }}>Disconnect</button>
       </div>
+      {console.log('[ClaimWinningsPage] Rendered wallet UI')}
       {/* Logging output */}
       <div style={{ background: '#222', color: '#fff', fontSize: 13, padding: 10, borderRadius: 6, marginBottom: 16, maxHeight: 180, overflow: 'auto' }}>
+        {console.log('[ClaimWinningsPage] Rendering debug log with', logs.length, 'entries')}
         <b>Debug Log:</b>
         <ul style={{ margin: 0, padding: 0, listStyle: 'none' }}>
           {logs.map((l, i) => <li key={i} style={{ marginBottom: 2 }}>{l}</li>)}
         </ul>
       </div>
+      {console.log('[ClaimWinningsPage] Rendered debug log')}
       {loading && <div>Loading...</div>}
+      {loading && console.log('[ClaimWinningsPage] Rendered loading state')}
       {error && <div style={{ color: 'red', marginBottom: 8 }}>{error}</div>}
+      {error && console.log('[ClaimWinningsPage] Rendered error:', error)}
       {successMsg && <div style={{ color: 'green' }}>{successMsg}</div>}
+      {successMsg && console.log('[ClaimWinningsPage] Rendered success message:', successMsg)}
       {!loading && winnings.length === 0 && <div style={{ color: '#888' }}>No claimable winnings at this time.</div>}
+      {!loading && winnings.length === 0 && console.log('[ClaimWinningsPage] Rendered no winnings message')}
       {dedupedWinnings.length > 0 && (
-        <table style={{ width: '100%', borderCollapse: 'collapse', marginTop: 16 }}>
-          <thead>
-            <tr style={{ background: '#f5f5f5' }}>
-              <th style={{ padding: 8, border: '1px solid #ccc' }}>Game ID</th>
-              <th style={{ padding: 8, border: '1px solid #ccc' }}>Amount</th>
-              <th style={{ padding: 8, border: '1px solid #ccc' }}>Currency</th>
-              <th style={{ padding: 8, border: '1px solid #ccc' }}>Created At</th>
-              <th style={{ padding: 8, border: '1px solid #ccc' }}>Claimed</th>
-              <th style={{ padding: 8, border: '1px solid #ccc' }}>Action</th>
-            </tr>
-          </thead>
-          <tbody>
-            {dedupedWinnings.map((win, i) => (
-              <tr key={win.id}>
-                <td>{win.game_id}</td>
-                <td>{win.amount}</td>
-                <td>{win.currency}</td>
-                <td>{new Date(win.created_at).toLocaleString()}</td>
-                <td>{win.currency === 'ABT' && walletType === 'metamask' ? (onChainClaimed[win.id] ? 'Yes' : 'No') : (win.claimed ? 'Yes' : 'No')}</td>
-                <td>
-                  {walletType === 'metamask' && win.currency === 'ABT' && !win.claimed && (
-                    <button onClick={() => claimOnChain(win)} disabled={claiming[win.id]}>Claim On-Chain (MetaMask)</button>
-                  )}
-                  {walletType === 'phantom' && win.currency === 'SPL' && !win.claimed && (
-                    <button onClick={() => claimSplOnChain(win)} disabled={claiming[win.id]}>Claim SPL (Phantom)</button>
-                  )}
-                </td>
+        <>
+          {console.log('[ClaimWinningsPage] Rendering winnings table with', dedupedWinnings.length, 'entries')}
+          <table style={{ width: '100%', borderCollapse: 'collapse', marginTop: 16 }}>
+            <thead>
+              <tr style={{ background: '#f5f5f5' }}>
+                <th style={{ padding: 8, border: '1px solid #ccc' }}>Game ID</th>
+                <th style={{ padding: 8, border: '1px solid #ccc' }}>Amount</th>
+                <th style={{ padding: 8, border: '1px solid #ccc' }}>Currency</th>
+                <th style={{ padding: 8, border: '1px solid #ccc' }}>Created At</th>
+                <th style={{ padding: 8, border: '1px solid #ccc' }}>Claimed</th>
+                <th style={{ padding: 8, border: '1px solid #ccc' }}>Action</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {dedupedWinnings.map((win, i) => (
+                <tr key={win.id}>
+                  <td>{win.game_id}</td>
+                  <td>{win.amount}</td>
+                  <td>{win.currency}</td>
+                  <td>{new Date(win.created_at).toLocaleString()}</td>
+                  <td>{win.currency === 'ABT' && walletType === 'metamask' ? (onChainClaimed[win.id] ? 'Yes' : 'No') : (win.claimed ? 'Yes' : 'No')}</td>
+                  <td>
+                    {walletType === 'metamask' && win.currency === 'ABT' && !win.claimed && (
+                      <button onClick={() => claimOnChain(win)} disabled={claiming[win.id]}>Claim On-Chain (MetaMask)</button>
+                    )}
+                    {walletType === 'phantom' && win.currency === 'SPL' && !win.claimed && (
+                      <button onClick={() => claimSplOnChain(win)} disabled={claiming[win.id]}>Claim SPL (Phantom)</button>
+                    )}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+          {console.log('[ClaimWinningsPage] Rendered complete winnings table')}
+        </>
       )}
+      {console.log('[ClaimWinningsPage] Component render complete')}
     </div>
   );
 }

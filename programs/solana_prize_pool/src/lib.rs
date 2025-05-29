@@ -74,9 +74,16 @@ pub struct Claim<'info> {
     pub game: Account<'info, Game>,
     #[account(mut)]
     pub winner: Signer<'info>,
-    #[account(mut)]
+    #[account(
+        mut,
+        constraint = prize_pool_token_account.owner == prize_pool_authority.key(),
+    )]
     pub prize_pool_token_account: Account<'info, TokenAccount>,
-    #[account(mut)]
+    #[account(
+        mut,
+        constraint = winner_token_account.owner == winner.key(),
+        constraint = winner_token_account.mint == prize_pool_token_account.mint,
+    )]
     pub winner_token_account: Account<'info, TokenAccount>,
     /// CHECK: This is the prize pool authority PDA derived from seeds
     #[account(seeds = [b"pool"], bump)]

@@ -354,7 +354,7 @@ async function agentPhaseHandler(gameId, state) {
       context.ended = true;
       context.phase = 'endgame';
       broadcastGameEvent(gameId, { type: 'winner', data: { winnerProposal: context.winnerProposal, state: context } });
-      // --- NEW: Aggregate prize pool and handle cross-currency payout ---
+      // --- NEW: Smart cross-chain prize pool management ---
       try {
         // 1. Aggregate entry fees by currency
         const { rows: paymentRows } = await pool.query(
@@ -365,71 +365,85 @@ async function agentPhaseHandler(gameId, state) {
         for (const row of paymentRows) {
           poolByCurrency[row.currency] = Number(row.total);
         }
-        // 2. Determine payout currency from proposal (use first nonzero winner's currency)
-        let payoutCurrency = null;
-        let payoutPlayers = Object.keys(winnerProposal.proposal || {});
-        for (const pid of payoutPlayers) {
-          // Find the currency this player paid in
-          const { rows: payRows } = await pool.query(
-            `SELECT currency FROM payments WHERE game_id = $1 AND player_id = $2 LIMIT 1`,
-            [gameId, pid]
-          );
-          if (payRows.length > 0) {
-            payoutCurrency = payRows[0].currency;
-            break;
-          }
-        }
-        if (!payoutCurrency) payoutCurrency = Object.keys(poolByCurrency)[0] || 'ABT';
-        // 3. If all entry fees are in payoutCurrency, proceed as before
-        const allSameCurrency = Object.keys(poolByCurrency).length === 1 && Object.keys(poolByCurrency)[0] === payoutCurrency;
-        if (!allSameCurrency) {
-          // 4. Cross-currency: burn losing side, mint payoutCurrency
-          for (const [cur, amt] of Object.entries(poolByCurrency)) {
-            if (cur !== payoutCurrency && amt > 0) {
-              // Burn tokens (implement burn logic for ABT/SPL)
-              console.log(`[BRIDGE] Burning ${amt} ${cur} for game ${gameId}`);
-              if (cur === 'ABT') {
-                await bridgeUtils.burnABT(amt /*, provider, signer */);
-              } else if (cur === 'SPL') {
-                await bridgeUtils.burnSPL(amt /*, payer, connection */);
-              }
-            }
-          }
-          // Mint payoutCurrency (implement mint logic for ABT/SPL)
-          const totalToMint = Object.values(poolByCurrency).reduce((a, b) => a + b, 0);
-          console.log(`[BRIDGE] Minting ${totalToMint} ${payoutCurrency} for game ${gameId}`);
-          if (payoutCurrency === 'ABT') {
-            // TODO: Provide recipient address and signer
-            // await bridgeUtils.mintABT(to, totalToMint, provider, signer);
-          } else if (payoutCurrency === 'SPL') {
-            // TODO: Provide recipient address and payer/connection
-            // await bridgeUtils.mintSPL(to, totalToMint, payer, connection);
-          }
-        }
-        // 5. Record payouts in winnings table
+        
+        // 2. Calculate total prize pool and individual currency needs
         const total = Object.values(poolByCurrency).reduce((a, b) => a + b, 0);
         const proposalDist = winnerProposal.proposal || {};
+        
+        // Group winners by their currency preference (based on their payment)
+        const winnersByCurrency = { ABT: [], SPL: [] };
+        const payoutsByCurrency = { ABT: 0, SPL: 0 };
+        
         for (const [playerId, percent] of Object.entries(proposalDist)) {
           const amount = (Number(percent) / 100) * total;
           if (amount > 0) {
+            // Find what currency this player paid in (their preferred payout currency)
+            const { rows: payRows } = await pool.query(
+              `SELECT currency FROM payments WHERE game_id = $1 AND player_id = $2 LIMIT 1`,
+              [gameId, playerId]
+            );
+            const currency = payRows.length > 0 ? payRows[0].currency : 'ABT';
+            
+            winnersByCurrency[currency].push({ playerId, amount, percent });
+            payoutsByCurrency[currency] += amount;
+            
+            // Record in winnings table with their preferred currency
             await pool.query(
               `INSERT INTO winnings (game_id, player_id, amount, currency, claimed, created_at) VALUES ($1, $2, $3, $4, false, NOW())`,
-              [gameId, playerId, amount, payoutCurrency]
+              [gameId, playerId, amount, currency]
             );
-            console.log(`[WINNINGS] Recorded: player ${playerId} gets ${amount} ${payoutCurrency} for game ${gameId}`);
+            console.log(`[WINNINGS] Recorded: player ${playerId} gets ${amount} ${currency} for game ${gameId}`);
           }
         }
         
-        // 6. If SPL payouts, call set_winners on Solana program
-        if (payoutCurrency === 'SPL') {
+        // 3. Check if cross-chain balancing is needed
+        const abtAvailable = poolByCurrency.ABT || 0;
+        const splAvailable = poolByCurrency.SPL || 0;
+        const abtNeeded = payoutsByCurrency.ABT;
+        const splNeeded = payoutsByCurrency.SPL;
+        
+        console.log(`[BRIDGE] Prize pool analysis for game ${gameId}:`);
+        console.log(`[BRIDGE] - ABT: ${abtAvailable} available, ${abtNeeded} needed`);
+        console.log(`[BRIDGE] - SPL: ${splAvailable} available, ${splNeeded} needed`);
+        
+        // 4. Handle cross-chain transfers if needed
+        if (abtNeeded > abtAvailable) {
+          const deficit = abtNeeded - abtAvailable;
+          const splSurplus = splAvailable - splNeeded;
+          if (splSurplus >= deficit) {
+            console.log(`[BRIDGE] Handling ABT deficit of ${deficit} using SPL surplus of ${splSurplus}`);
+            await bridgeUtils.handleCrossChainPayout('ABT', deficit, 'SPL', splSurplus);
+          } else {
+            console.error(`[BRIDGE] Insufficient funds: ABT deficit ${deficit} > SPL surplus ${splSurplus}`);
+          }
+        } else if (splNeeded > splAvailable) {
+          const deficit = splNeeded - splAvailable;
+          const abtSurplus = abtAvailable - abtNeeded;
+          if (abtSurplus >= deficit) {
+            console.log(`[BRIDGE] Handling SPL deficit of ${deficit} using ABT surplus of ${abtSurplus}`);
+            await bridgeUtils.handleCrossChainPayout('SPL', deficit, 'ABT', abtSurplus);
+          } else {
+            console.error(`[BRIDGE] Insufficient funds: SPL deficit ${deficit} > ABT surplus ${abtSurplus}`);
+          }
+        } else {
+          console.log(`[BRIDGE] No cross-chain balancing needed - sufficient funds on both chains`);
+        }
+        
+        // 5. Set winners on Solana program if there are SPL payouts
+        if (winnersByCurrency.SPL.length > 0) {
           try {
-            console.log(`[SOLANA] Setting winners on-chain for game ${gameId}...`);
-            await setSolanaWinners(gameId, proposalDist, total);
+            console.log(`[SOLANA] Setting winners on-chain for ${winnersByCurrency.SPL.length} SPL recipients...`);
+            const splDistribution = {};
+            for (const winner of winnersByCurrency.SPL) {
+              splDistribution[winner.playerId] = winner.percent;
+            }
+            await setSolanaWinners(gameId, splDistribution, total);
           } catch (err) {
             console.error(`[SOLANA] Failed to set winners on-chain for game ${gameId}:`, err);
             // Don't fail the whole process - winnings are still in database
           }
         }
+        
       } catch (err) {
         console.error('[WINNINGS/BRIDGE] Error recording payouts or handling bridge:', err);
       }

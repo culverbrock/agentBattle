@@ -308,17 +308,10 @@ function ClaimWinningsPage() {
       
       const instructions = [];
       
-      // Check if pool token account exists, create if not
+      // Pool token account should already exist - if not, this is an error
       const poolTokenAccountInfo = await connection.getAccountInfo(poolTokenAccount);
       if (!poolTokenAccountInfo) {
-        console.log('[ClaimWinningsPage] Pool token account does not exist, creating it...');
-        const createPoolTokenAccountIx = createAssociatedTokenAccountInstruction(
-          claimer, // payer
-          poolTokenAccount, // ata
-          poolAuthority, // owner
-          mint // mint
-        );
-        instructions.push(createPoolTokenAccountIx);
+        throw new Error(`Pool token account ${poolTokenAccount.toBase58()} does not exist. Pool must be properly set up.`);
       }
       
       // Check if claimer token account exists, create if not

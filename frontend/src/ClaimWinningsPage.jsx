@@ -240,16 +240,6 @@ function ClaimWinningsPage() {
     }
   }, [walletAddress]);
 
-  // Check on-chain claimed status when winnings change
-  useEffect(() => {
-    dedupedWinnings.forEach(win => {
-      if (win.currency === 'ABT' && walletType === 'metamask') {
-        checkOnChainClaimed(win);
-      }
-    });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [dedupedWinnings, walletType, walletAddress]);
-
   // Deduplicate winnings: only show the latest unclaimed winning per game
   const dedupedWinnings = Object.values(
     winnings
@@ -261,6 +251,16 @@ function ClaimWinningsPage() {
         return acc;
       }, {})
   );
+
+  // Check on-chain claimed status when winnings change
+  useEffect(() => {
+    dedupedWinnings.forEach(win => {
+      if (win.currency === 'ABT' && walletType === 'metamask') {
+        checkOnChainClaimed(win);
+      }
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [dedupedWinnings, walletType, walletAddress]);
 
   return (
     <div style={{ maxWidth: 700, margin: '2rem auto', fontFamily: 'sans-serif', padding: 16 }}>

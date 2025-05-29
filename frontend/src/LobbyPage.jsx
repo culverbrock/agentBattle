@@ -565,6 +565,8 @@ function LobbyPage() {
           </div>
           {/* Leaderboard Link */}
           <a href="/leaderboard" style={{ textDecoration: 'none', color: '#007bff', fontWeight: 'bold', fontSize: 20, marginLeft: 16, marginTop: 8 }}>🏆 Leaderboard</a>
+          {/* Claim Winnings Link */}
+          <a href="/claim-winnings" style={{ textDecoration: 'none', color: '#28a745', fontWeight: 'bold', fontSize: 20, marginLeft: 16, marginTop: 8 }}>💰 Claim Winnings</a>
         </div>
       </header>
       {/* Main Content */}

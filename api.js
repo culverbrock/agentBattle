@@ -328,6 +328,20 @@ router.post('/claim', async (req, res) => {
   }
   try {
     console.log(`[CLAIM] Attempting claim for playerId: ${playerId}, gameId: ${gameId}, currency: ${currency}`);
+    
+    // First, fetch the winning record
+    const { rows } = await pool.query(
+      `SELECT * FROM winnings WHERE LOWER(player_id) = LOWER($1) AND game_id = $2 AND currency = $3 AND claimed = false ORDER BY created_at DESC LIMIT 1`,
+      [playerId, gameId, currency]
+    );
+    
+    if (rows.length === 0) {
+      return res.status(404).json({ error: 'No claimable winnings found for this game' });
+    }
+    
+    const win = rows[0];
+    let payoutSuccess = false;
+    
     if (currency === 'ABT') {
       // --- ABT payout: call withdraw() on ABTPrizePoolV2 as relayer ---
       try {
@@ -361,30 +375,138 @@ router.post('/claim', async (req, res) => {
         return res.status(500).json({ error: 'Failed to payout ABT winnings' });
       }
     } else if (currency === 'SPL') {
-      // --- SPL payout: send SPL from prize pool token account to player ---
+      // --- SPL payout: call Solana program's claim instruction ---
       try {
-        const connection = new Connection(process.env.SOL_DEVNET_URL, 'confirmed');
-        const payer = Keypair.fromSecretKey(Buffer.from(JSON.parse(process.env.SOL_PRIZE_POOL_PRIVATE_KEY)));
+        console.log(`[CLAIM] Processing SPL claim for ${win.amount} SPL to ${playerId} via Solana program`);
+        
+        // Validate environment variables
+        if (!process.env.SOL_PRIZE_POOL_PRIVATE_KEY) {
+          console.error('[CLAIM] Missing SOL_PRIZE_POOL_PRIVATE_KEY environment variable');
+          return res.status(500).json({ error: 'Server configuration error: missing Solana private key' });
+        }
+        
+        if (!process.env.SOL_SPL_MINT) {
+          console.error('[CLAIM] Missing SOL_SPL_MINT environment variable');
+          return res.status(500).json({ error: 'Server configuration error: missing SPL mint address' });
+        }
+        
+        let payer;
+        try {
+          const privateKeyArray = JSON.parse(process.env.SOL_PRIZE_POOL_PRIVATE_KEY);
+          payer = Keypair.fromSecretKey(Buffer.from(privateKeyArray));
+          console.log(`[CLAIM] Loaded payer wallet: ${payer.publicKey.toBase58()}`);
+        } catch (keyErr) {
+          console.error('[CLAIM] Failed to parse SOL_PRIZE_POOL_PRIVATE_KEY:', keyErr);
+          return res.status(500).json({ error: 'Server configuration error: invalid Solana private key format' });
+        }
+        
+        const connection = new Connection(process.env.SOL_DEVNET_URL || 'https://api.devnet.solana.com', 'confirmed');
+        
+        // Program and account setup
+        const programId = new PublicKey('DFZn8wUy1m63ky68XtMx4zSQsy3K56HVrshhWeToyNzc');
         const mint = new PublicKey(process.env.SOL_SPL_MINT);
-        const to = new PublicKey(playerId);
-        const ata = await getAssociatedTokenAddress(mint, to);
-        const fromTokenAccount = new PublicKey(process.env.SOL_PRIZE_POOL_TOKEN_ACCOUNT);
-        const amount = BigInt(Math.floor(Number(win.amount) * 10 ** 6));
-        const ix = createTransferInstruction(fromTokenAccount, ata, payer.publicKey, amount);
-        const tx = new Transaction().add(ix);
+        const playerPubkey = new PublicKey(playerId);
+        
+        // Derive PDAs
+        const [poolPda] = await PublicKey.findProgramAddress(
+          [Buffer.from('pool')],
+          programId
+        );
+        const [gamePda] = await PublicKey.findProgramAddress(
+          [Buffer.from('game'), Buffer.from(gameId.replace(/-/g, ''))],
+          programId
+        );
+        const [winnerPda] = await PublicKey.findProgramAddress(
+          [Buffer.from('winner'), gamePda.toBuffer(), playerPubkey.toBuffer()],
+          programId
+        );
+        
+        // Token accounts
+        const poolTokenAccount = await getAssociatedTokenAddress(mint, poolPda, true);
+        const playerTokenAccount = await getAssociatedTokenAddress(mint, playerPubkey);
+        
+        console.log(`[CLAIM] SPL program claim details:`, {
+          gameId,
+          player: playerId,
+          amount: win.amount,
+          payerWallet: payer.publicKey.toBase58(),
+          gamePda: gamePda.toBase58(),
+          winnerPda: winnerPda.toBase58(),
+          poolTokenAccount: poolTokenAccount.toBase58(),
+          playerTokenAccount: playerTokenAccount.toBase58()
+        });
+        
+        // Create claim instruction (simplified - you'll need to implement the actual instruction encoding)
+        const claimIx = new solanaWeb3.TransactionInstruction({
+          keys: [
+            { pubkey: playerPubkey, isSigner: false, isWritable: false },
+            { pubkey: gamePda, isSigner: false, isWritable: true },
+            { pubkey: winnerPda, isSigner: false, isWritable: true },
+            { pubkey: poolPda, isSigner: false, isWritable: false },
+            { pubkey: poolTokenAccount, isSigner: false, isWritable: true },
+            { pubkey: playerTokenAccount, isSigner: false, isWritable: true },
+            { pubkey: mint, isSigner: false, isWritable: false },
+            { pubkey: solanaWeb3.TOKEN_PROGRAM_ID, isSigner: false, isWritable: false },
+            { pubkey: payer.publicKey, isSigner: true, isWritable: true }
+          ],
+          programId,
+          data: Buffer.from([2]) // Claim instruction discriminator (0x02)
+        });
+        
+        const tx = new Transaction().add(claimIx);
         tx.feePayer = payer.publicKey;
         tx.recentBlockhash = (await connection.getLatestBlockhash()).blockhash;
+        
         const sig = await connection.sendTransaction(tx, [payer]);
         await connection.confirmTransaction(sig, 'confirmed');
         payoutSuccess = true;
-        console.log(`[CLAIM] SPL transfer tx sent for ${playerId}:`, sig);
+        console.log(`[CLAIM] SPL program claim tx sent for ${playerId}:`, sig);
       } catch (err) {
-        console.error('[CLAIM] SPL payout error:', err);
-        return res.status(500).json({ error: 'Failed to payout SPL winnings' });
+        console.error('[CLAIM] SPL program claim error:', err);
+        
+        // Fallback: Try direct transfer from backend wallet if program claim fails
+        console.log('[CLAIM] Attempting fallback to backend wallet transfer...');
+        try {
+          // Validate environment variables for fallback
+          if (!process.env.SOL_PRIZE_POOL_PRIVATE_KEY) {
+            throw new Error('Missing SOL_PRIZE_POOL_PRIVATE_KEY environment variable');
+          }
+          
+          let payer;
+          try {
+            const privateKeyArray = JSON.parse(process.env.SOL_PRIZE_POOL_PRIVATE_KEY);
+            payer = Keypair.fromSecretKey(Buffer.from(privateKeyArray));
+            console.log(`[CLAIM] Fallback using payer wallet: ${payer.publicKey.toBase58()}`);
+          } catch (keyErr) {
+            throw new Error(`Failed to parse SOL_PRIZE_POOL_PRIVATE_KEY: ${keyErr.message}`);
+          }
+          
+          const connection = new Connection(process.env.SOL_DEVNET_URL || 'https://api.devnet.solana.com', 'confirmed');
+          const mint = new PublicKey(process.env.SOL_SPL_MINT);
+          const to = new PublicKey(playerId);
+          const fromAta = await getAssociatedTokenAddress(mint, payer.publicKey);
+          const toAta = await getAssociatedTokenAddress(mint, to);
+          const amount = BigInt(Math.floor(Number(win.amount) * 10 ** 6));
+          
+          console.log(`[CLAIM] Fallback transfer from ${fromAta.toBase58()} to ${toAta.toBase58()}, amount: ${amount}`);
+          
+          const ix = createTransferInstruction(fromAta, toAta, payer.publicKey, amount);
+          const tx = new Transaction().add(ix);
+          tx.feePayer = payer.publicKey;
+          tx.recentBlockhash = (await connection.getLatestBlockhash()).blockhash;
+          const sig = await connection.sendTransaction(tx, [payer]);
+          await connection.confirmTransaction(sig, 'confirmed');
+          payoutSuccess = true;
+          console.log(`[CLAIM] SPL fallback transfer tx sent for ${playerId}:`, sig);
+        } catch (fallbackErr) {
+          console.error('[CLAIM] SPL fallback transfer error:', fallbackErr);
+          return res.status(500).json({ error: `Failed to payout SPL winnings: ${fallbackErr.message}` });
+        }
       }
     } else {
       return res.status(400).json({ error: 'Unsupported currency for claim' });
     }
+    
     if (payoutSuccess) {
       await pool.query(
         `UPDATE winnings SET claimed = true, claimed_at = NOW() WHERE id = $1`,

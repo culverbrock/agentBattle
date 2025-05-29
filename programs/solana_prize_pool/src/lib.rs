@@ -1,7 +1,7 @@
 use anchor_lang::prelude::*;
 use anchor_spl::token::{self, Token, TokenAccount, Transfer};
 
-declare_id!("92d5uAumDAzFSXBCUfRU28GCKVHLVE6GgLwAPeZfG5so");
+declare_id!("6PtE7SKWtvFCUd4c2TfkkszEt1i6L3ho8wvmwWSAR7Vs");
 
 #[program]
 pub mod solana_prize_pool {
@@ -35,14 +35,20 @@ pub mod solana_prize_pool {
         
         require!(!game.claimed[winner_index], PrizePoolError::AlreadyClaimed);
         
-        // Transfer tokens
+        // Transfer tokens using PDA signing
         let cpi_accounts = Transfer {
             from: ctx.accounts.prize_pool_token_account.to_account_info(),
             to: ctx.accounts.winner_token_account.to_account_info(),
             authority: ctx.accounts.prize_pool_authority.to_account_info(),
         };
         let cpi_program = ctx.accounts.token_program.to_account_info();
-        let cpi_ctx = CpiContext::new(cpi_program, cpi_accounts);
+        
+        // Create PDA seeds for signing
+        let seeds = &[b"pool".as_ref()];
+        let bump = ctx.bumps.prize_pool_authority;
+        let signer_seeds = &[&seeds[..], &[bump]];
+        
+        let cpi_ctx = CpiContext::new_with_signer(cpi_program, cpi_accounts, &[signer_seeds]);
         
         token::transfer(cpi_ctx, game.amounts[winner_index])?;
         
@@ -72,7 +78,8 @@ pub struct Claim<'info> {
     pub prize_pool_token_account: Account<'info, TokenAccount>,
     #[account(mut)]
     pub winner_token_account: Account<'info, TokenAccount>,
-    /// CHECK: This is the prize pool authority PDA
+    /// CHECK: This is the prize pool authority PDA derived from seeds
+    #[account(seeds = [b"pool"], bump)]
     pub prize_pool_authority: AccountInfo<'info>,
     pub token_program: Program<'info, Token>,
 }

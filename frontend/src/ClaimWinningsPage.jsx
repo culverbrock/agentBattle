@@ -255,6 +255,20 @@ function ClaimWinningsPage() {
         programId
       );
       
+      console.log('[ClaimWinningsPage] PDA derivation details:', {
+        programId: programId.toBase58(),
+        poolAuthority: poolAuthority.toBase58(),
+        seeds: ['pool']
+      });
+      
+      // Verify this matches the expected pool authority from the program
+      // The error shows: FiRatRMB4SJKYooWb5XxYNVo91Vk1VBMWMhXiDDT6BQx
+      if (poolAuthority.toBase58() !== 'FiRatRMB4SJKYooWb5XxYNVo91Vk1VBMWMhXiDDT6BQx') {
+        console.warn('[ClaimWinningsPage] Pool authority mismatch!');
+        console.warn('Expected: FiRatRMB4SJKYooWb5XxYNVo91Vk1VBMWMhXiDDT6BQx');
+        console.warn('Derived:', poolAuthority.toBase58());
+      }
+      
       // All SPL winnings are now on-chain with known account addresses
       const gamePda = new PublicKey(win.account_address);
       console.log(`[ClaimWinningsPage] Using game account: ${gamePda.toBase58()}`);

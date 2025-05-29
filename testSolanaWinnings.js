@@ -11,9 +11,9 @@ async function run() {
     const gameId2 = '44444444-4444-4444-4444-444444444444';
     
     // Solana addresses
-    const player1 = '8CFx4ijkRfa6haYoRbbtDw3HAbBLF1ARFtZtE5AG4DFN'; // Your SOL address
-    const player2 = 'DFZn8wUy1m63ky68XtMx4zSQsy3K56HVrshhWeToyNzc'; // Test address
-    const programId = 'DFZn8wUy1m63ky68XtMx4zSQsy3K56HVrshhWeToyNzc';
+    const player1 = 'ErajApgE5NuQbmLtqHHwYPPEVHvvVxkZYD8i4MHBdg6p'; // Winner
+    const player2 = '6PtE7SKWtvFCUd4c2TfkkszEt1i6L3ho8wvmwWSAR7Vs'; // Test address
+    const programId = '6PtE7SKWtvFCUd4c2TfkkszEt1i6L3ho8wvmwWSAR7Vs';
 
     console.log('📋 Test Data for Solana Prize Pool:');
     console.log('===================================');

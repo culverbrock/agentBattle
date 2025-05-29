@@ -10,7 +10,8 @@ const { Connection, PublicKey } = require('@solana/web3.js');
 const { getAccount } = require('@solana/spl-token');
 const ABT_ADDRESS = process.env.ABT_TOKEN_ADDRESS || '0x799b7b7cC889449952283CF23a15956920E7f85B';
 const PRIZE_POOL_CA = process.env.PRIZE_POOL_CA || '0x94Aba2204C686f41a1fC7dd5DBaA56172844593a';
-const SOL_PRIZE_POOL_TOKEN_ACCOUNT = '9QxGRV3dEkqTaeaz5xcEWwbSxx5pmqPSmL9v62iWzDv';
+// Pool authority's token account (configurable via env var)
+const SOL_PRIZE_POOL_TOKEN_ACCOUNT = process.env.SOL_PRIZE_POOL_TOKEN_ACCOUNT || 'Fp9wXBYossFZmR29EGgpLzC5GAwBUZHgoeuN834WtDup';
 const SPL_MINT_ADDRESS = process.env.SOL_SPL_MINT || '7iJY63ffm5Q7QC6mxb6v3QECMv2Ss4E5UcMmmdaMfFCb';
 const SOL_DEVNET_URL = 'https://api.devnet.solana.com';
 

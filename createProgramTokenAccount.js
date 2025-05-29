@@ -1,9 +1,9 @@
-const { Connection, PublicKey, Keypair, Transaction } = require('@solana/web3.js');
-const { createAssociatedTokenAccountInstruction, getAssociatedTokenAddress } = require('@solana/spl-token');
+const { Connection, PublicKey, Keypair, Transaction, SystemProgram } = require('@solana/web3.js');
+const { createAssociatedTokenAccountInstruction, getAssociatedTokenAddress, TOKEN_PROGRAM_ID } = require('@solana/spl-token');
 require('dotenv').config();
 
 // Configuration
-const PROGRAM_ID = 'DFZn8wUy1m63ky68XtMx4zSQsy3K56HVrshhWeToyNzc';
+const PROGRAM_ID = '6PtE7SKWtvFCUd4c2TfkkszEt1i6L3ho8wvmwWSAR7Vs';
 const SPL_MINT = '7iJY63ffm5Q7QC6mxb6v3QECMv2Ss4E5UcMmmdaMfFCb';
 const SOL_DEVNET_URL = 'https://api.devnet.solana.com';
 

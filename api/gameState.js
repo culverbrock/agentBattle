@@ -9,6 +9,7 @@ const agentInvoker = require('../agentInvoker');
 const eventLogger = require('../eventLogger');
 const { State } = require('xstate');
 const bridgeUtils = require('../bridgeUtils');
+const { setSolanaWinners } = require('../solanaProgram');
 
 // In-memory cache for active state machines (for demo/dev)
 const machines = {};
@@ -416,6 +417,17 @@ async function agentPhaseHandler(gameId, state) {
               [gameId, playerId, amount, payoutCurrency]
             );
             console.log(`[WINNINGS] Recorded: player ${playerId} gets ${amount} ${payoutCurrency} for game ${gameId}`);
+          }
+        }
+        
+        // 6. If SPL payouts, call set_winners on Solana program
+        if (payoutCurrency === 'SPL') {
+          try {
+            console.log(`[SOLANA] Setting winners on-chain for game ${gameId}...`);
+            await setSolanaWinners(gameId, proposalDist, total);
+          } catch (err) {
+            console.error(`[SOLANA] Failed to set winners on-chain for game ${gameId}:`, err);
+            // Don't fail the whole process - winnings are still in database
           }
         }
       } catch (err) {

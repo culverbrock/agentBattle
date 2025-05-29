@@ -21,7 +21,7 @@ const SPL_DECIMALS = 6;
 const SOL_DEVNET_URL = 'https://api.devnet.solana.com';
 const API_URL = import.meta.env.VITE_API_URL || '';
 const PRIZE_POOL_CA = import.meta.env.VITE_PRIZE_POOL_CA || '0x94Aba2204C686f41a1fC7dd5DBaA56172844593a';
-const SOL_PRIZE_POOL_TOKEN_ACCOUNT = '9QxGRV3dEkqTaeaz5xcEWwbSxx5pmqPSmL9v62iWzDv';
+const SOL_PRIZE_POOL_TOKEN_ACCOUNT = import.meta.env.VITE_SOL_PRIZE_POOL_TOKEN_ACCOUNT || 'Fp9wXBYossFZmR29EGgpLzC5GAwBUZHgoeuN834WtDup';
 
 // Utility to safely stringify objects with BigInt values
 function safeStringify(obj) {

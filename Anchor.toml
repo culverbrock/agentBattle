@@ -1,9 +1,12 @@
-[programs.localnet]
-solana_prize_pool = "92d5uAumDAzFSXBCUfRU28GCKVHLVE6GgLwAPeZfG5so"
+[programs.devnet]
+solana_prize_pool = "6PtE7SKWtvFCUd4c2TfkkszEt1i6L3ho8wvmwWSAR7Vs"
 
 [provider]
-cluster = "localnet"
+cluster = "devnet"
 wallet = "~/.config/solana/id.json"
 
 [scripts]
-test = "mocha -t 1000000 tests/" 
+test = "mocha -t 1000000 tests/"
+
+[toolchain]
+anchor_version = "0.31.0" 

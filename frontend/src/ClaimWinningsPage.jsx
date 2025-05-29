@@ -273,10 +273,41 @@ function ClaimWinningsPage() {
         claimerTokenAccount: claimerTokenAccount.toBase58()
       });
       
-      // Check if game account exists
+      // Check if accounts exist and create them if needed
       const gameAccount = await connection.getAccountInfo(gamePda);
       if (!gameAccount) {
         throw new Error('Game account not found on blockchain.');
+      }
+      
+      // Import createAssociatedTokenAccountInstruction
+      const { createAssociatedTokenAccountInstruction } = await import('@solana/spl-token');
+      
+      const instructions = [];
+      
+      // Check if pool token account exists, create if not
+      const poolTokenAccountInfo = await connection.getAccountInfo(poolTokenAccount);
+      if (!poolTokenAccountInfo) {
+        console.log('[ClaimWinningsPage] Pool token account does not exist, creating it...');
+        const createPoolTokenAccountIx = createAssociatedTokenAccountInstruction(
+          claimer, // payer
+          poolTokenAccount, // ata
+          poolAuthority, // owner
+          mint // mint
+        );
+        instructions.push(createPoolTokenAccountIx);
+      }
+      
+      // Check if claimer token account exists, create if not
+      const claimerTokenAccountInfo = await connection.getAccountInfo(claimerTokenAccount);
+      if (!claimerTokenAccountInfo) {
+        console.log('[ClaimWinningsPage] Claimer token account does not exist, creating it...');
+        const createClaimerTokenAccountIx = createAssociatedTokenAccountInstruction(
+          claimer, // payer
+          claimerTokenAccount, // ata
+          claimer, // owner
+          mint // mint
+        );
+        instructions.push(createClaimerTokenAccountIx);
       }
       
       // Create claim instruction - use zero-filled game ID for direct account claiming
@@ -301,7 +332,10 @@ function ClaimWinningsPage() {
         data: instructionData
       });
       
-      const tx = new Transaction().add(claimIx);
+      // Add claim instruction to the list
+      instructions.push(claimIx);
+      
+      const tx = new Transaction().add(...instructions);
       
       // Set required transaction properties
       const { blockhash } = await connection.getLatestBlockhash();

@@ -41,6 +41,6 @@ RUN . $NVM_DIR/nvm.sh && \
 RUN sh -c "$(curl -sSfL https://release.solana.com/${SOLANA_CLI}/install)"
 
 # Install anchor.
-RUN cargo install --git https://github.com/coral-xyz/anchor --tag ${ANCHOR_CLI} anchor-cli --locked
+RUN cargo install --git https://github.com/coral-xyz/anchor --tag ${ANCHOR_CLI} anchor-cli
 
 WORKDIR /workdir

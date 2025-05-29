@@ -1,8 +1,7 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { BrowserProvider, Contract, formatUnits } from 'ethers';
-import { Connection as SolConnection, PublicKey, Keypair, SystemProgram, Transaction } from '@solana/web3.js';
+import { Connection as SolConnection, PublicKey } from '@solana/web3.js';
 import { getAssociatedTokenAddress, getAccount, TOKEN_PROGRAM_ID } from '@solana/spl-token';
-import { Program, AnchorProvider, web3, BN } from '@coral-xyz/anchor';
 import { Buffer } from 'buffer';
 import { ethers, keccak256, toUtf8Bytes } from "ethers";
 window.Buffer = Buffer;
@@ -22,49 +21,6 @@ const ABT_PRIZE_POOL_ABI = [
 
 // Solana Prize Pool Program
 const SOLANA_PRIZE_POOL_PROGRAM_ID = "DFZn8wUy1m63ky68XtMx4zSQsy3K56HVrshhWeToyNzc";
-const SOLANA_PRIZE_POOL_IDL = {
-  "version": "0.1.0",
-  "name": "test_solana_prize_pool",
-  "instructions": [
-    {
-      "name": "claim",
-      "accounts": [
-        { "name": "game", "isMut": true, "isSigner": false },
-        { "name": "poolTokenAccount", "isMut": true, "isSigner": false },
-        { "name": "claimerTokenAccount", "isMut": true, "isSigner": false },
-        { "name": "poolAuthority", "isMut": false, "isSigner": false },
-        { "name": "claimer", "isMut": false, "isSigner": true },
-        { "name": "tokenProgram", "isMut": false, "isSigner": false }
-      ],
-      "args": [
-        { "name": "gameId", "type": { "array": ["u8", 32] } }
-      ]
-    }
-  ],
-  "accounts": [
-    {
-      "name": "Game",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          { "name": "gameId", "type": { "array": ["u8", 32] } },
-          { "name": "winners", "type": { "vec": "publicKey" } },
-          { "name": "amounts", "type": { "vec": "u64" } },
-          { "name": "claimed", "type": { "vec": "bool" } },
-          { "name": "winnersSet", "type": "bool" }
-        ]
-      }
-    }
-  ],
-  "errors": [
-    { "code": 6000, "name": "InvalidInput", "msg": "Invalid input" },
-    { "code": 6001, "name": "WinnersAlreadySet", "msg": "Winners already set" },
-    { "code": 6002, "name": "WinnersNotSet", "msg": "Winners not set" },
-    { "code": 6003, "name": "AlreadyClaimed", "msg": "Already claimed" },
-    { "code": 6004, "name": "NotAWinner", "msg": "Not a winner" }
-  ],
-  "metadata": { "address": "DFZn8wUy1m63ky68XtMx4zSQsy3K56HVrshhWeToyNzc" }
-};
 
 function ClaimWinningsPage() {
   // Wallet state
@@ -240,8 +196,7 @@ function ClaimWinningsPage() {
     try {
       if (!window.solana) throw new Error("Phantom wallet required");
       
-      // For now, we'll use the backend claim since the on-chain program needs to be deployed
-      // In the future, this would call the Solana prize pool program directly
+      // Currently using backend claiming - will be upgraded to on-chain claiming later
       log(`[ClaimWinningsPage] Claiming SPL via backend for game ${win.game_id}...`);
       
       const res = await fetch(`${API_URL}/api/claim`, {

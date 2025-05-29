@@ -290,12 +290,12 @@ function ClaimWinningsPage() {
       
       const claimIx = new TransactionInstruction({
         keys: [
-          { pubkey: gamePda, isSigner: false, isWritable: true },
-          { pubkey: poolTokenAccount, isSigner: false, isWritable: true },
-          { pubkey: claimerTokenAccount, isSigner: false, isWritable: true },
-          { pubkey: poolAuthority, isSigner: false, isWritable: false },
-          { pubkey: claimer, isSigner: true, isWritable: false },
-          { pubkey: new PublicKey('TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA'), isSigner: false, isWritable: false }
+          { pubkey: gamePda, isSigner: false, isWritable: true },          // game
+          { pubkey: claimer, isSigner: true, isWritable: true },           // winner 
+          { pubkey: poolTokenAccount, isSigner: false, isWritable: true }, // prizePoolTokenAccount
+          { pubkey: claimerTokenAccount, isSigner: false, isWritable: true }, // winnerTokenAccount
+          { pubkey: poolAuthority, isSigner: false, isWritable: false },   // prizePoolAuthority
+          { pubkey: new PublicKey('TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA'), isSigner: false, isWritable: false } // tokenProgram
         ],
         programId,
         data: instructionData

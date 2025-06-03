@@ -296,8 +296,30 @@ class ContinuousEvolutionSystem {
 
       // Run a single game
       this.log('info', 'GameLoop', `Running game ${gameNumber} with ${viableStrategies.length} players`);
-      const gameResult = await this.runSingleGame(gameNumber, viableStrategies);
-      this.log('info', 'GameLoop', `Game ${gameNumber} completed - Winner: ${gameResult.winner?.name || 'None'}`);
+      
+      let gameResult;
+      try {
+        gameResult = await this.runSingleGame(gameNumber, viableStrategies);
+        this.log('info', 'GameLoop', `Game ${gameNumber} completed - Winner: ${gameResult.winner?.name || 'None'}`);
+      } catch (error) {
+        this.log('error', 'GameLoop', `Game ${gameNumber} failed: ${error.message}`);
+        this.log('warning', 'GameLoop', 'Attempting to continue with next game...');
+        
+        // Broadcast error for debugging
+        this.onUpdate({
+          type: 'game_error',
+          data: {
+            gameNumber: gameNumber,
+            error: error.message,
+            stack: error.stack,
+            playersCount: viableStrategies.length,
+            timestamp: Date.now()
+          }
+        });
+        
+        // Continue to next iteration instead of crashing
+        continue;
+      }
       
       // Handle bankruptcies and evolution (combined)
       this.log('debug', 'GameLoop', 'Checking for bankruptcies and evolution...');
@@ -621,6 +643,7 @@ Respond with JSON:
     });
 
     // Run the game using the matrix system
+    this.log('info', 'Game', `Setting up matrix system for game ${gameNumber}...`);
     const matrixSystem = new ImprovedMatrixSystem({
       collectReasoning: this.fullLogging,
       verbosity: this.fullLogging ? 3 : 1,
@@ -644,6 +667,7 @@ Respond with JSON:
       }
     });
 
+    this.log('info', 'Game', `Matrix system created. Starting game simulation...`);
     const gameResult = await this.simulateGameWithMatrix(matrixSystem, gameData);
     
     gameData.endTime = Date.now();
@@ -730,6 +754,9 @@ Respond with JSON:
   }
 
   async simulateGameWithMatrix(matrixSystem, gameData) {
+    this.log('info', 'MatrixGame', `🎮 Starting matrix game simulation for game ${gameData.number}`);
+    this.log('info', 'MatrixGame', `Config: fullLogging=${this.fullLogging}, maxNegotiationRounds=${this.maxNegotiationRounds}`);
+    
     // Setup players for matrix system
     const allPlayers = gameData.players.map((strategy, index) => ({
       id: strategy.id,
@@ -737,6 +764,8 @@ Respond with JSON:
       strategy: strategy.strategy,
       agent: { strategyId: strategy.id }
     }));
+    
+    this.log('info', 'MatrixGame', `Players mapped: ${allPlayers.map(p => p.name).join(', ')}`);
     
     // Initialize matrix system with players
     matrixSystem.initializeMatrix(allPlayers);
@@ -765,15 +794,53 @@ Respond with JSON:
       this.log('debug', 'MatrixGame', `Matrix negotiations starting (${this.maxNegotiationRounds} rounds)`);
 
       // Negotiation phase via matrix
-      const matrixResultsPromise = matrixSystem.runNegotiation({
-        players: allPlayers,
-        eliminated: allPlayers.filter(p => !activePlayers.includes(p)),
-        rounds: this.maxNegotiationRounds,
-        gameContext: gameData
-      });
-
-      const matrixResults = await matrixResultsPromise;
+      this.log('info', 'MatrixGame', `Starting matrix negotiations with ${allPlayers.length} players...`);
+      let matrixResults;
       
+      try {
+        const matrixResultsPromise = matrixSystem.runNegotiation({
+          players: allPlayers,
+          eliminated: allPlayers.filter(p => !activePlayers.includes(p)),
+          rounds: this.maxNegotiationRounds,
+          gameContext: gameData
+        });
+
+        // Add timeout wrapper for production safety
+        const timeoutPromise = new Promise((_, reject) => 
+          setTimeout(() => reject(new Error('Matrix negotiation timeout after 5 minutes')), 300000)
+        );
+        
+        matrixResults = await Promise.race([matrixResultsPromise, timeoutPromise]);
+        this.log('info', 'MatrixGame', `Matrix negotiations completed successfully`);
+        
+      } catch (error) {
+        this.log('error', 'MatrixGame', `Matrix negotiation failed: ${error.message}`);
+        this.log('warning', 'MatrixGame', 'Using fallback negotiation results to continue game');
+        
+        // Create fallback matrix results to prevent game crash
+        matrixResults = {
+          finalMatrix: matrixSystem.getMatrix() || [],
+          proposals: [],
+          votes: {},
+          activePlayers: activePlayers.length,
+          totalPlayers: allPlayers.length,
+          success: false
+        };
+        
+        // Broadcast error for debugging
+        this.onUpdate({
+          type: 'matrix_negotiation_error',
+          data: {
+            gameNumber: gameData.number,
+            roundNumber: roundNumber,
+            error: error.message,
+            playersCount: allPlayers.length,
+            activePlayers: activePlayers.length,
+            timestamp: Date.now()
+          }
+        });
+      }
+
       // Extract reasoning data after matrix
       const reasoning = this.extractReasoningData(matrixSystem);
       

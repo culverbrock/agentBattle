@@ -62,6 +62,9 @@ class EvolutionController {
         broadcaster: this.broadcaster
       });
 
+      // Start the evolution system
+      this.currentSimulation.start();
+
       // Start the simulation in the background
       this.isRunning = true;
       this.runSimulationLoop();

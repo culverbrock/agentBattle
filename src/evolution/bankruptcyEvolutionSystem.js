@@ -28,7 +28,7 @@ class BankruptcyEvolutionSystem {
     // Evolution parameters
     this.minPopulation = 6;
     this.maxPopulation = 12;
-    this.evolutionPressure = 0.1; // 10% chance to evolve when winning
+    this.evolutionPressure = 0.3; // Increased from 0.1 to 0.3 (30% chance to evolve when winning)
     
     // Rate limiting and timing
     this.gameDelayMinutes = 5; // 5 minute delay between games
@@ -517,13 +517,15 @@ class BankruptcyEvolutionSystem {
   }
 
   async checkForEvolution() {
-    // Identify successful strategies (above average performance)
+    // Identify successful strategies (above average performance OR simply profitable)
     const avgBalance = this.strategies.reduce((sum, s) => sum + s.coinBalance, 0) / this.strategies.length;
     const successfulStrategies = this.strategies.filter(s => 
-      s.coinBalance > avgBalance && 
-      s.gamesPlayed >= 3 && 
+      (s.coinBalance > avgBalance || s.avgProfit > 0) && // Above average OR profitable
+      s.gamesPlayed >= 2 && // Reduced from 3 to 2 games minimum
       Math.random() < this.evolutionPressure
     );
+
+    this.log('debug', 'Evolution', `Checking evolution: ${successfulStrategies.length} potential parents found`);
 
     for (const parentStrategy of successfulStrategies) {
       if (this.strategies.length < this.maxPopulation) {
@@ -551,6 +553,7 @@ class BankruptcyEvolutionSystem {
 
   async evolveStrategy(parentStrategy) {
     try {
+      // Try LLM-based evolution first
       const evolutionPrompt = `You are an AI strategy evolution system. A successful strategy needs to evolve and adapt.
 
 PARENT STRATEGY:
@@ -596,17 +599,71 @@ Respond with JSON:
           gamesPlayed: 0,
           wins: 0,
           avgProfit: 0,
-          generationNumber: parentStrategy.generationNumber + 1,
+          generationNumber: (parentStrategy.generationNumber || 1) + 1,
           parentId: parentStrategy.id,
           mutationType: evolutionData.mutationType,
           evolutionReasoning: evolutionData.evolutionReasoning
         };
+      } else {
+        throw new Error('Invalid evolution data generated');
       }
     } catch (error) {
-      this.log('error', 'Evolution', `Failed to evolve strategy ${parentStrategy.name}: ${error.message}`);
+      this.log('warning', 'Evolution', `LLM-based evolution failed for ${parentStrategy.name}: ${error.message}, using fallback`);
+      
+      // Fallback to simpler evolution if LLM fails
+      return this.createSimpleEvolution(parentStrategy);
     }
+  }
 
-    return null;
+  createSimpleEvolution(parentStrategy) {
+    // Simplified evolution as fallback when LLM fails
+    const evolutionTypes = [
+      'ENHANCEMENT', 'ADAPTATION', 'SPECIALIZATION', 'HYBRIDIZATION'
+    ];
+    
+    const mutationType = evolutionTypes[Math.floor(Math.random() * evolutionTypes.length)];
+    
+    // Generate evolved name
+    const evolutionSuffixes = [
+      'Enhanced', 'Advanced', 'Evolved', 'Refined', 'Optimized', 'Prime', 'Elite', 'Modified'
+    ];
+    const suffix = evolutionSuffixes[Math.floor(Math.random() * evolutionSuffixes.length)];
+    const newName = `${parentStrategy.name} ${suffix}`;
+    
+    // Generate evolved strategy based on parent
+    let evolvedStrategy = parentStrategy.strategy;
+    
+    switch (mutationType) {
+      case 'ENHANCEMENT':
+        evolvedStrategy += ' Enhanced with improved mathematical precision and risk assessment.';
+        break;
+      case 'ADAPTATION':
+        evolvedStrategy += ' Adapted with dynamic response patterns and environmental awareness.';
+        break;
+      case 'SPECIALIZATION':
+        evolvedStrategy += ' Specialized for optimal coalition formation and vote trading efficiency.';
+        break;
+      case 'HYBRIDIZATION':
+        evolvedStrategy += ' Hybridized with cross-archetype techniques for maximum flexibility.';
+        break;
+    }
+    
+    const evolutionReasoning = `${mutationType} evolution of successful ${parentStrategy.archetype} strategy. Parent had ${parentStrategy.avgProfit.toFixed(2)} average profit over ${parentStrategy.gamesPlayed} games.`;
+    
+    return {
+      id: `evolved-${Date.now()}-${Math.random().toString(36).substr(2, 5)}`,
+      name: newName,
+      archetype: parentStrategy.archetype, // Keep same archetype but evolved
+      strategy: evolvedStrategy,
+      coinBalance: this.startingBalance,
+      gamesPlayed: 0,
+      wins: 0,
+      avgProfit: 0,
+      generationNumber: (parentStrategy.generationNumber || 1) + 1,
+      parentId: parentStrategy.id,
+      mutationType: mutationType,
+      evolutionReasoning: evolutionReasoning
+    };
   }
 
   async restartWithFreshPopulation() {
@@ -665,8 +722,118 @@ Respond with JSON:
       };
     } catch (error) {
       this.log('error', 'Evolution', `Failed to create fresh strategy: ${error.message}`);
-      return null;
+      // Fallback to predefined strategy if LLM fails
+      return this.createFallbackStrategy();
     }
+  }
+
+  createFallbackStrategy() {
+    const strategyTemplates = [
+      {
+        name: 'Strategic Vote Trader',
+        archetype: 'Strategic',
+        strategy: 'Make explicit vote-for-allocation deals. Track trust and honor commitments when beneficial. Focus on coalition mathematics.'
+      },
+      {
+        name: 'Trust Builder',
+        archetype: 'Cooperative',
+        strategy: 'Focus on consistent promise-keeping to build long-term alliances. Reference voting history and punish betrayers.'
+      },
+      {
+        name: 'Coalition Breaker',
+        archetype: 'Aggressive',
+        strategy: 'Identify and disrupt opposing coalitions through targeted vote offers and strategic betrayals when profitable.'
+      },
+      {
+        name: 'Mathematical Negotiator',
+        archetype: 'Analytical',
+        strategy: 'Use precise calculations in vote trading. Make conditional commitments based on probabilities and expected values.'
+      },
+      {
+        name: 'Reputation Manager',
+        archetype: 'Conservative',
+        strategy: 'Carefully balance short-term gains vs long-term trust. Track all players promise-keeping patterns.'
+      },
+      {
+        name: 'Aggressive Dealer',
+        archetype: 'Aggressive',
+        strategy: 'Make bold vote offers to secure large allocations. Use intimidation and leverage in negotiations.'
+      }
+    ];
+
+    const template = strategyTemplates[Math.floor(Math.random() * strategyTemplates.length)];
+    const variation = Math.floor(Math.random() * 1000);
+    
+    return {
+      id: this.generateUniqueId(),
+      name: `${template.name} ${variation}`,
+      archetype: template.archetype,
+      strategy: template.strategy,
+      coinBalance: this.startingBalance,
+      gamesPlayed: 0,
+      wins: 0,
+      avgProfit: 0,
+      creationTime: Date.now(),
+      parentId: null,
+      mutationCount: 0
+    };
+  }
+
+  async generateStrategy(context = 'general') {
+    try {
+      const prompt = `You are an AI strategy generator for a negotiation game. Create a unique strategic approach.
+
+CONTEXT: ${context === 'fresh_spawn' ? 'Creating a new agent to replace an eliminated one' : 'General strategy creation'}
+
+GAME OVERVIEW:
+- Players negotiate to split a prize pool
+- Must get 61%+ votes to win
+- Strategies compete over multiple games
+- Successful strategies survive and evolve
+
+STRATEGY REQUIREMENTS:
+- Unique approach to negotiation
+- Clear tactical philosophy
+- Adaptable to different opponents
+- Long-term perspective on profit
+
+ARCHETYPE OPTIONS:
+- Cooperative: Fair distribution, alliance building
+- Aggressive: Maximizing personal gain
+- Strategic: Adaptive based on game state
+- Analytical: Pattern recognition and exploitation
+- Coalition: Alliance formation and control
+- Conservative: Risk management and survival
+- Hybrid: Combination of approaches
+
+Respond with JSON:
+{
+  "name": "Unique strategy name",
+  "archetype": "Strategy category",
+  "strategy": "Detailed strategic approach and tactics"
+}`;
+
+      const response = await callLLM(prompt, {
+        temperature: 0.8,
+        max_tokens: 400,
+        system: 'You are an expert in game theory and strategic design. Create diverse and effective negotiation strategies.'
+      });
+
+      const strategyData = JSON.parse(response.match(/\{[\s\S]*\}/)?.[0] || '{}');
+      
+      if (strategyData.name && strategyData.strategy) {
+        return strategyData;
+      } else {
+        throw new Error('Invalid strategy data generated');
+      }
+    } catch (error) {
+      this.log('error', 'Evolution', `Failed to generate strategy: ${error.message}`);
+      throw error; // Re-throw to trigger fallback
+    }
+  }
+
+  generateUniqueId() {
+    return `strategy-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
   }
 }
 

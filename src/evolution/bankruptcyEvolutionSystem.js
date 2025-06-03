@@ -481,6 +481,39 @@ class BankruptcyEvolutionSystem {
 
     // Remove bankrupt strategies
     this.strategies = this.strategies.filter(s => s.coinBalance >= this.entryFee);
+    
+    // Spawn new agents to replace eliminated ones
+    const eliminatedCount = bankruptStrategies.length;
+    if (eliminatedCount > 0) {
+      this.log('info', 'Evolution', `Spawning ${eliminatedCount} new agents to replace eliminated strategies`);
+      
+      for (let i = 0; i < eliminatedCount; i++) {
+        // Create a new strategy to replace the eliminated one
+        const newStrategy = await this.createFreshStrategy();
+        if (newStrategy) {
+          this.strategies.push(newStrategy);
+          this.log('info', 'Evolution', `New strategy spawned: ${newStrategy.name}`);
+          
+          // Broadcast the new strategy
+          this.onUpdate({
+            type: 'strategy_spawned',
+            strategy: {
+              id: newStrategy.id,
+              name: newStrategy.name,
+              archetype: newStrategy.archetype,
+              coinBalance: newStrategy.coinBalance,
+              reason: 'Replacement for bankruptcy elimination'
+            }
+          });
+        }
+      }
+      
+      // Broadcast updated strategies list
+      this.onUpdate({
+        type: 'strategies_updated',
+        strategies: this.strategies
+      });
+    }
   }
 
   async checkForEvolution() {
@@ -611,6 +644,28 @@ Respond with JSON:
     
     if (this.broadcaster) {
       this.broadcaster.broadcastLog(level, source, message);
+    }
+  }
+
+  async createFreshStrategy() {
+    try {
+      const strategyData = await this.generateStrategy('fresh_spawn');
+      return {
+        id: this.generateUniqueId(),
+        name: strategyData.name,
+        archetype: strategyData.archetype,
+        strategy: strategyData.strategy,
+        coinBalance: this.startingBalance,
+        gamesPlayed: 0,
+        wins: 0,
+        avgProfit: 0,
+        creationTime: Date.now(),
+        parentId: null, // Fresh strategy, not evolved from another
+        mutationCount: 0
+      };
+    } catch (error) {
+      this.log('error', 'Evolution', `Failed to create fresh strategy: ${error.message}`);
+      return null;
     }
   }
 }

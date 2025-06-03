@@ -167,9 +167,39 @@ class ImprovedMatrixSystem {
             // Show full matrix only if requested
             if (this.config.showFullMatrix && this.config.verbosity >= 2) {
                 const logFunction = this.config.customLogger || console.log;
-                logFunction(`\n=== MATRIX STATE AFTER PLAYER ${playerIndex + 1} UPDATE ===`);
-                logFunction(this.formatDetailedMatrixState());
-                logFunction('=== END MATRIX STATE ===\n');
+                logFunction(`=== MATRIX STATE AFTER PLAYER ${playerIndex + 1} UPDATE ===`);
+                
+                // Send each player's matrix state as a separate log message for better formatting
+                this.negotiationMatrix.forEach((rowObj, idx) => {
+                    const data = rowObj.data;
+                    const numPlayers = this.players.length;
+                    const proposal = data.slice(0, numPlayers);
+                    const votes = data.slice(numPlayers, numPlayers * 2);
+                    const requests = data.slice(numPlayers * 2, numPlayers * 3);
+                    
+                    const proposalSum = proposal.reduce((a, b) => a + b, 0);
+                    const voteSum = votes.reduce((a, b) => a + b, 0);
+                    
+                    // Check if player is eliminated
+                    const isEliminated = proposal.every(val => val === -1);
+                    const statusLabel = isEliminated ? 'ELIMINATED' : 'ACTIVE';
+                    
+                    // Format displays
+                    const proposalDisplay = isEliminated ? 
+                        `[${proposal.join(',')}] ELIMINATED` :
+                        `[${proposal.map(p => p.toFixed(1)).join(',')}%] (sum: ${proposalSum.toFixed(1)}%) ${Math.abs(proposalSum - 100) <= 3 ? 'VALID' : 'INVALID'}`;
+                    
+                    const requestDisplay = isEliminated ?
+                        `[${requests.join(',')}] NO REQUESTS` :
+                        `[${requests.map(r => r.toFixed(1)).join(',')}] votes`;
+                    
+                    logFunction(`Player ${idx + 1} (${rowObj.playerName}) - ${statusLabel}:`);
+                    logFunction(`  Proposal: ${proposalDisplay}`);
+                    logFunction(`  Votes: [${votes.map(v => v.toFixed(1)).join(',')}%] (sum: ${voteSum.toFixed(1)}%) ${Math.abs(voteSum - 100) <= 3 ? 'VALID' : 'INVALID'}`);
+                    logFunction(`  Requests: ${requestDisplay}`);
+                });
+                
+                logFunction('=== END MATRIX STATE ===');
             }
             
             return true;

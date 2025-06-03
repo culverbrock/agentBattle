@@ -91,6 +91,10 @@ class ImprovedMatrixSystem {
         const playerName = this.players[playerIndex].name;
         
         try {
+            // Rate limiting: small delay before LLM call
+            this.log.debug(`⏱️ Waiting 3s before ${playerName} matrix negotiation...`);
+            await new Promise(resolve => setTimeout(resolve, 3000)); // 3 second delay
+            
             // Track which players are eliminated for vote allocation guidance
             this.currentActivePlayers = activePlayers || this.players.map((_, i) => ({ playerIndex: i, isActive: !isEliminated }));
             

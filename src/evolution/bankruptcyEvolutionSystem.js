@@ -32,7 +32,8 @@ class ContinuousEvolutionSystem {
     // Rate limiting and timing
     this.maxRounds = options.maxRounds || 100;
     this.maxNegotiationRounds = options.maxNegotiationRounds || 3;
-    this.gameDelayMinutes = 5; // 5 minute delay for OpenAI rate limits
+    this.gameDelayMinutes = 0.17; // 10 seconds between games (was 5 minutes)
+    this.llmDelaySeconds = 3; // 3 second delay between individual LLM calls
     this.interactionDelaySeconds = 3; // 3 second delay between interactions
     this.roundDelaySeconds = 10; // 10 second delay between negotiation rounds
     this.isWaitingForNextGame = false;
@@ -523,6 +524,10 @@ Respond with JSON:
 }`;
 
     try {
+      // Rate limiting: small delay before LLM call
+      this.log('debug', 'RateLimit', `Waiting ${this.llmDelaySeconds}s before evolution strategy generation...`);
+      await this.sleep(this.llmDelaySeconds * 1000);
+      
       const response = await callLLM(blendPrompt, {
         temperature: 0.7,
         max_tokens: 600,
@@ -1379,6 +1384,10 @@ Respond with JSON:
 
   async createFreshStrategy() {
     try {
+      // Rate limiting: small delay before LLM call
+      this.log('debug', 'RateLimit', `Waiting ${this.llmDelaySeconds}s before strategy generation...`);
+      await this.sleep(this.llmDelaySeconds * 1000);
+      
       const strategyData = await this.generateStrategy('fresh_spawn');
       return {
         id: this.generateUniqueId(),
@@ -1476,6 +1485,10 @@ Respond with JSON:
 
   async generateStrategy(context = 'general') {
     try {
+      // Rate limiting: small delay before LLM call
+      this.log('debug', 'RateLimit', `Waiting ${this.llmDelaySeconds}s before strategy generation...`);
+      await this.sleep(this.llmDelaySeconds * 1000);
+      
       const prompt = `You are an AI strategy generator for a negotiation game. Create a unique strategic approach.
 
 CONTEXT: ${context === 'fresh_spawn' ? 'Creating a new agent to replace an eliminated one' : 'General strategy creation'}
@@ -1533,6 +1546,10 @@ Respond with JSON:
 
   async generateProposal(context, player, allPlayers, gameData) {
     try {
+      // Rate limiting: small delay before LLM call
+      this.log('debug', 'RateLimit', `Waiting ${this.llmDelaySeconds}s before ${player.name} proposal generation...`);
+      await this.sleep(this.llmDelaySeconds * 1000);
+      
       const strategy = gameData.players ? gameData.players.find(s => s.id === player.id) : null;
       const strategyText = strategy ? strategy.strategy : 'Maximize strategic positioning in negotiations';
       
@@ -1614,6 +1631,10 @@ Respond with JSON only:
 
   async generateVote(context, player, proposals, gameData) {
     try {
+      // Rate limiting: small delay before LLM call
+      this.log('debug', 'RateLimit', `Waiting ${this.llmDelaySeconds}s before ${player.name} vote generation...`);
+      await this.sleep(this.llmDelaySeconds * 1000);
+      
       const strategy = gameData.players ? gameData.players.find(s => s.id === player.id) : null;
       const strategyText = strategy ? strategy.strategy : 'Vote strategically to maximize outcomes';
       

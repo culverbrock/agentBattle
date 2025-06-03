@@ -11,7 +11,6 @@ function EvolutionObservatory() {
   const [strategies, setStrategies] = useState([]);
   const [eliminatedStrategies, setEliminatedStrategies] = useState([]);
   const [evolutionTree, setEvolutionTree] = useState([]);
-  const [detailedLogs, setDetailedLogs] = useState([]);
   const [currentRound, setCurrentRound] = useState(null);
   const [activeView, setActiveView] = useState('dashboard'); // 'dashboard', 'tree', 'logs', 'reasoning'
   const [selectedStrategy, setSelectedStrategy] = useState(null);
@@ -25,8 +24,8 @@ function EvolutionObservatory() {
   // Rate limiting and countdown states
   const [isWaitingForNextGame, setIsWaitingForNextGame] = useState(false);
   const [countdown, setCountdown] = useState({ minutes: 0, seconds: 0, formattedTime: '0:00', timeRemaining: 0 });
-  const [liveLogs, setLiveLogs] = useState([]);
   const [aiReasoning, setAiReasoning] = useState([]);
+  const [detailedLogs, setDetailedLogs] = useState([]);
   
   const wsRef = useRef(null);
   const startTimeRef = useRef(null);
@@ -139,12 +138,6 @@ function EvolutionObservatory() {
         setCurrentRound(message.data);
         if (message.data.logs) {
           setDetailedLogs(prev => [...prev.slice(-200), ...message.data.logs]); // Keep last 200 logs
-          // Also add these logs to live logs for dashboard display
-          const newLiveLogs = message.data.logs.map(log => ({
-            ...log,
-            timestamp: log.timestamp || Date.now()
-          }));
-          setLiveLogs(prev => [...prev.slice(-100), ...newLiveLogs]);
         }
         if (message.data.reasoning) {
           setAiReasoning(prev => [...prev.slice(-10), ...Object.entries(message.data.reasoning).map(([strategyId, reasoning]) => ({
@@ -171,12 +164,12 @@ function EvolutionObservatory() {
         break;
         
       case 'log':
-        // Handle individual log messages
+        // Handle individual log messages - add to detailedLogs
         const logEntry = {
           ...message.data,
           timestamp: message.data.timestamp || Date.now()
         };
-        setLiveLogs(prev => [...prev.slice(-100), logEntry]); // Keep last 100 logs (increased from 50)
+        setDetailedLogs(prev => [...prev.slice(-200), logEntry]); // Keep last 200 logs
         break;
         
       default:
@@ -326,7 +319,7 @@ function EvolutionObservatory() {
             onSelectStrategy={setSelectedStrategy}
             isWaitingForNextGame={isWaitingForNextGame}
             countdown={countdown}
-            liveLogs={liveLogs}
+            detailedLogs={detailedLogs}
             aiReasoning={aiReasoning}
           />
         )}
@@ -354,7 +347,7 @@ function EvolutionObservatory() {
 }
 
 // Dashboard View Component
-function DashboardView({ strategies, currentGame, currentTournament, currentRound, eliminatedStrategies, onSelectStrategy, isWaitingForNextGame, countdown, liveLogs, aiReasoning }) {
+function DashboardView({ strategies, currentGame, currentTournament, currentRound, eliminatedStrategies, onSelectStrategy, isWaitingForNextGame, countdown, detailedLogs, aiReasoning }) {
   return (
     <div className="dashboard-view">
       <div className="dashboard-grid">
@@ -401,6 +394,9 @@ function DashboardView({ strategies, currentGame, currentTournament, currentRoun
                 <div className="strategy-games">
                   Games: {strategy.gamesPlayed || 0}
                 </div>
+                <div className="strategy-description">
+                  {strategy.strategy}
+                </div>
               </div>
             ))}
           </div>
@@ -430,9 +426,9 @@ function DashboardView({ strategies, currentGame, currentTournament, currentRoun
                   <span className="log-message">Waiting for rate limit delay</span>
                 </div>
               </div>
-            ) : liveLogs.length > 0 ? (
+            ) : detailedLogs.length > 0 ? (
               <div className="activity-feed">
-                {liveLogs.slice(-15).map((log, idx) => (
+                {detailedLogs.slice(-15).map((log, idx) => (
                   <div key={idx} className={`log-entry log-${log.level || 'info'}`}>
                     <span className="log-time">{new Date(log.timestamp).toLocaleTimeString()}</span>
                     <span className="log-source">{log.source || 'System'}</span>

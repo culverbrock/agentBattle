@@ -30,7 +30,9 @@ class ContinuousEvolutionSystem {
     this.populationSize = 6; // Always maintain exactly 6 strategies
     
     // Rate limiting and timing
-    this.gameDelayMinutes = 5; // 5 minute delay between games
+    this.maxRounds = options.maxRounds || 100;
+    this.maxNegotiationRounds = options.maxNegotiationRounds || 3;
+    this.gameDelayMinutes = 5; // 5 minute delay for OpenAI rate limits
     this.interactionDelaySeconds = 3; // 3 second delay between interactions
     this.roundDelaySeconds = 10; // 10 second delay between negotiation rounds
     this.isWaitingForNextGame = false;
@@ -1033,12 +1035,15 @@ Respond with JSON:
       // Broadcast round results
       if (this.realTimeUpdates) {
         const reasoning = this.extractReasoningData(matrixSystem);
-        const logs = roundNegotiations.map(neg => ({
-          level: 'info',
-          source: 'AI_Reasoning',
-          message: `${neg.playerName}: ${neg.message}`,
-          timestamp: Date.now()
-        }));
+        const logs = Object.entries(reasoning).map(([playerId, reasoningText]) => {
+          const player = allPlayers.find(p => p.id === playerId);
+          return {
+            level: 'info',
+            source: 'AI_Reasoning',
+            message: `${player?.name || playerId}: ${reasoningText}`,
+            timestamp: Date.now()
+          };
+        });
         
         this.onUpdate({
           type: 'round_update',
@@ -1496,7 +1501,7 @@ GAME CONTEXT:
 ${matrixInfo}
 
 RECENT NEGOTIATIONS:
-${context.negotiationHistory.slice(-6).map(n => `${n.playerName}: ${n.message}`).join('\n')}
+${context.negotiationHistory?.slice(-6).map(n => `${n.playerName}: ${n.message}`).join('\n') || 'No recent negotiations'}
 
 Create a proposal that assigns percentages to all players (must total 100%).
 Consider:
@@ -1550,10 +1555,10 @@ Respond with JSON only:
       if (context.matrixSystem) {
         try {
           const matrix = context.matrixSystem.getMatrix();
-          const playerIndex = context.players.findIndex(p => p.id === player.id);
+          const playerIndex = context.allPlayers.findIndex(p => p.id === player.id);
           if (playerIndex !== -1 && matrix[playerIndex]) {
-            const votes = matrix[playerIndex].slice(context.players.length, context.players.length * 2);
-            matrixInfo = `\nYour matrix voting weights: [${votes.map((v, i) => `${context.players[i].name}: ${v}`).join(', ')}]`;
+            const votes = matrix[playerIndex].slice(context.allPlayers.length, context.allPlayers.length * 2);
+            matrixInfo = `\nYour matrix voting weights: [${votes.map((v, i) => `${context.allPlayers[i].name}: ${v}`).join(', ')}]`;
           }
         } catch (err) {
           // Matrix info is optional
@@ -1562,7 +1567,7 @@ Respond with JSON only:
 
       const proposalSummary = proposals.map(p => {
         const shares = Object.entries(p.proposal)
-          .map(([id, pct]) => `${context.players.find(pl => pl.id === id)?.name}: ${pct}%`)
+          .map(([id, pct]) => `${context.allPlayers.find(pl => pl.id === id)?.name}: ${pct}%`)
           .join(', ');
         return `${p.playerName}: {${shares}}`;
       }).join('\n');
@@ -1582,7 +1587,7 @@ PROPOSALS TO VOTE ON:
 ${proposalSummary}
 
 RECENT NEGOTIATIONS:
-${context.negotiationHistory.slice(-4).map(n => `${n.playerName}: ${n.message}`).join('\n')}
+${context.negotiationHistory?.slice(-4).map(n => `${n.playerName}: ${n.message}`).join('\n') || 'No recent negotiations'}
 
 Consider:
 1. Which proposal gives you the best outcome

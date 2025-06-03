@@ -949,6 +949,146 @@ Array format: [${data.join(', ')}]`;
     printCurrentMatrixState() {
         this.log.normal(this.formatDetailedMatrixState());
     }
+
+    /**
+     * Run multiple negotiation rounds and return final results
+     * This method was missing and being called by the bankruptcy evolution system
+     */
+    async runNegotiation(options = {}) {
+        const { players, eliminated = [], rounds = 3, gameContext } = options;
+        
+        this.log.verbose(`🔄 Starting matrix negotiations: ${rounds} rounds`);
+        
+        const numPlayers = this.players.length;
+        const eliminatedPlayerIds = eliminated.map(p => p.id);
+        const activePlayers = this.players.filter(p => !eliminatedPlayerIds.includes(p.id));
+        
+        // Run negotiation rounds
+        for (let round = 1; round <= rounds; round++) {
+            this.log.debug(`--- Matrix Round ${round}/${rounds} ---`);
+            
+            // Process players SEQUENTIALLY to avoid hanging with Promise.all
+            const roundResults = [];
+            
+            for (let playerIndex = 0; playerIndex < this.players.length; playerIndex++) {
+                const player = this.players[playerIndex];
+                const isEliminated = eliminatedPlayerIds.includes(player.id);
+                const strategy = player.strategy || `Player ${playerIndex + 1} Strategy`;
+                
+                try {
+                    // Add timeout to prevent hanging
+                    const timeout = new Promise((_, reject) => 
+                        setTimeout(() => reject(new Error('LLM call timeout')), 30000) // 30 second timeout
+                    );
+                    
+                    const negotiationPromise = this.performNegotiationRound(
+                        playerIndex, 
+                        strategy, 
+                        round, 
+                        isEliminated, 
+                        activePlayers.map((_, i) => ({ playerIndex: i, isActive: true }))
+                    );
+                    
+                    const success = await Promise.race([negotiationPromise, timeout]);
+                    roundResults.push({ playerIndex, success, playerName: player.name });
+                    
+                } catch (error) {
+                    this.log.verbose(`❌ Player ${player.name} round ${round} failed: ${error.message}`);
+                    roundResults.push({ playerIndex, success: false, playerName: player.name, error: error.message });
+                    
+                    // Generate fallback matrix row for failed players
+                    const fallbackRow = this.generateFallbackRow(numPlayers, playerIndex, isEliminated);
+                    this.updatePlayerRow(playerIndex, fallbackRow, `Fallback strategy due to timeout: ${error.message}`, round);
+                }
+            }
+            
+            const successCount = roundResults.filter(r => r.success).length;
+            this.log.debug(`Round ${round} completed: ${successCount}/${numPlayers} successful updates`);
+            
+            // Show matrix state after each round if verbosity is high enough
+            if (this.config.showFullMatrix && this.config.verbosity >= 3) {
+                this.printCurrentMatrixState();
+            }
+        }
+        
+        // Extract final results
+        const finalMatrix = this.getMatrix();
+        const proposals = this.extractProposals();
+        const votes = this.extractVotes();
+        
+        this.log.verbose(`✅ Matrix negotiations completed`);
+        
+        return {
+            finalMatrix: finalMatrix,
+            proposals: proposals,
+            votes: votes,
+            activePlayers: activePlayers.length,
+            totalPlayers: numPlayers,
+            success: true
+        };
+    }
+    
+    /**
+     * Extract proposal data from the matrix
+     */
+    extractProposals() {
+        const numPlayers = this.players.length;
+        const proposals = [];
+        
+        this.negotiationMatrix.forEach((rowObj, playerIndex) => {
+            const proposalData = rowObj.data.slice(0, numPlayers);
+            const player = this.players[playerIndex];
+            
+            // Check if player is eliminated (all -1 values)
+            const isEliminated = proposalData.every(val => val === -1);
+            
+            if (!isEliminated) {
+                const proposal = {};
+                this.players.forEach((p, i) => {
+                    proposal[p.id] = proposalData[i];
+                });
+                
+                proposals.push({
+                    playerId: player.id,
+                    playerName: player.name,
+                    proposal: proposal
+                });
+            }
+        });
+        
+        return proposals;
+    }
+    
+    /**
+     * Extract vote data from the matrix
+     */
+    extractVotes() {
+        const numPlayers = this.players.length;
+        const votes = {};
+        
+        this.negotiationMatrix.forEach((rowObj, playerIndex) => {
+            const voteData = rowObj.data.slice(numPlayers, numPlayers * 2);
+            const player = this.players[playerIndex];
+            
+            // Check if player is eliminated (all -1 values)
+            const isEliminated = voteData.every(val => val === -1);
+            
+            if (!isEliminated) {
+                const playerVotes = {};
+                this.players.forEach((p, i) => {
+                    playerVotes[p.id] = voteData[i];
+                });
+                
+                votes[player.id] = {
+                    playerId: player.id,
+                    playerName: player.name,
+                    votes: playerVotes
+                };
+            }
+        });
+        
+        return votes;
+    }
 }
 
 module.exports = { ImprovedMatrixSystem }; 

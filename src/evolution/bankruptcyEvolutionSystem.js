@@ -90,12 +90,23 @@ class ContinuousEvolutionSystem {
         archetype: 'Cooperative',
         strategy: 'Focuses on fair distribution and building coalitions for mutual benefit',
         coinBalance: this.startingBalance,
+        initialBalance: this.startingBalance, // Balance when born
+        preGameBalance: this.startingBalance, // Balance before current game
+        balanceHistory: [{ 
+          game: 0, 
+          balance: this.startingBalance, 
+          change: 0, 
+          reason: 'Initial spawn',
+          timestamp: Date.now() 
+        }],
         gamesPlayed: 0,
         wins: 0,
         avgProfit: 0,
         totalProfit: 0,
         generationNumber: 1,
-        parentIds: null
+        parentIds: null,
+        birthGame: 0,
+        birthTimestamp: Date.now()
       },
       {
         id: 'aggressive-1',
@@ -103,12 +114,23 @@ class ContinuousEvolutionSystem {
         archetype: 'Aggressive',
         strategy: 'Seeks to maximize personal gain, often at the expense of others',
         coinBalance: this.startingBalance,
+        initialBalance: this.startingBalance,
+        preGameBalance: this.startingBalance,
+        balanceHistory: [{ 
+          game: 0, 
+          balance: this.startingBalance, 
+          change: 0, 
+          reason: 'Initial spawn',
+          timestamp: Date.now() 
+        }],
         gamesPlayed: 0,
         wins: 0,
         avgProfit: 0,
         totalProfit: 0,
         generationNumber: 1,
-        parentIds: null
+        parentIds: null,
+        birthGame: 0,
+        birthTimestamp: Date.now()
       },
       {
         id: 'strategic-1',
@@ -116,12 +138,23 @@ class ContinuousEvolutionSystem {
         archetype: 'Strategic',
         strategy: 'Adapts strategy based on game state and other players\' behavior',
         coinBalance: this.startingBalance,
+        initialBalance: this.startingBalance,
+        preGameBalance: this.startingBalance,
+        balanceHistory: [{ 
+          game: 0, 
+          balance: this.startingBalance, 
+          change: 0, 
+          reason: 'Initial spawn',
+          timestamp: Date.now() 
+        }],
         gamesPlayed: 0,
         wins: 0,
         avgProfit: 0,
         totalProfit: 0,
         generationNumber: 1,
-        parentIds: null
+        parentIds: null,
+        birthGame: 0,
+        birthTimestamp: Date.now()
       },
       {
         id: 'analyzer-1',
@@ -129,12 +162,23 @@ class ContinuousEvolutionSystem {
         archetype: 'Analytical',
         strategy: 'Studies opponent patterns and exploits predictable behaviors',
         coinBalance: this.startingBalance,
+        initialBalance: this.startingBalance,
+        preGameBalance: this.startingBalance,
+        balanceHistory: [{ 
+          game: 0, 
+          balance: this.startingBalance, 
+          change: 0, 
+          reason: 'Initial spawn',
+          timestamp: Date.now() 
+        }],
         gamesPlayed: 0,
         wins: 0,
         avgProfit: 0,
         totalProfit: 0,
         generationNumber: 1,
-        parentIds: null
+        parentIds: null,
+        birthGame: 0,
+        birthTimestamp: Date.now()
       },
       {
         id: 'coalition-1',
@@ -142,12 +186,23 @@ class ContinuousEvolutionSystem {
         archetype: 'Coalition',
         strategy: 'Forms and breaks alliances strategically to control game outcomes',
         coinBalance: this.startingBalance,
+        initialBalance: this.startingBalance,
+        preGameBalance: this.startingBalance,
+        balanceHistory: [{ 
+          game: 0, 
+          balance: this.startingBalance, 
+          change: 0, 
+          reason: 'Initial spawn',
+          timestamp: Date.now() 
+        }],
         gamesPlayed: 0,
         wins: 0,
         avgProfit: 0,
         totalProfit: 0,
         generationNumber: 1,
-        parentIds: null
+        parentIds: null,
+        birthGame: 0,
+        birthTimestamp: Date.now()
       },
       {
         id: 'conservative-1',
@@ -155,12 +210,23 @@ class ContinuousEvolutionSystem {
         archetype: 'Conservative',
         strategy: 'Prioritizes survival and consistent small gains over risky big wins',
         coinBalance: this.startingBalance,
+        initialBalance: this.startingBalance,
+        preGameBalance: this.startingBalance,
+        balanceHistory: [{ 
+          game: 0, 
+          balance: this.startingBalance, 
+          change: 0, 
+          reason: 'Initial spawn',
+          timestamp: Date.now() 
+        }],
         gamesPlayed: 0,
         wins: 0,
         avgProfit: 0,
         totalProfit: 0,
         generationNumber: 1,
-        parentIds: null
+        parentIds: null,
+        birthGame: 0,
+        birthTimestamp: Date.now()
       }
     ];
 
@@ -179,7 +245,21 @@ class ContinuousEvolutionSystem {
     // Broadcast initial strategies to frontend
     this.onUpdate({
       type: 'strategies_updated',
-      strategies: this.strategies
+      strategies: this.strategies.map(s => ({
+        ...s,
+        balanceInfo: {
+          current: s.coinBalance,
+          initial: s.initialBalance,
+          preGame: s.preGameBalance,
+          totalChange: s.coinBalance - s.initialBalance,
+          gameChange: s.coinBalance - s.preGameBalance,
+          gamesPlayed: s.gamesPlayed,
+          avgProfit: s.avgProfit || 0,
+          totalProfit: s.totalProfit || 0,
+          generationInfo: `Gen ${s.generationNumber}${s.birthGame > 0 ? ` (Born Game ${s.birthGame})` : ' (Original)'}`,
+          recentBalanceHistory: (s.balanceHistory || []).slice(-5) // Last 5 balance changes
+        }
+      }))
     });
 
     let gameNumber = this.totalGamesPlayed; // Start from where we left off
@@ -324,7 +404,21 @@ class ContinuousEvolutionSystem {
     // Broadcast updated strategies list
     this.onUpdate({
       type: 'strategies_updated',
-      strategies: this.strategies
+      strategies: this.strategies.map(s => ({
+        ...s,
+        balanceInfo: {
+          current: s.coinBalance,
+          initial: s.initialBalance,
+          preGame: s.preGameBalance,
+          totalChange: s.coinBalance - s.initialBalance,
+          gameChange: s.coinBalance - s.preGameBalance,
+          gamesPlayed: s.gamesPlayed,
+          avgProfit: s.avgProfit || 0,
+          totalProfit: s.totalProfit || 0,
+          generationInfo: `Gen ${s.generationNumber}${s.birthGame > 0 ? ` (Born Game ${s.birthGame})` : ' (Original)'}`,
+          recentBalanceHistory: (s.balanceHistory || []).slice(-5) // Last 5 balance changes
+        }
+      }))
     });
     
     // Save progress after evolution events
@@ -422,6 +516,15 @@ Respond with JSON:
           archetype: evolutionData.archetype || 'Hybrid',
           strategy: evolutionData.strategy,
           coinBalance: this.startingBalance, // Fresh start
+          initialBalance: this.startingBalance, // Balance when born
+          preGameBalance: this.startingBalance, // Balance before current game
+          balanceHistory: [{ 
+            game: this.totalGamesPlayed, 
+            balance: this.startingBalance, 
+            change: 0, 
+            reason: 'Evolved spawn',
+            timestamp: Date.now() 
+          }],
           gamesPlayed: 0,
           wins: 0,
           avgProfit: 0,
@@ -430,7 +533,9 @@ Respond with JSON:
           parentIds: weights.map(w => w.strategy.id),
           parentNames: weights.map(w => w.strategy.name),
           blendWeights: evolutionData.blendWeights || weights.map(w => w.weight),
-          evolutionReasoning: evolutionData.evolutionReasoning || 'Profit-weighted hybrid strategy'
+          evolutionReasoning: evolutionData.evolutionReasoning || 'Profit-weighted hybrid strategy',
+          birthGame: this.totalGamesPlayed,
+          birthTimestamp: Date.now()
         };
       } else {
         throw new Error('Invalid evolution data generated');
@@ -459,6 +564,15 @@ Respond with JSON:
       archetype: topStrategy.archetype,
       strategy: hybridStrategy.substring(0, 200),
       coinBalance: this.startingBalance,
+      initialBalance: this.startingBalance,
+      preGameBalance: this.startingBalance,
+      balanceHistory: [{ 
+        game: this.totalGamesPlayed, 
+        balance: this.startingBalance, 
+        change: 0, 
+        reason: 'Fallback evolved spawn',
+        timestamp: Date.now() 
+      }],
       gamesPlayed: 0,
       wins: 0,
       avgProfit: 0,
@@ -467,7 +581,9 @@ Respond with JSON:
       parentIds: weights.map(w => w.strategy.id),
       parentNames: weights.map(w => w.strategy.name),
       blendWeights: weights.map(w => w.weight),
-      evolutionReasoning: `Fallback hybrid of ${topStrategy.name} (${(weights[0].weight * 100).toFixed(1)}%) and ${secondStrategy.name} (${((weights[1]?.weight || 0) * 100).toFixed(1)}%)`
+      evolutionReasoning: `Fallback hybrid of ${topStrategy.name} (${(weights[0].weight * 100).toFixed(1)}%) and ${secondStrategy.name} (${((weights[1]?.weight || 0) * 100).toFixed(1)}%)`,
+      birthGame: this.totalGamesPlayed,
+      birthTimestamp: Date.now()
     };
   }
 
@@ -478,6 +594,11 @@ Respond with JSON:
       startTime: Date.now()
     };
 
+    // Record pre-game balances for all strategies
+    this.strategies.forEach(strategy => {
+      strategy.preGameBalance = strategy.coinBalance;
+    });
+
     this.onUpdate({
       type: 'game_started',
       game: gameData
@@ -485,10 +606,16 @@ Respond with JSON:
 
     this.log('info', 'Game', `Starting game ${gameNumber} with players: ${gameData.players.map(p => p.name).join(', ')}`);
 
-    // Deduct entry fees
+    // Deduct entry fees and track the change
     gameData.players.forEach(player => {
+      const previousBalance = player.coinBalance;
       player.coinBalance -= this.entryFee;
       player.gamesPlayed++;
+      
+      // Record entry fee deduction in balance history
+      this.addBalanceHistoryEntry(player, gameNumber, player.coinBalance, -this.entryFee, 'Entry fee deducted');
+      
+      this.log('debug', 'Balance', `${player.name}: ${previousBalance} → ${player.coinBalance} (-${this.entryFee} entry fee)`);
     });
 
     // Run the game using the matrix system
@@ -522,11 +649,18 @@ Respond with JSON:
     gameData.finalProposal = gameResult.winningProposal;
     gameData.coinDistribution = gameResult.coinDistribution;
 
-    // Distribute winnings and update statistics
+    // Distribute winnings and update statistics with detailed balance tracking
     if (gameResult.coinDistribution) {
       gameData.players.forEach((player, index) => {
         const winnings = gameResult.coinDistribution[index] || 0;
+        const previousBalance = player.coinBalance;
         player.coinBalance += winnings;
+        
+        // Record winnings in balance history
+        if (winnings > 0) {
+          this.addBalanceHistoryEntry(player, gameNumber, player.coinBalance, winnings, 
+            gameResult.winner?.id === player.id ? 'Game won' : 'Participation reward');
+        }
         
         // Update profit statistics
         const profit = winnings - this.entryFee;
@@ -539,17 +673,27 @@ Respond with JSON:
         if (winnings > this.entryFee) {
           player.wins++;
         }
+        
+        this.log('info', 'Balance', `${player.name}: ${previousBalance} → ${player.coinBalance} (+${winnings} winnings, ${profit >= 0 ? '+' : ''}${profit} profit)`);
       });
     }
 
     this.log('info', 'Game', `Game ${gameNumber} completed. Winner: ${gameResult.winner?.name || 'None'}`);
 
-    // Broadcast game completion with full results
+    // Broadcast game completion with full results including balance changes
     this.onUpdate({
       type: 'game_completed',
       game: {
         number: gameNumber,
-        players: gameData.players.map(p => ({ id: p.id, name: p.name })),
+        players: gameData.players.map(p => ({ 
+          id: p.id, 
+          name: p.name,
+          preGameBalance: p.preGameBalance,
+          currentBalance: p.coinBalance,
+          balanceChange: p.coinBalance - p.preGameBalance,
+          totalProfit: p.totalProfit || 0,
+          avgProfit: p.avgProfit || 0
+        })),
         winner: gameResult.winner,
         finalProposal: gameResult.winningProposal,
         coinDistribution: gameResult.coinDistribution,
@@ -561,6 +705,26 @@ Respond with JSON:
     });
 
     return gameData;
+  }
+
+  // Helper method to add balance history entries
+  addBalanceHistoryEntry(strategy, gameNumber, newBalance, change, reason) {
+    if (!strategy.balanceHistory) {
+      strategy.balanceHistory = [];
+    }
+    
+    strategy.balanceHistory.push({
+      game: gameNumber,
+      balance: newBalance,
+      change: change,
+      reason: reason,
+      timestamp: Date.now()
+    });
+    
+    // Keep only last 50 balance changes to prevent memory bloat
+    if (strategy.balanceHistory.length > 50) {
+      strategy.balanceHistory = strategy.balanceHistory.slice(-50);
+    }
   }
 
   async simulateGameWithMatrix(matrixSystem, gameData) {
@@ -1200,12 +1364,23 @@ Respond with JSON:
         archetype: strategyData.archetype,
         strategy: strategyData.strategy,
         coinBalance: this.startingBalance,
+        initialBalance: this.startingBalance,
+        preGameBalance: this.startingBalance,
+        balanceHistory: [{ 
+          game: this.totalGamesPlayed, 
+          balance: this.startingBalance, 
+          change: 0, 
+          reason: 'Fresh strategy spawn',
+          timestamp: Date.now() 
+        }],
         gamesPlayed: 0,
         wins: 0,
         avgProfit: 0,
         totalProfit: 0,
         generationNumber: 1,
-        parentIds: null
+        parentIds: null,
+        birthGame: this.totalGamesPlayed,
+        birthTimestamp: Date.now()
       };
     } catch (error) {
       this.log('error', 'Evolution', `Failed to create fresh strategy: ${error.message}`);
@@ -1257,12 +1432,23 @@ Respond with JSON:
       archetype: template.archetype,
       strategy: template.strategy,
       coinBalance: this.startingBalance,
+      initialBalance: this.startingBalance,
+      preGameBalance: this.startingBalance,
+      balanceHistory: [{ 
+        game: this.totalGamesPlayed, 
+        balance: this.startingBalance, 
+        change: 0, 
+        reason: 'Fresh strategy spawn',
+        timestamp: Date.now() 
+      }],
       gamesPlayed: 0,
       wins: 0,
       avgProfit: 0,
       totalProfit: 0,
       generationNumber: 1,
-      parentIds: null
+      parentIds: null,
+      birthGame: this.totalGamesPlayed,
+      birthTimestamp: Date.now()
     };
   }
 
@@ -1569,7 +1755,12 @@ Allocate 100 points among proposals (can be 0 for any proposal):
         avgProfit: s.avgProfit || 0,
         totalProfit: s.totalProfit || 0,
         generationNumber: s.generationNumber || 1,
-        parentIds: s.parentIds || null
+        parentIds: s.parentIds || null,
+        initialBalance: s.initialBalance || this.startingBalance,
+        preGameBalance: s.preGameBalance || s.coinBalance,
+        balanceHistory: s.balanceHistory || [],
+        birthGame: s.birthGame || 0,
+        birthTimestamp: s.birthTimestamp || Date.now()
       }));
       
       this.totalGamesPlayed = progressData.totalGamesPlayed || 0;
@@ -1610,6 +1801,9 @@ Allocate 100 points among proposals (can be 0 for any proposal):
           archetype: s.archetype,
           strategy: s.strategy,
           coinBalance: s.coinBalance,
+          initialBalance: s.initialBalance,
+          preGameBalance: s.preGameBalance,
+          balanceHistory: s.balanceHistory || [],
           gamesPlayed: s.gamesPlayed,
           wins: s.wins,
           avgProfit: s.avgProfit,
@@ -1618,7 +1812,9 @@ Allocate 100 points among proposals (can be 0 for any proposal):
           parentIds: s.parentIds,
           parentNames: s.parentNames,
           blendWeights: s.blendWeights,
-          evolutionReasoning: s.evolutionReasoning
+          evolutionReasoning: s.evolutionReasoning,
+          birthGame: s.birthGame,
+          birthTimestamp: s.birthTimestamp
         })),
         eliminatedStrategies: this.eliminatedStrategies,
         evolutionHistory: this.evolutionHistory,
@@ -1663,6 +1859,9 @@ Allocate 100 points among proposals (can be 0 for any proposal):
           archetype: s.archetype,
           strategy: s.strategy,
           coinBalance: s.coinBalance,
+          initialBalance: s.initialBalance,
+          preGameBalance: s.preGameBalance,
+          balanceHistory: s.balanceHistory || [],
           gamesPlayed: s.gamesPlayed,
           wins: s.wins,
           avgProfit: s.avgProfit,
@@ -1671,7 +1870,9 @@ Allocate 100 points among proposals (can be 0 for any proposal):
           parentIds: s.parentIds,
           parentNames: s.parentNames,
           blendWeights: s.blendWeights,
-          evolutionReasoning: s.evolutionReasoning
+          evolutionReasoning: s.evolutionReasoning,
+          birthGame: s.birthGame,
+          birthTimestamp: s.birthTimestamp
         })),
         eliminatedStrategies: this.eliminatedStrategies,
         evolutionHistory: this.evolutionHistory,

@@ -22,6 +22,8 @@ const claimAbtHandler = require('./api/claim-abt');
 const bridgeUtils = require('./bridgeUtils');
 const { Connection, PublicKey, Keypair, Transaction } = require('@solana/web3.js');
 const { createTransferInstruction, getAssociatedTokenAddress } = require('@solana/spl-token');
+const evolutionController = require('./api/evolutionController');
+const { startEvolutionWebSocketServer } = require('./evolutionWebSocketServer');
 
 /**
  * @route POST /games
@@ -644,6 +646,12 @@ router.post('/claim', async (req, res) => {
   }
 });
 
+// Add evolution endpoints
+router.post('/evolution/start', evolutionController.startEvolution);
+router.post('/evolution/stop', evolutionController.stopEvolution);
+router.get('/evolution/status', evolutionController.getStatus);
+router.get('/evolution/data', evolutionController.getCurrentData);
+
 app.use('/api', router);
 app.use('/api/game-state', gameStateRouter);
 
@@ -656,5 +664,7 @@ const server = app.listen(PORT, () => {
 startLobbyWebSocketServer(server);
 // Start the WebSocket server for game room updates
 startGameRoomWebSocketServer(server);
+// Start the WebSocket server for evolution observatory
+startEvolutionWebSocketServer(server);
 
 // TODO: After implementing join/leave, call broadcastLobbyState() after those actions as well. 

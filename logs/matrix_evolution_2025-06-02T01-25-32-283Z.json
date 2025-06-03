@@ -1,0 +1,46 @@
+{
+  "strategies": [
+    {
+      "id": "matrix_aggressive",
+      "name": "Matrix Aggressive Maximizer",
+      "strategy": "Demand high percentages for yourself (40%+), use minimal vote trading, make aggressive requests",
+      "balance": 500,
+      "wins": 0,
+      "totalGames": 0,
+      "averageReturn": 0,
+      "eliminated": false
+    },
+    {
+      "id": "matrix_diplomatic",
+      "name": "Matrix Diplomatic Builder",
+      "strategy": "Propose balanced allocations (20-30% for all), make generous offers, build alliances through vote trading",
+      "balance": 500,
+      "totalGames": 0,
+      "averageReturn": 0,
+      "eliminated": false
+    },
+    {
+      "id": "matrix_calculator",
+      "name": "Matrix Strategic Calculator",
+      "strategy": "Use mathematical optimization, analyze matrix patterns, make calculated offers based on probability",
+      "balance": 500,
+      "wins": 0,
+      "totalGames": 0,
+      "averageReturn": 0,
+      "eliminated": false
+    },
+    {
+      "id": "matrix_opportunist",
+      "name": "Matrix Smart Opportunist",
+      "strategy": "Adapt your matrix based on what others propose, form temporary alliances, exploit weaknesses",
+      "balance": 500,
+      "wins": 0,
+      "totalGames": 0,
+      "averageReturn": 0,
+      "eliminated": false
+    }
+  ],
+  "gameHistory": [],
+  "currentTournament": 1,
+  "timestamp": "2025-06-02T01:25:32.289Z"
+}

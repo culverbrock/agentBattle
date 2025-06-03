@@ -1,0 +1,80 @@
+[
+  {
+    "timestamp": "2025-06-02T13:53:33.535Z",
+    "playerName": "Aggressive Maximizer",
+    "playerIndex": 0,
+    "round": 1,
+    "prompt": "",
+    "response": "",
+    "success": false,
+    "error": "agentInvoker.invokeAgent is not a function",
+    "corrected": false,
+    "promptLength": 0,
+    "responseLength": 0
+  },
+  {
+    "timestamp": "2025-06-02T13:53:33.637Z",
+    "playerName": "Diplomatic Builder",
+    "playerIndex": 1,
+    "round": 1,
+    "prompt": "",
+    "response": "",
+    "success": false,
+    "error": "agentInvoker.invokeAgent is not a function",
+    "corrected": false,
+    "promptLength": 0,
+    "responseLength": 0
+  },
+  {
+    "timestamp": "2025-06-02T13:53:33.739Z",
+    "playerName": "Strategic Opportunist",
+    "playerIndex": 2,
+    "round": 1,
+    "prompt": "",
+    "response": "",
+    "success": false,
+    "error": "agentInvoker.invokeAgent is not a function",
+    "corrected": false,
+    "promptLength": 0,
+    "responseLength": 0
+  },
+  {
+    "timestamp": "2025-06-02T13:53:33.841Z",
+    "playerName": "Mathematical Analyzer",
+    "playerIndex": 3,
+    "round": 1,
+    "prompt": "",
+    "response": "",
+    "success": false,
+    "error": "agentInvoker.invokeAgent is not a function",
+    "corrected": false,
+    "promptLength": 0,
+    "responseLength": 0
+  },
+  {
+    "timestamp": "2025-06-02T13:53:33.943Z",
+    "playerName": "Social Manipulator",
+    "playerIndex": 4,
+    "round": 1,
+    "prompt": "",
+    "response": "",
+    "success": false,
+    "error": "agentInvoker.invokeAgent is not a function",
+    "corrected": false,
+    "promptLength": 0,
+    "responseLength": 0
+  },
+  {
+    "timestamp": "2025-06-02T13:53:34.045Z",
+    "playerName": "Strategy Identifier",
+    "playerIndex": 5,
+    "round": 1,
+    "prompt": "",
+    "response": "",
+    "success": false,
+    "error": "agentInvoker.invokeAgent is not a function",
+    "corrected": false,
+    "promptLength": 0,
+    "responseLength": 0
+  }
+]

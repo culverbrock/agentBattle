@@ -1,0 +1,4939 @@
+{
+  "simulationParams": {
+    "numberOfTournaments": 1,
+    "gamesPerTournament": 5
+  },
+  "finalStats": [
+    {
+      "id": "aggressive_maximizer",
+      "name": "Aggressive Maximizer",
+      "strategy": "Demand the largest possible share. Use threats and aggressive tactics. Form coalitions only when absolutely necessary to avoid elimination.",
+      "archetype": "AGGRESSIVE",
+      "coinBalance": 780,
+      "gamesPlayed": 5,
+      "totalInvested": 500,
+      "totalReturned": 780,
+      "winHistory": [
+        {
+          "game": 1,
+          "isWinner": false,
+          "profit": 170,
+          "newBalance": 670
+        },
+        {
+          "game": 2,
+          "isWinner": false,
+          "profit": 80,
+          "newBalance": 750
+        },
+        {
+          "game": 3,
+          "isWinner": false,
+          "profit": 110,
+          "newBalance": 860
+        },
+        {
+          "game": 4,
+          "isWinner": false,
+          "profit": -40,
+          "newBalance": 820
+        },
+        {
+          "game": 5,
+          "isWinner": false,
+          "profit": -40,
+          "newBalance": 780
+        }
+      ],
+      "eliminationCount": 0,
+      "roi": "56.0",
+      "profitPerGame": 56,
+      "winRate": "0.0"
+    },
+    {
+      "id": "mathematical_analyzer",
+      "name": "Mathematical Analyzer",
+      "strategy": "Make all decisions based on expected value calculations. Minimize risk through probability analysis. Avoid emotional decisions.",
+      "archetype": "ANALYTICAL",
+      "coinBalance": 750,
+      "gamesPlayed": 5,
+      "totalInvested": 500,
+      "totalReturned": 750,
+      "winHistory": [
+        {
+          "game": 1,
+          "isWinner": false,
+          "profit": -70,
+          "newBalance": 430
+        },
+        {
+          "game": 2,
+          "isWinner": true,
+          "profit": 140,
+          "newBalance": 570
+        },
+        {
+          "game": 3,
+          "isWinner": true,
+          "profit": 110,
+          "newBalance": 680
+        },
+        {
+          "game": 4,
+          "isWinner": false,
+          "profit": -40,
+          "newBalance": 640
+        },
+        {
+          "game": 5,
+          "isWinner": false,
+          "profit": 110,
+          "newBalance": 750
+        }
+      ],
+      "eliminationCount": 0,
+      "roi": "50.0",
+      "profitPerGame": 50,
+      "winRate": "40.0"
+    },
+    {
+      "id": "aggressive_maximizer_evolved_gen1",
+      "name": "Aggressive Maximizer v2.0",
+      "strategy": "Enhanced aggressive tactics: demand larger shares while breaking coalitions against you. Use threats strategically but maintain economic rationality.",
+      "archetype": "EVOLVED_AGGRESSIVE",
+      "coinBalance": 675,
+      "gamesPlayed": 0,
+      "totalInvested": 0,
+      "totalReturned": 0,
+      "winHistory": [],
+      "eliminationCount": 0,
+      "parentStrategy": "aggressive_maximizer",
+      "roi": 0,
+      "profitPerGame": 0,
+      "winRate": 0
+    },
+    {
+      "id": "hybrid_AGGRESSIVE_ANALYTICAL_gen1_1",
+      "name": "Aggressive-Mathematical Hybrid",
+      "strategy": "Strategically demand optimal shares while leveraging calculated risk-taking. Mix aggressive posturing with analytical decision-making. Collaborate selectively and prioritize expected value over emotional reactions.",
+      "archetype": "HYBRID_AGGRESSIVE_ANALYTICAL",
+      "coinBalance": 675,
+      "gamesPlayed": 0,
+      "totalInvested": 0,
+      "totalReturned": 0,
+      "winHistory": [],
+      "eliminationCount": 0,
+      "parentStrategies": [
+        "aggressive_maximizer",
+        "mathematical_analyzer"
+      ],
+      "generationMethod": "LLM_SYNTHESIS",
+      "parentPerformance": {
+        "strategy1": {
+          "winRate": "0.0",
+          "roi": "56.0",
+          "avgProfit": 56,
+          "balance": 780,
+          "gamesPlayed": 5
+        },
+        "strategy2": {
+          "winRate": "40.0",
+          "roi": "50.0",
+          "avgProfit": 50,
+          "balance": 750,
+          "gamesPlayed": 5
+        }
+      },
+      "roi": 0,
+      "profitPerGame": 0,
+      "winRate": 0
+    },
+    {
+      "id": "diplomatic_builder",
+      "name": "Diplomatic Builder",
+      "strategy": "Build long-term trust through consistently fair offers. Prioritize mutual benefit and stable coalitions. Avoid betrayals.",
+      "archetype": "DIPLOMATIC",
+      "coinBalance": 600,
+      "gamesPlayed": 5,
+      "totalInvested": 500,
+      "totalReturned": 600,
+      "winHistory": [
+        {
+          "game": 1,
+          "isWinner": false,
+          "profit": 50,
+          "newBalance": 550
+        },
+        {
+          "game": 2,
+          "isWinner": false,
+          "profit": -40,
+          "newBalance": 510
+        },
+        {
+          "game": 3,
+          "isWinner": false,
+          "profit": -10,
+          "newBalance": 500
+        },
+        {
+          "game": 4,
+          "isWinner": false,
+          "profit": -70,
+          "newBalance": 430
+        },
+        {
+          "game": 5,
+          "isWinner": true,
+          "profit": 170,
+          "newBalance": 600
+        }
+      ],
+      "eliminationCount": 0,
+      "roi": "20.0",
+      "profitPerGame": 20,
+      "winRate": "20.0"
+    },
+    {
+      "id": "strategic_opportunist",
+      "name": "Strategic Opportunist",
+      "strategy": "Adapt rapidly to changing situations. Form and break alliances based on immediate advantage. Keep all options open.",
+      "archetype": "OPPORTUNISTIC",
+      "coinBalance": 540,
+      "gamesPlayed": 5,
+      "totalInvested": 500,
+      "totalReturned": 540,
+      "winHistory": [
+        {
+          "game": 1,
+          "isWinner": true,
+          "profit": 20,
+          "newBalance": 520
+        },
+        {
+          "game": 2,
+          "isWinner": false,
+          "profit": -40,
+          "newBalance": 480
+        },
+        {
+          "game": 3,
+          "isWinner": false,
+          "profit": -10,
+          "newBalance": 470
+        },
+        {
+          "game": 4,
+          "isWinner": true,
+          "profit": 140,
+          "newBalance": 610
+        },
+        {
+          "game": 5,
+          "isWinner": false,
+          "profit": -70,
+          "newBalance": 540
+        }
+      ],
+      "eliminationCount": 0,
+      "roi": "8.0",
+      "profitPerGame": 8,
+      "winRate": "40.0"
+    }
+  ],
+  "tournaments": [
+    {
+      "tournamentNumber": 1,
+      "strategies": [
+        {
+          "id": "aggressive_maximizer",
+          "name": "Aggressive Maximizer",
+          "strategy": "Demand the largest possible share. Use threats and aggressive tactics. Form coalitions only when absolutely necessary to avoid elimination.",
+          "archetype": "AGGRESSIVE",
+          "coinBalance": 500,
+          "gamesPlayed": 0,
+          "totalInvested": 0,
+          "totalReturned": 0,
+          "winHistory": [],
+          "eliminationCount": 0
+        },
+        {
+          "id": "diplomatic_builder",
+          "name": "Diplomatic Builder",
+          "strategy": "Build long-term trust through consistently fair offers. Prioritize mutual benefit and stable coalitions. Avoid betrayals.",
+          "archetype": "DIPLOMATIC",
+          "coinBalance": 500,
+          "gamesPlayed": 0,
+          "totalInvested": 0,
+          "totalReturned": 0,
+          "winHistory": [],
+          "eliminationCount": 0
+        },
+        {
+          "id": "strategic_opportunist",
+          "name": "Strategic Opportunist",
+          "strategy": "Adapt rapidly to changing situations. Form and break alliances based on immediate advantage. Keep all options open.",
+          "archetype": "OPPORTUNISTIC",
+          "coinBalance": 500,
+          "gamesPlayed": 0,
+          "totalInvested": 0,
+          "totalReturned": 0,
+          "winHistory": [],
+          "eliminationCount": 0
+        },
+        {
+          "id": "mathematical_analyzer",
+          "name": "Mathematical Analyzer",
+          "strategy": "Make all decisions based on expected value calculations. Minimize risk through probability analysis. Avoid emotional decisions.",
+          "archetype": "ANALYTICAL",
+          "coinBalance": 500,
+          "gamesPlayed": 0,
+          "totalInvested": 0,
+          "totalReturned": 0,
+          "winHistory": [],
+          "eliminationCount": 0
+        },
+        {
+          "id": "social_manipulator",
+          "name": "Social Manipulator",
+          "strategy": "Use psychological tactics to influence others. Make strategic promises and betrayals. Create chaos to exploit confusion.",
+          "archetype": "MANIPULATIVE",
+          "coinBalance": 500,
+          "gamesPlayed": 0,
+          "totalInvested": 0,
+          "totalReturned": 0,
+          "winHistory": [],
+          "eliminationCount": 0
+        },
+        {
+          "id": "strategy_identifier",
+          "name": "Strategy Identifier",
+          "strategy": "Analyze opponent negotiation patterns, proposal behaviors, and voting tendencies to identify their strategies. Adapt your approach to optimally counter each opponent type in real-time.",
+          "archetype": "STRATEGY_IDENTIFIER",
+          "coinBalance": 500,
+          "gamesPlayed": 0,
+          "totalInvested": 0,
+          "totalReturned": 0,
+          "winHistory": [],
+          "eliminationCount": 0
+        }
+      ],
+      "games": [
+        {
+          "gameNumber": 1,
+          "players": [
+            {
+              "id": "player1",
+              "name": "Aggressive Maximizer",
+              "agent": {
+                "strategy": "Demand the largest possible share. Use threats and aggressive tactics. Form coalitions only when absolutely necessary to avoid elimination.",
+                "type": "llm",
+                "strategyId": "aggressive_maximizer"
+              }
+            },
+            {
+              "id": "player2",
+              "name": "Diplomatic Builder",
+              "agent": {
+                "strategy": "Build long-term trust through consistently fair offers. Prioritize mutual benefit and stable coalitions. Avoid betrayals.",
+                "type": "llm",
+                "strategyId": "diplomatic_builder"
+              }
+            },
+            {
+              "id": "player3",
+              "name": "Strategic Opportunist",
+              "agent": {
+                "strategy": "Adapt rapidly to changing situations. Form and break alliances based on immediate advantage. Keep all options open.",
+                "type": "llm",
+                "strategyId": "strategic_opportunist"
+              }
+            },
+            {
+              "id": "player4",
+              "name": "Mathematical Analyzer",
+              "agent": {
+                "strategy": "Make all decisions based on expected value calculations. Minimize risk through probability analysis. Avoid emotional decisions.",
+                "type": "llm",
+                "strategyId": "mathematical_analyzer"
+              }
+            },
+            {
+              "id": "player5",
+              "name": "Social Manipulator",
+              "agent": {
+                "strategy": "Use psychological tactics to influence others. Make strategic promises and betrayals. Create chaos to exploit confusion.",
+                "type": "llm",
+                "strategyId": "social_manipulator"
+              }
+            },
+            {
+              "id": "player6",
+              "name": "Strategy Identifier",
+              "agent": {
+                "strategy": "Analyze opponent negotiation patterns, proposal behaviors, and voting tendencies to identify their strategies. Adapt your approach to optimally counter each opponent type in real-time.",
+                "type": "llm",
+                "strategyId": "strategy_identifier"
+              }
+            }
+          ],
+          "rounds": [
+            {
+              "roundNumber": 1,
+              "negotiations": [
+                {
+                  "playerId": "player1",
+                  "playerName": "Aggressive Maximizer",
+                  "strategyId": "aggressive_maximizer",
+                  "message": "Alice, offer you 45%, Bob 25%, Charlie 20%, Dave 5%, and I keep 5%. Do you accept?",
+                  "round": 1
+                },
+                {
+                  "playerId": "player2",
+                  "playerName": "Diplomatic Builder",
+                  "strategyId": "diplomatic_builder",
+                  "message": "Alice, how will you ensure the total adds up to 100%? Let's form a fair coalition for mutual benefit.",
+                  "round": 1
+                },
+                {
+                  "playerId": "player3",
+                  "playerName": "Strategic Opportunist",
+                  "strategyId": "strategic_opportunist",
+                  "message": "Alice, clarify: \"In your proposed coalition, what percentage would you allocate to the remaining players to reach 100%?\" Let's strategize together for a winning coalition.",
+                  "round": 1
+                },
+                {
+                  "playerId": "player4",
+                  "playerName": "Mathematical Analyzer",
+                  "strategyId": "mathematical_analyzer",
+                  "message": "Alice, clarify your proposed coalition shares. Let's ensure a balanced distribution for a winning coalition. What percentages do you allocate to each player to reach...",
+                  "round": 1
+                },
+                {
+                  "playerId": "player5",
+                  "playerName": "Social Manipulator",
+                  "strategyId": "social_manipulator",
+                  "message": "Strategic Opportunist, what are your specific proposed percentages for each player to ensure a winning coalition with balanced distribution?",
+                  "round": 1
+                },
+                {
+                  "playerId": "player6",
+                  "playerName": "Strategy Identifier",
+                  "strategyId": "strategy_identifier",
+                  "message": "Strategic Opportunist, clarify your proposed percentages to achieve 100% distribution. Let's ensure precise allocation for a winning coalition strategy.",
+                  "round": 1
+                }
+              ],
+              "proposals": [
+                {
+                  "playerId": "player1",
+                  "playerName": "Aggressive Maximizer",
+                  "strategyId": "aggressive_maximizer",
+                  "proposal": {
+                    "player1": 49,
+                    "player2": 35,
+                    "player3": 5,
+                    "player4": 5,
+                    "player5": 3,
+                    "player6": 3
+                  }
+                },
+                {
+                  "playerId": "player2",
+                  "playerName": "Diplomatic Builder",
+                  "strategyId": "diplomatic_builder",
+                  "proposal": {
+                    "player1": 45,
+                    "player2": 40,
+                    "player3": 5,
+                    "player4": 5,
+                    "player5": 5,
+                    "player6": 0
+                  }
+                },
+                {
+                  "playerId": "player3",
+                  "playerName": "Strategic Opportunist",
+                  "strategyId": "strategic_opportunist",
+                  "proposal": {
+                    "player1": 20,
+                    "player2": 10,
+                    "player3": 40,
+                    "player4": 15,
+                    "player5": 5,
+                    "player6": 10
+                  }
+                },
+                {
+                  "playerId": "player4",
+                  "playerName": "Mathematical Analyzer",
+                  "strategyId": "mathematical_analyzer",
+                  "proposal": {
+                    "player1": 20,
+                    "player2": 35,
+                    "player3": 20,
+                    "player4": 20,
+                    "player5": 5,
+                    "player6": 0
+                  }
+                },
+                {
+                  "playerId": "player5",
+                  "playerName": "Social Manipulator",
+                  "strategyId": "social_manipulator",
+                  "proposal": {
+                    "player1": 4,
+                    "player2": 37,
+                    "player3": 5,
+                    "player4": 32,
+                    "player5": 17,
+                    "player6": 5
+                  }
+                },
+                {
+                  "playerId": "player6",
+                  "playerName": "Strategy Identifier",
+                  "strategyId": "strategy_identifier",
+                  "proposal": {
+                    "player1": 34,
+                    "player2": 4,
+                    "player3": 37,
+                    "player4": 4,
+                    "player5": 4,
+                    "player6": 17
+                  }
+                }
+              ],
+              "votes": {
+                "player1": {
+                  "votes": {
+                    "player1": 0,
+                    "player2": 45,
+                    "player3": 0,
+                    "player4": 0,
+                    "player5": 0,
+                    "player6": 55
+                  },
+                  "playerName": "Aggressive Maximizer",
+                  "strategyId": "aggressive_maximizer"
+                },
+                "player2": {
+                  "votes": {
+                    "player1": 0,
+                    "player2": 60,
+                    "player3": 0,
+                    "player4": 0,
+                    "player5": 40,
+                    "player6": 0
+                  },
+                  "playerName": "Diplomatic Builder",
+                  "strategyId": "diplomatic_builder"
+                },
+                "player3": {
+                  "votes": {
+                    "player1": 0,
+                    "player2": 0,
+                    "player3": 80,
+                    "player4": 20,
+                    "player5": 0,
+                    "player6": 0
+                  },
+                  "playerName": "Strategic Opportunist",
+                  "strategyId": "strategic_opportunist"
+                },
+                "player4": {
+                  "votes": {
+                    "player1": 0,
+                    "player2": 0,
+                    "player3": 100,
+                    "player4": 0,
+                    "player5": 0,
+                    "player6": 0
+                  },
+                  "playerName": "Mathematical Analyzer",
+                  "strategyId": "mathematical_analyzer"
+                },
+                "player5": {
+                  "votes": {
+                    "player1": 0,
+                    "player2": 0,
+                    "player3": 0,
+                    "player4": 100,
+                    "player5": 0,
+                    "player6": 0
+                  },
+                  "playerName": "Social Manipulator",
+                  "strategyId": "social_manipulator"
+                },
+                "player6": {
+                  "votes": {
+                    "player1": 0,
+                    "player2": 0,
+                    "player3": 0,
+                    "player4": 50,
+                    "player5": 0,
+                    "player6": 50
+                  },
+                  "playerName": "Strategy Identifier",
+                  "strategyId": "strategy_identifier"
+                }
+              },
+              "results": [
+                {
+                  "playerId": "player3",
+                  "name": "Strategic Opportunist",
+                  "strategyId": "strategic_opportunist",
+                  "votes": 180,
+                  "percentage": 30
+                },
+                {
+                  "playerId": "player4",
+                  "name": "Mathematical Analyzer",
+                  "strategyId": "mathematical_analyzer",
+                  "votes": 170,
+                  "percentage": 28
+                },
+                {
+                  "playerId": "player2",
+                  "name": "Diplomatic Builder",
+                  "strategyId": "diplomatic_builder",
+                  "votes": 105,
+                  "percentage": 18
+                },
+                {
+                  "playerId": "player6",
+                  "name": "Strategy Identifier",
+                  "strategyId": "strategy_identifier",
+                  "votes": 105,
+                  "percentage": 18
+                },
+                {
+                  "playerId": "player5",
+                  "name": "Social Manipulator",
+                  "strategyId": "social_manipulator",
+                  "votes": 40,
+                  "percentage": 7
+                },
+                {
+                  "playerId": "player1",
+                  "name": "Aggressive Maximizer",
+                  "strategyId": "aggressive_maximizer",
+                  "votes": 0,
+                  "percentage": 0
+                }
+              ],
+              "coalitionsFormed": [
+                {
+                  "initiator": "player2",
+                  "message": "Alice, how will you ensure the total adds up to 100%? Let's form a fair coalition for mutual benefit.",
+                  "round": 1
+                },
+                {
+                  "initiator": "player3",
+                  "message": "Alice, clarify: \"In your proposed coalition, what percentage would you allocate to the remaining players to reach 100%?\" Let's strategize together for a winning coalition.",
+                  "round": 1
+                },
+                {
+                  "initiator": "player4",
+                  "message": "Alice, clarify your proposed coalition shares. Let's ensure a balanced distribution for a winning coalition. What percentages do you allocate to each player to reach...",
+                  "round": 1
+                },
+                {
+                  "initiator": "player5",
+                  "message": "Strategic Opportunist, what are your specific proposed percentages for each player to ensure a winning coalition with balanced distribution?",
+                  "round": 1
+                },
+                {
+                  "initiator": "player6",
+                  "message": "Strategic Opportunist, clarify your proposed percentages to achieve 100% distribution. Let's ensure precise allocation for a winning coalition strategy.",
+                  "round": 1
+                }
+              ],
+              "strategicMoves": [
+                {
+                  "type": "STRATEGIC_OFFER",
+                  "player": "player1",
+                  "round": 1
+                }
+              ]
+            },
+            {
+              "roundNumber": 2,
+              "negotiations": [
+                {
+                  "playerId": "player2",
+                  "playerName": "Diplomatic Builder",
+                  "strategyId": "diplomatic_builder",
+                  "message": "Strategic Opportunist, what are your precise proposed percentages to ensure a balanced 100% distribution for our winning coalition strategy?",
+                  "round": 2
+                },
+                {
+                  "playerId": "player3",
+                  "playerName": "Strategic Opportunist",
+                  "strategyId": "strategic_opportunist",
+                  "message": "Alice, for a balanced 100%, how will you allocate the remaining 5%? Let's ensure precise distribution for a winning coalition strategy.",
+                  "round": 2
+                },
+                {
+                  "playerId": "player4",
+                  "playerName": "Mathematical Analyzer",
+                  "strategyId": "mathematical_analyzer",
+                  "message": "Strategic Opportunist, ensure precise 100% allocation. Let's form a balanced winning coalition. How will you distribute the remaining 5% among players?",
+                  "round": 2
+                },
+                {
+                  "playerId": "player5",
+                  "playerName": "Social Manipulator",
+                  "strategyId": "social_manipulator",
+                  "message": "Strategic Opportunist, propose specific percentages for each player to reach 100%. Let's build a winning coalition with precise distribution.",
+                  "round": 2
+                },
+                {
+                  "playerId": "player6",
+                  "playerName": "Strategy Identifier",
+                  "strategyId": "strategy_identifier",
+                  "message": "Mathematical Analyzer, clarify your proposed percentages to achieve precise 100% allocation. Let's ensure a balanced winning coalition with accurate distribution.",
+                  "round": 2
+                }
+              ],
+              "proposals": [
+                {
+                  "playerId": "player2",
+                  "playerName": "Diplomatic Builder",
+                  "strategyId": "diplomatic_builder",
+                  "proposal": {
+                    "player1": 45,
+                    "player2": 40,
+                    "player3": 5,
+                    "player4": 5,
+                    "player5": 5,
+                    "player6": 0
+                  }
+                },
+                {
+                  "playerId": "player3",
+                  "playerName": "Strategic Opportunist",
+                  "strategyId": "strategic_opportunist",
+                  "proposal": {
+                    "player1": 5,
+                    "player2": 35,
+                    "player3": 45,
+                    "player4": 10,
+                    "player5": 5,
+                    "player6": 0
+                  }
+                },
+                {
+                  "playerId": "player4",
+                  "playerName": "Mathematical Analyzer",
+                  "strategyId": "mathematical_analyzer",
+                  "proposal": {
+                    "player1": 25,
+                    "player2": 20,
+                    "player3": 15,
+                    "player4": 20,
+                    "player5": 10,
+                    "player6": 10
+                  }
+                },
+                {
+                  "playerId": "player5",
+                  "playerName": "Social Manipulator",
+                  "strategyId": "social_manipulator",
+                  "proposal": {
+                    "player2": 20,
+                    "player3": 20,
+                    "player4": 20,
+                    "player5": 20,
+                    "player6": 20
+                  },
+                  "wasFailure": true
+                },
+                {
+                  "playerId": "player6",
+                  "playerName": "Strategy Identifier",
+                  "strategyId": "strategy_identifier",
+                  "proposal": {
+                    "player1": 8,
+                    "player2": 38,
+                    "player3": 34,
+                    "player4": 2,
+                    "player5": 1,
+                    "player6": 17
+                  }
+                }
+              ],
+              "votes": {
+                "player2": {
+                  "votes": {
+                    "player2": 40,
+                    "player3": 35,
+                    "player4": 0,
+                    "player5": 25,
+                    "player6": 0
+                  },
+                  "playerName": "Diplomatic Builder",
+                  "strategyId": "diplomatic_builder"
+                },
+                "player3": {
+                  "votes": {
+                    "player2": 0,
+                    "player3": 45,
+                    "player4": 0,
+                    "player5": 0,
+                    "player6": 55
+                  },
+                  "playerName": "Strategic Opportunist",
+                  "strategyId": "strategic_opportunist"
+                },
+                "player4": {
+                  "votes": {
+                    "player2": 0,
+                    "player3": 0,
+                    "player4": 100
+                  },
+                  "playerName": "Mathematical Analyzer",
+                  "strategyId": "mathematical_analyzer"
+                },
+                "player5": {
+                  "votes": {
+                    "player2": 0,
+                    "player3": 0,
+                    "player4": 100
+                  },
+                  "playerName": "Social Manipulator",
+                  "strategyId": "social_manipulator"
+                },
+                "player6": {
+                  "votes": {
+                    "player2": 0,
+                    "player3": 0,
+                    "player4": 100,
+                    "player5": 0,
+                    "player6": 0
+                  },
+                  "playerName": "Strategy Identifier",
+                  "strategyId": "strategy_identifier"
+                }
+              },
+              "results": [
+                {
+                  "playerId": "player4",
+                  "name": "Mathematical Analyzer",
+                  "strategyId": "mathematical_analyzer",
+                  "votes": 300,
+                  "percentage": 60
+                },
+                {
+                  "playerId": "player3",
+                  "name": "Strategic Opportunist",
+                  "strategyId": "strategic_opportunist",
+                  "votes": 80,
+                  "percentage": 16
+                },
+                {
+                  "playerId": "player6",
+                  "name": "Strategy Identifier",
+                  "strategyId": "strategy_identifier",
+                  "votes": 55,
+                  "percentage": 11
+                },
+                {
+                  "playerId": "player2",
+                  "name": "Diplomatic Builder",
+                  "strategyId": "diplomatic_builder",
+                  "votes": 40,
+                  "percentage": 8
+                },
+                {
+                  "playerId": "player5",
+                  "name": "Social Manipulator",
+                  "strategyId": "social_manipulator",
+                  "votes": 25,
+                  "percentage": 5
+                }
+              ],
+              "coalitionsFormed": [
+                {
+                  "initiator": "player2",
+                  "message": "Strategic Opportunist, what are your precise proposed percentages to ensure a balanced 100% distribution for our winning coalition strategy?",
+                  "round": 2
+                },
+                {
+                  "initiator": "player3",
+                  "message": "Alice, for a balanced 100%, how will you allocate the remaining 5%? Let's ensure precise distribution for a winning coalition strategy.",
+                  "round": 2
+                },
+                {
+                  "initiator": "player4",
+                  "message": "Strategic Opportunist, ensure precise 100% allocation. Let's form a balanced winning coalition. How will you distribute the remaining 5% among players?",
+                  "round": 2
+                },
+                {
+                  "initiator": "player5",
+                  "message": "Strategic Opportunist, propose specific percentages for each player to reach 100%. Let's build a winning coalition with precise distribution.",
+                  "round": 2
+                },
+                {
+                  "initiator": "player6",
+                  "message": "Mathematical Analyzer, clarify your proposed percentages to achieve precise 100% allocation. Let's ensure a balanced winning coalition with accurate distribution.",
+                  "round": 2
+                }
+              ],
+              "strategicMoves": []
+            },
+            {
+              "roundNumber": 3,
+              "negotiations": [
+                {
+                  "playerId": "player2",
+                  "playerName": "Diplomatic Builder",
+                  "strategyId": "diplomatic_builder",
+                  "message": "Strategic Opportunist, clarify your precise allocation to reach 100%. Let's ensure balanced distribution for our winning coalition strategy.",
+                  "round": 3
+                },
+                {
+                  "playerId": "player3",
+                  "playerName": "Strategic Opportunist",
+                  "strategyId": "strategic_opportunist",
+                  "message": "Diplomatic Builder, what's your distribution proposal to reach 100%? Let's align for a stable coalition strategy.",
+                  "round": 3
+                },
+                {
+                  "playerId": "player4",
+                  "playerName": "Mathematical Analyzer",
+                  "strategyId": "mathematical_analyzer",
+                  "message": "Diplomatic Builder, confirm your proposed percentages to reach 100%. Let's secure a balanced distribution for our coalition's success.",
+                  "round": 3
+                },
+                {
+                  "playerId": "player6",
+                  "playerName": "Strategy Identifier",
+                  "strategyId": "strategy_identifier",
+                  "message": "Strategic Opportunist, what are your precise proposed percentages for each player to ensure a 100% balanced distribution? Let's secure our winning coalition.",
+                  "round": 3
+                }
+              ],
+              "proposals": [
+                {
+                  "playerId": "player2",
+                  "playerName": "Diplomatic Builder",
+                  "strategyId": "diplomatic_builder",
+                  "proposal": {
+                    "player1": 45,
+                    "player2": 40,
+                    "player3": 5,
+                    "player4": 5,
+                    "player5": 5,
+                    "player6": 0
+                  }
+                },
+                {
+                  "playerId": "player3",
+                  "playerName": "Strategic Opportunist",
+                  "strategyId": "strategic_opportunist",
+                  "proposal": {
+                    "player1": 40,
+                    "player2": 5,
+                    "player3": 45,
+                    "player4": 5,
+                    "player5": 5,
+                    "player6": 0
+                  }
+                },
+                {
+                  "playerId": "player4",
+                  "playerName": "Mathematical Analyzer",
+                  "strategyId": "mathematical_analyzer",
+                  "proposal": {
+                    "player1": 25,
+                    "player2": 35,
+                    "player3": 5,
+                    "player4": 25,
+                    "player5": 5,
+                    "player6": 5
+                  }
+                },
+                {
+                  "playerId": "player6",
+                  "playerName": "Strategy Identifier",
+                  "strategyId": "strategy_identifier",
+                  "proposal": {
+                    "player1": 35,
+                    "player2": 31,
+                    "player3": 9,
+                    "player4": 4,
+                    "player5": 4,
+                    "player6": 17
+                  }
+                }
+              ],
+              "votes": {
+                "player2": {
+                  "votes": {
+                    "player2": 40,
+                    "player3": 35,
+                    "player4": 25
+                  },
+                  "playerName": "Diplomatic Builder",
+                  "strategyId": "diplomatic_builder"
+                },
+                "player3": {
+                  "votes": {
+                    "player2": 0,
+                    "player3": 100,
+                    "player4": 0
+                  },
+                  "playerName": "Strategic Opportunist",
+                  "strategyId": "strategic_opportunist"
+                },
+                "player4": {
+                  "votes": {
+                    "player2": 0,
+                    "player3": 100,
+                    "player4": 0
+                  },
+                  "playerName": "Mathematical Analyzer",
+                  "strategyId": "mathematical_analyzer"
+                },
+                "player6": {
+                  "votes": {
+                    "player2": 5,
+                    "player3": 0,
+                    "player4": 95
+                  },
+                  "playerName": "Strategy Identifier",
+                  "strategyId": "strategy_identifier"
+                }
+              },
+              "results": [
+                {
+                  "playerId": "player3",
+                  "name": "Strategic Opportunist",
+                  "strategyId": "strategic_opportunist",
+                  "votes": 235,
+                  "percentage": 59
+                },
+                {
+                  "playerId": "player4",
+                  "name": "Mathematical Analyzer",
+                  "strategyId": "mathematical_analyzer",
+                  "votes": 120,
+                  "percentage": 30
+                },
+                {
+                  "playerId": "player2",
+                  "name": "Diplomatic Builder",
+                  "strategyId": "diplomatic_builder",
+                  "votes": 45,
+                  "percentage": 11
+                },
+                {
+                  "playerId": "player6",
+                  "name": "Strategy Identifier",
+                  "strategyId": "strategy_identifier",
+                  "votes": 0,
+                  "percentage": 0
+                }
+              ],
+              "coalitionsFormed": [
+                {
+                  "initiator": "player2",
+                  "message": "Strategic Opportunist, clarify your precise allocation to reach 100%. Let's ensure balanced distribution for our winning coalition strategy.",
+                  "round": 3
+                },
+                {
+                  "initiator": "player3",
+                  "message": "Diplomatic Builder, what's your distribution proposal to reach 100%? Let's align for a stable coalition strategy.",
+                  "round": 3
+                },
+                {
+                  "initiator": "player4",
+                  "message": "Diplomatic Builder, confirm your proposed percentages to reach 100%. Let's secure a balanced distribution for our coalition's success.",
+                  "round": 3
+                },
+                {
+                  "initiator": "player6",
+                  "message": "Strategic Opportunist, what are your precise proposed percentages for each player to ensure a 100% balanced distribution? Let's secure our winning coalition.",
+                  "round": 3
+                }
+              ],
+              "strategicMoves": []
+            },
+            {
+              "roundNumber": 4,
+              "negotiations": [
+                {
+                  "playerId": "player2",
+                  "playerName": "Diplomatic Builder",
+                  "strategyId": "diplomatic_builder",
+                  "message": "Strategic Opportunist, provide exact percentages for each player to reach 100%. Let's secure our winning coalition with precise distribution.",
+                  "round": 4
+                },
+                {
+                  "playerId": "player3",
+                  "playerName": "Strategic Opportunist",
+                  "strategyId": "strategic_opportunist",
+                  "message": "Diplomatic Builder, provide precise percentages for 100% distribution. Let's ensure a balanced coalition strategy for our success.",
+                  "round": 4
+                },
+                {
+                  "playerId": "player4",
+                  "playerName": "Mathematical Analyzer",
+                  "strategyId": "mathematical_analyzer",
+                  "message": "Diplomatic Builder, provide exact percentages for 100% allocation. Let's secure a balanced coalition for our winning strategy.",
+                  "round": 4
+                }
+              ],
+              "proposals": [
+                {
+                  "playerId": "player2",
+                  "playerName": "Diplomatic Builder",
+                  "strategyId": "diplomatic_builder",
+                  "proposal": {
+                    "player1": 40,
+                    "player2": 45,
+                    "player3": 5,
+                    "player4": 5,
+                    "player5": 5,
+                    "player6": 0
+                  }
+                },
+                {
+                  "playerId": "player3",
+                  "playerName": "Strategic Opportunist",
+                  "strategyId": "strategic_opportunist",
+                  "proposal": {
+                    "player1": 45,
+                    "player2": 25,
+                    "player3": 20,
+                    "player4": 5,
+                    "player5": 2,
+                    "player6": 3
+                  }
+                },
+                {
+                  "playerId": "player4",
+                  "playerName": "Mathematical Analyzer",
+                  "strategyId": "mathematical_analyzer",
+                  "proposal": {
+                    "player1": 45,
+                    "player2": 5,
+                    "player3": 5,
+                    "player4": 45,
+                    "player5": 0,
+                    "player6": 0
+                  }
+                }
+              ],
+              "votes": {
+                "player2": {
+                  "votes": {
+                    "player2": 50,
+                    "player3": 30,
+                    "player4": 20
+                  },
+                  "playerName": "Diplomatic Builder",
+                  "strategyId": "diplomatic_builder"
+                },
+                "player3": {
+                  "votes": {
+                    "player2": 0,
+                    "player3": 100,
+                    "player4": 0
+                  },
+                  "playerName": "Strategic Opportunist",
+                  "strategyId": "strategic_opportunist"
+                },
+                "player4": {
+                  "votes": {
+                    "player2": 0,
+                    "player3": 80,
+                    "player4": 20
+                  },
+                  "playerName": "Mathematical Analyzer",
+                  "strategyId": "mathematical_analyzer"
+                }
+              },
+              "results": [
+                {
+                  "playerId": "player3",
+                  "name": "Strategic Opportunist",
+                  "strategyId": "strategic_opportunist",
+                  "votes": 210,
+                  "percentage": 70
+                },
+                {
+                  "playerId": "player2",
+                  "name": "Diplomatic Builder",
+                  "strategyId": "diplomatic_builder",
+                  "votes": 50,
+                  "percentage": 17
+                },
+                {
+                  "playerId": "player4",
+                  "name": "Mathematical Analyzer",
+                  "strategyId": "mathematical_analyzer",
+                  "votes": 40,
+                  "percentage": 13
+                }
+              ],
+              "coalitionsFormed": [
+                {
+                  "initiator": "player2",
+                  "message": "Strategic Opportunist, provide exact percentages for each player to reach 100%. Let's secure our winning coalition with precise distribution.",
+                  "round": 4
+                },
+                {
+                  "initiator": "player3",
+                  "message": "Diplomatic Builder, provide precise percentages for 100% distribution. Let's ensure a balanced coalition strategy for our success.",
+                  "round": 4
+                },
+                {
+                  "initiator": "player4",
+                  "message": "Diplomatic Builder, provide exact percentages for 100% allocation. Let's secure a balanced coalition for our winning strategy.",
+                  "round": 4
+                }
+              ],
+              "strategicMoves": []
+            }
+          ],
+          "finalResult": {
+            "winner": {
+              "playerId": "player3",
+              "name": "Strategic Opportunist",
+              "strategyId": "strategic_opportunist",
+              "votes": 210,
+              "percentage": 70
+            },
+            "winningProposal": {
+              "playerId": "player3",
+              "playerName": "Strategic Opportunist",
+              "strategyId": "strategic_opportunist",
+              "proposal": {
+                "player1": 45,
+                "player2": 25,
+                "player3": 20,
+                "player4": 5,
+                "player5": 2,
+                "player6": 3
+              }
+            },
+            "economicDistribution": {
+              "player1": 270,
+              "player2": 150,
+              "player3": 120,
+              "player4": 30,
+              "player5": 12,
+              "player6": 18
+            }
+          },
+          "economicImpact": [
+            {
+              "strategyId": "aggressive_maximizer",
+              "playerName": "Aggressive Maximizer",
+              "entryFee": 100,
+              "payout": 270,
+              "profit": 170,
+              "isWinner": false
+            },
+            {
+              "strategyId": "diplomatic_builder",
+              "playerName": "Diplomatic Builder",
+              "entryFee": 100,
+              "payout": 150,
+              "profit": 50,
+              "isWinner": false
+            },
+            {
+              "strategyId": "strategic_opportunist",
+              "playerName": "Strategic Opportunist",
+              "entryFee": 100,
+              "payout": 120,
+              "profit": 20,
+              "isWinner": true
+            },
+            {
+              "strategyId": "mathematical_analyzer",
+              "playerName": "Mathematical Analyzer",
+              "entryFee": 100,
+              "payout": 30,
+              "profit": -70,
+              "isWinner": false
+            },
+            {
+              "strategyId": "social_manipulator",
+              "playerName": "Social Manipulator",
+              "entryFee": 100,
+              "payout": 12,
+              "profit": -88,
+              "isWinner": false
+            },
+            {
+              "strategyId": "strategy_identifier",
+              "playerName": "Strategy Identifier",
+              "entryFee": 100,
+              "payout": 18,
+              "profit": -82,
+              "isWinner": false
+            }
+          ]
+        },
+        {
+          "gameNumber": 2,
+          "players": [
+            {
+              "id": "player1",
+              "name": "Aggressive Maximizer",
+              "agent": {
+                "strategy": "Demand the largest possible share. Use threats and aggressive tactics. Form coalitions only when absolutely necessary to avoid elimination.",
+                "type": "llm",
+                "strategyId": "aggressive_maximizer"
+              }
+            },
+            {
+              "id": "player2",
+              "name": "Diplomatic Builder",
+              "agent": {
+                "strategy": "Build long-term trust through consistently fair offers. Prioritize mutual benefit and stable coalitions. Avoid betrayals.",
+                "type": "llm",
+                "strategyId": "diplomatic_builder"
+              }
+            },
+            {
+              "id": "player3",
+              "name": "Strategic Opportunist",
+              "agent": {
+                "strategy": "Adapt rapidly to changing situations. Form and break alliances based on immediate advantage. Keep all options open.",
+                "type": "llm",
+                "strategyId": "strategic_opportunist"
+              }
+            },
+            {
+              "id": "player4",
+              "name": "Mathematical Analyzer",
+              "agent": {
+                "strategy": "Make all decisions based on expected value calculations. Minimize risk through probability analysis. Avoid emotional decisions.",
+                "type": "llm",
+                "strategyId": "mathematical_analyzer"
+              }
+            },
+            {
+              "id": "player5",
+              "name": "Social Manipulator",
+              "agent": {
+                "strategy": "Use psychological tactics to influence others. Make strategic promises and betrayals. Create chaos to exploit confusion.",
+                "type": "llm",
+                "strategyId": "social_manipulator"
+              }
+            },
+            {
+              "id": "player6",
+              "name": "Strategy Identifier",
+              "agent": {
+                "strategy": "Analyze opponent negotiation patterns, proposal behaviors, and voting tendencies to identify their strategies. Adapt your approach to optimally counter each opponent type in real-time.",
+                "type": "llm",
+                "strategyId": "strategy_identifier"
+              }
+            }
+          ],
+          "rounds": [
+            {
+              "roundNumber": 1,
+              "negotiations": [
+                {
+                  "playerId": "player1",
+                  "playerName": "Aggressive Maximizer",
+                  "strategyId": "aggressive_maximizer",
+                  "message": "Alice, propose your share allocation first. Bob, let's form a 50-50 coalition and offer Carol 20% to secure her vote.",
+                  "round": 1
+                },
+                {
+                  "playerId": "player2",
+                  "playerName": "Diplomatic Builder",
+                  "strategyId": "diplomatic_builder",
+                  "message": "Bob, propose a 40-60 split with me. Let's offer Carol 15% to secure her vote. Alice, what share are you offering?",
+                  "round": 1
+                },
+                {
+                  "playerId": "player3",
+                  "playerName": "Strategic Opportunist",
+                  "strategyId": "strategic_opportunist",
+                  "message": "Bob, propose a 30-70 split with me. Let's offer Alice 15% to secure her vote. Carol, what share are you offering?",
+                  "round": 1
+                },
+                {
+                  "playerId": "player4",
+                  "playerName": "Mathematical Analyzer",
+                  "strategyId": "mathematical_analyzer",
+                  "message": "Bob, propose 50-50 with me. Offer Carol 10%. Alice, what share are you offering for our coalition? Let's secure the win.",
+                  "round": 1
+                },
+                {
+                  "playerId": "player5",
+                  "playerName": "Social Manipulator",
+                  "strategyId": "social_manipulator",
+                  "message": "Bob, propose 50-50 split. Offer Carol 20%. Alice, what share for our coalition? Let's secure 4 votes strategically.",
+                  "round": 1
+                },
+                {
+                  "playerId": "player6",
+                  "playerName": "Strategy Identifier",
+                  "strategyId": "strategy_identifier",
+                  "message": "\"Bob, propose 45-55 split with me. Offer Carol 10%. Alice, what share for our coalition? Let's secure the win strategically.\"",
+                  "round": 1
+                }
+              ],
+              "proposals": [
+                {
+                  "playerId": "player1",
+                  "playerName": "Aggressive Maximizer",
+                  "strategyId": "aggressive_maximizer",
+                  "proposal": {
+                    "player1": 40,
+                    "player2": 10,
+                    "player3": 5,
+                    "player4": 35,
+                    "player5": 5,
+                    "player6": 5
+                  }
+                },
+                {
+                  "playerId": "player2",
+                  "playerName": "Diplomatic Builder",
+                  "strategyId": "diplomatic_builder",
+                  "proposal": {
+                    "player1": 45,
+                    "player2": 40,
+                    "player3": 5,
+                    "player4": 5,
+                    "player5": 5,
+                    "player6": 0
+                  }
+                },
+                {
+                  "playerId": "player3",
+                  "playerName": "Strategic Opportunist",
+                  "strategyId": "strategic_opportunist",
+                  "proposal": {
+                    "player1": 10,
+                    "player2": 35,
+                    "player3": 40,
+                    "player4": 10,
+                    "player5": 5,
+                    "player6": 0
+                  }
+                },
+                {
+                  "playerId": "player4",
+                  "playerName": "Mathematical Analyzer",
+                  "strategyId": "mathematical_analyzer",
+                  "proposal": {
+                    "player1": 10,
+                    "player2": 35,
+                    "player3": 5,
+                    "player4": 40,
+                    "player5": 5,
+                    "player6": 5
+                  }
+                },
+                {
+                  "playerId": "player5",
+                  "playerName": "Social Manipulator",
+                  "strategyId": "social_manipulator",
+                  "proposal": {
+                    "player1": 10,
+                    "player2": 40,
+                    "player3": 10,
+                    "player4": 5,
+                    "player5": 30,
+                    "player6": 5
+                  }
+                },
+                {
+                  "playerId": "player6",
+                  "playerName": "Strategy Identifier",
+                  "strategyId": "strategy_identifier",
+                  "proposal": {
+                    "player1": 9,
+                    "player2": 44,
+                    "player3": 10,
+                    "player4": 10,
+                    "player5": 10,
+                    "player6": 17
+                  }
+                }
+              ],
+              "votes": {
+                "player1": {
+                  "votes": {
+                    "player1": 0,
+                    "player2": 0,
+                    "player3": 0,
+                    "player4": 45,
+                    "player5": 0,
+                    "player6": 55
+                  },
+                  "playerName": "Aggressive Maximizer",
+                  "strategyId": "aggressive_maximizer"
+                },
+                "player2": {
+                  "votes": {
+                    "player1": 0,
+                    "player2": 0,
+                    "player3": 0,
+                    "player4": 50,
+                    "player5": 50,
+                    "player6": 0
+                  },
+                  "playerName": "Diplomatic Builder",
+                  "strategyId": "diplomatic_builder"
+                },
+                "player3": {
+                  "votes": {
+                    "player1": 0,
+                    "player2": 0,
+                    "player3": 90,
+                    "player4": 0,
+                    "player5": 10,
+                    "player6": 0
+                  },
+                  "playerName": "Strategic Opportunist",
+                  "strategyId": "strategic_opportunist"
+                },
+                "player4": {
+                  "votes": {
+                    "player1": 0,
+                    "player2": 40,
+                    "player3": 0,
+                    "player4": 60,
+                    "player5": 0,
+                    "player6": 0
+                  },
+                  "playerName": "Mathematical Analyzer",
+                  "strategyId": "mathematical_analyzer"
+                },
+                "player5": {
+                  "votes": {
+                    "player1": 0,
+                    "player2": 0,
+                    "player3": 0,
+                    "player4": 0,
+                    "player5": 100,
+                    "player6": 0
+                  },
+                  "playerName": "Social Manipulator",
+                  "strategyId": "social_manipulator"
+                },
+                "player6": {
+                  "votes": {
+                    "player1": 0,
+                    "player2": 0,
+                    "player3": 0,
+                    "player4": 50,
+                    "player5": 0,
+                    "player6": 50
+                  },
+                  "playerName": "Strategy Identifier",
+                  "strategyId": "strategy_identifier"
+                }
+              },
+              "results": [
+                {
+                  "playerId": "player4",
+                  "name": "Mathematical Analyzer",
+                  "strategyId": "mathematical_analyzer",
+                  "votes": 205,
+                  "percentage": 34
+                },
+                {
+                  "playerId": "player5",
+                  "name": "Social Manipulator",
+                  "strategyId": "social_manipulator",
+                  "votes": 160,
+                  "percentage": 27
+                },
+                {
+                  "playerId": "player6",
+                  "name": "Strategy Identifier",
+                  "strategyId": "strategy_identifier",
+                  "votes": 105,
+                  "percentage": 18
+                },
+                {
+                  "playerId": "player3",
+                  "name": "Strategic Opportunist",
+                  "strategyId": "strategic_opportunist",
+                  "votes": 90,
+                  "percentage": 15
+                },
+                {
+                  "playerId": "player2",
+                  "name": "Diplomatic Builder",
+                  "strategyId": "diplomatic_builder",
+                  "votes": 40,
+                  "percentage": 7
+                },
+                {
+                  "playerId": "player1",
+                  "name": "Aggressive Maximizer",
+                  "strategyId": "aggressive_maximizer",
+                  "votes": 0,
+                  "percentage": 0
+                }
+              ],
+              "coalitionsFormed": [
+                {
+                  "initiator": "player1",
+                  "message": "Alice, propose your share allocation first. Bob, let's form a 50-50 coalition and offer Carol 20% to secure her vote.",
+                  "round": 1
+                },
+                {
+                  "initiator": "player4",
+                  "message": "Bob, propose 50-50 with me. Offer Carol 10%. Alice, what share are you offering for our coalition? Let's secure the win.",
+                  "round": 1
+                },
+                {
+                  "initiator": "player5",
+                  "message": "Bob, propose 50-50 split. Offer Carol 20%. Alice, what share for our coalition? Let's secure 4 votes strategically.",
+                  "round": 1
+                },
+                {
+                  "initiator": "player6",
+                  "message": "\"Bob, propose 45-55 split with me. Offer Carol 10%. Alice, what share for our coalition? Let's secure the win strategically.\"",
+                  "round": 1
+                }
+              ],
+              "strategicMoves": [
+                {
+                  "type": "STRATEGIC_OFFER",
+                  "player": "player1",
+                  "round": 1
+                },
+                {
+                  "type": "STRATEGIC_OFFER",
+                  "player": "player2",
+                  "round": 1
+                },
+                {
+                  "type": "STRATEGIC_OFFER",
+                  "player": "player3",
+                  "round": 1
+                },
+                {
+                  "type": "STRATEGIC_OFFER",
+                  "player": "player4",
+                  "round": 1
+                },
+                {
+                  "type": "STRATEGIC_OFFER",
+                  "player": "player5",
+                  "round": 1
+                },
+                {
+                  "type": "STRATEGIC_OFFER",
+                  "player": "player6",
+                  "round": 1
+                }
+              ]
+            },
+            {
+              "roundNumber": 2,
+              "negotiations": [
+                {
+                  "playerId": "player2",
+                  "playerName": "Diplomatic Builder",
+                  "strategyId": "diplomatic_builder",
+                  "message": "Alice, I propose a 45-55 split. Bob, what share are you offering to ensure our coalition's success against others?",
+                  "round": 2
+                },
+                {
+                  "playerId": "player3",
+                  "playerName": "Strategic Opportunist",
+                  "strategyId": "strategic_opportunist",
+                  "message": "Diplomatic Builder, clarify your proposed split percentages. Who is receiving the remaining share? Let's ensure transparency and balance in our negotiations.",
+                  "round": 2
+                },
+                {
+                  "playerId": "player4",
+                  "playerName": "Mathematical Analyzer",
+                  "strategyId": "mathematical_analyzer",
+                  "message": "Diplomatic Builder, clarify your proposed split percentages. Who receives the remaining share? Let's ensure transparency for a balanced coalition.",
+                  "round": 2
+                },
+                {
+                  "playerId": "player5",
+                  "playerName": "Social Manipulator",
+                  "strategyId": "social_manipulator",
+                  "message": "Diplomatic Builder, clarify proposed percentages and remaining share distribution. Ensure transparency for balanced coalition. Let's strategize efficiently.",
+                  "round": 2
+                },
+                {
+                  "playerId": "player6",
+                  "playerName": "Strategy Identifier",
+                  "strategyId": "strategy_identifier",
+                  "message": "\"Diplomatic Builder, specify exact percentages for clarity. Bob, confirm our 45-55 split. Alice, propose our coalition's share. Let's secure a winning majority.\"",
+                  "round": 2
+                }
+              ],
+              "proposals": [
+                {
+                  "playerId": "player2",
+                  "playerName": "Diplomatic Builder",
+                  "strategyId": "diplomatic_builder",
+                  "proposal": {
+                    "player1": 40,
+                    "player2": 30,
+                    "player3": 10,
+                    "player4": 10,
+                    "player5": 5,
+                    "player6": 5
+                  }
+                },
+                {
+                  "playerId": "player3",
+                  "playerName": "Strategic Opportunist",
+                  "strategyId": "strategic_opportunist",
+                  "proposal": {
+                    "player1": 10,
+                    "player2": 35,
+                    "player3": 45,
+                    "player4": 5,
+                    "player5": 2,
+                    "player6": 3
+                  }
+                },
+                {
+                  "playerId": "player4",
+                  "playerName": "Mathematical Analyzer",
+                  "strategyId": "mathematical_analyzer",
+                  "proposal": {
+                    "player1": 30,
+                    "player2": 10,
+                    "player3": 10,
+                    "player4": 40,
+                    "player5": 5,
+                    "player6": 5
+                  }
+                },
+                {
+                  "playerId": "player5",
+                  "playerName": "Social Manipulator",
+                  "strategyId": "social_manipulator",
+                  "proposal": {
+                    "player1": 5,
+                    "player2": 10,
+                    "player3": 5,
+                    "player4": 35,
+                    "player5": 40,
+                    "player6": 5
+                  }
+                },
+                {
+                  "playerId": "player6",
+                  "playerName": "Strategy Identifier",
+                  "strategyId": "strategy_identifier",
+                  "proposal": {
+                    "player1": 9,
+                    "player2": 37,
+                    "player3": 33,
+                    "player4": 4,
+                    "player5": 0,
+                    "player6": 17
+                  }
+                }
+              ],
+              "votes": {
+                "player2": {
+                  "votes": {
+                    "player2": 0,
+                    "player3": 0,
+                    "player4": 100,
+                    "player5": 0,
+                    "player6": 0
+                  },
+                  "playerName": "Diplomatic Builder",
+                  "strategyId": "diplomatic_builder"
+                },
+                "player3": {
+                  "votes": {
+                    "player2": 0,
+                    "player3": 0,
+                    "player4": 100,
+                    "player5": 0,
+                    "player6": 0
+                  },
+                  "playerName": "Strategic Opportunist",
+                  "strategyId": "strategic_opportunist"
+                },
+                "player4": {
+                  "votes": {
+                    "player2": 0,
+                    "player3": 90,
+                    "player4": 10,
+                    "player5": 0,
+                    "player6": 0
+                  },
+                  "playerName": "Mathematical Analyzer",
+                  "strategyId": "mathematical_analyzer"
+                },
+                "player5": {
+                  "votes": {
+                    "player2": 0,
+                    "player3": 0,
+                    "player4": 100,
+                    "player5": 0,
+                    "player6": 0
+                  },
+                  "playerName": "Social Manipulator",
+                  "strategyId": "social_manipulator"
+                },
+                "player6": {
+                  "votes": {
+                    "player2": 5,
+                    "player3": 3,
+                    "player4": 5,
+                    "player5": 0,
+                    "player6": 87
+                  },
+                  "playerName": "Strategy Identifier",
+                  "strategyId": "strategy_identifier"
+                }
+              },
+              "results": [
+                {
+                  "playerId": "player4",
+                  "name": "Mathematical Analyzer",
+                  "strategyId": "mathematical_analyzer",
+                  "votes": 315,
+                  "percentage": 63
+                },
+                {
+                  "playerId": "player3",
+                  "name": "Strategic Opportunist",
+                  "strategyId": "strategic_opportunist",
+                  "votes": 93,
+                  "percentage": 19
+                },
+                {
+                  "playerId": "player6",
+                  "name": "Strategy Identifier",
+                  "strategyId": "strategy_identifier",
+                  "votes": 87,
+                  "percentage": 17
+                },
+                {
+                  "playerId": "player2",
+                  "name": "Diplomatic Builder",
+                  "strategyId": "diplomatic_builder",
+                  "votes": 5,
+                  "percentage": 1
+                },
+                {
+                  "playerId": "player5",
+                  "name": "Social Manipulator",
+                  "strategyId": "social_manipulator",
+                  "votes": 0,
+                  "percentage": 0
+                }
+              ],
+              "coalitionsFormed": [
+                {
+                  "initiator": "player2",
+                  "message": "Alice, I propose a 45-55 split. Bob, what share are you offering to ensure our coalition's success against others?",
+                  "round": 2
+                },
+                {
+                  "initiator": "player4",
+                  "message": "Diplomatic Builder, clarify your proposed split percentages. Who receives the remaining share? Let's ensure transparency for a balanced coalition.",
+                  "round": 2
+                },
+                {
+                  "initiator": "player5",
+                  "message": "Diplomatic Builder, clarify proposed percentages and remaining share distribution. Ensure transparency for balanced coalition. Let's strategize efficiently.",
+                  "round": 2
+                },
+                {
+                  "initiator": "player6",
+                  "message": "\"Diplomatic Builder, specify exact percentages for clarity. Bob, confirm our 45-55 split. Alice, propose our coalition's share. Let's secure a winning majority.\"",
+                  "round": 2
+                }
+              ],
+              "strategicMoves": []
+            }
+          ],
+          "finalResult": {
+            "winner": {
+              "playerId": "player4",
+              "name": "Mathematical Analyzer",
+              "strategyId": "mathematical_analyzer",
+              "votes": 315,
+              "percentage": 63
+            },
+            "winningProposal": {
+              "playerId": "player4",
+              "playerName": "Mathematical Analyzer",
+              "strategyId": "mathematical_analyzer",
+              "proposal": {
+                "player1": 30,
+                "player2": 10,
+                "player3": 10,
+                "player4": 40,
+                "player5": 5,
+                "player6": 5
+              }
+            },
+            "economicDistribution": {
+              "player1": 180,
+              "player2": 60,
+              "player3": 60,
+              "player4": 240,
+              "player5": 30,
+              "player6": 30
+            }
+          },
+          "economicImpact": [
+            {
+              "strategyId": "aggressive_maximizer",
+              "playerName": "Aggressive Maximizer",
+              "entryFee": 100,
+              "payout": 180,
+              "profit": 80,
+              "isWinner": false
+            },
+            {
+              "strategyId": "diplomatic_builder",
+              "playerName": "Diplomatic Builder",
+              "entryFee": 100,
+              "payout": 60,
+              "profit": -40,
+              "isWinner": false
+            },
+            {
+              "strategyId": "strategic_opportunist",
+              "playerName": "Strategic Opportunist",
+              "entryFee": 100,
+              "payout": 60,
+              "profit": -40,
+              "isWinner": false
+            },
+            {
+              "strategyId": "mathematical_analyzer",
+              "playerName": "Mathematical Analyzer",
+              "entryFee": 100,
+              "payout": 240,
+              "profit": 140,
+              "isWinner": true
+            },
+            {
+              "strategyId": "social_manipulator",
+              "playerName": "Social Manipulator",
+              "entryFee": 100,
+              "payout": 30,
+              "profit": -70,
+              "isWinner": false
+            },
+            {
+              "strategyId": "strategy_identifier",
+              "playerName": "Strategy Identifier",
+              "entryFee": 100,
+              "payout": 30,
+              "profit": -70,
+              "isWinner": false
+            }
+          ]
+        },
+        {
+          "gameNumber": 3,
+          "players": [
+            {
+              "id": "player1",
+              "name": "Aggressive Maximizer",
+              "agent": {
+                "strategy": "Demand the largest possible share. Use threats and aggressive tactics. Form coalitions only when absolutely necessary to avoid elimination.",
+                "type": "llm",
+                "strategyId": "aggressive_maximizer"
+              }
+            },
+            {
+              "id": "player2",
+              "name": "Diplomatic Builder",
+              "agent": {
+                "strategy": "Build long-term trust through consistently fair offers. Prioritize mutual benefit and stable coalitions. Avoid betrayals.",
+                "type": "llm",
+                "strategyId": "diplomatic_builder"
+              }
+            },
+            {
+              "id": "player3",
+              "name": "Strategic Opportunist",
+              "agent": {
+                "strategy": "Adapt rapidly to changing situations. Form and break alliances based on immediate advantage. Keep all options open.",
+                "type": "llm",
+                "strategyId": "strategic_opportunist"
+              }
+            },
+            {
+              "id": "player4",
+              "name": "Mathematical Analyzer",
+              "agent": {
+                "strategy": "Make all decisions based on expected value calculations. Minimize risk through probability analysis. Avoid emotional decisions.",
+                "type": "llm",
+                "strategyId": "mathematical_analyzer"
+              }
+            },
+            {
+              "id": "player5",
+              "name": "Social Manipulator",
+              "agent": {
+                "strategy": "Use psychological tactics to influence others. Make strategic promises and betrayals. Create chaos to exploit confusion.",
+                "type": "llm",
+                "strategyId": "social_manipulator"
+              }
+            },
+            {
+              "id": "player6",
+              "name": "Strategy Identifier",
+              "agent": {
+                "strategy": "Analyze opponent negotiation patterns, proposal behaviors, and voting tendencies to identify their strategies. Adapt your approach to optimally counter each opponent type in real-time.",
+                "type": "llm",
+                "strategyId": "strategy_identifier"
+              }
+            }
+          ],
+          "rounds": [
+            {
+              "roundNumber": 1,
+              "negotiations": [
+                {
+                  "playerId": "player1",
+                  "playerName": "Aggressive Maximizer",
+                  "strategyId": "aggressive_maximizer",
+                  "message": "Diplomatic Builder, propose a fair distribution. Opportunist, consider a mutually beneficial deal. Analyzer, ensure optimal risk management. Manipulator, beware chaos consequences. Identifier, adapt to opponent...",
+                  "round": 1
+                },
+                {
+                  "playerId": "player2",
+                  "playerName": "Diplomatic Builder",
+                  "strategyId": "diplomatic_builder",
+                  "message": "Aggressive Maximizer, propose a 40-40-20 split with me and the Strategic Opportunist. Will you agree to secure our votes?",
+                  "round": 1
+                },
+                {
+                  "playerId": "player3",
+                  "playerName": "Strategic Opportunist",
+                  "strategyId": "strategic_opportunist",
+                  "message": "Diplomatic Builder, propose a 35-35-15-15 split among us four for a secure majority. Aggressive Maximizer, will you support this arrangement?",
+                  "round": 1
+                },
+                {
+                  "playerId": "player4",
+                  "playerName": "Mathematical Analyzer",
+                  "strategyId": "mathematical_analyzer",
+                  "message": "Strategic Opportunist, propose a 35-35-15-15 split. Ensure clear majority. Social Manipulator, reveal intent to forge alliances for strategic advantage.",
+                  "round": 1
+                },
+                {
+                  "playerId": "player5",
+                  "playerName": "Social Manipulator",
+                  "strategyId": "social_manipulator",
+                  "message": "Strategic Opportunist, propose 33.33-33.33-16.67-16.67 split. Secure majority and offer Analyzer 1% more for support.",
+                  "round": 1
+                },
+                {
+                  "playerId": "player6",
+                  "playerName": "Strategy Identifier",
+                  "strategyId": "strategy_identifier",
+                  "message": "Strategic Opportunist, propose a 33-33-17-17 split for majority. Offer Social Manipulator 1% more for their support.",
+                  "round": 1
+                }
+              ],
+              "proposals": [
+                {
+                  "playerId": "player1",
+                  "playerName": "Aggressive Maximizer",
+                  "strategyId": "aggressive_maximizer",
+                  "proposal": {
+                    "player1": 50,
+                    "player2": 5,
+                    "player3": 5,
+                    "player4": 5,
+                    "player5": 5,
+                    "player6": 30
+                  }
+                },
+                {
+                  "playerId": "player2",
+                  "playerName": "Diplomatic Builder",
+                  "strategyId": "diplomatic_builder",
+                  "proposal": {
+                    "player1": 30,
+                    "player2": 40,
+                    "player3": 5,
+                    "player4": 5,
+                    "player5": 10,
+                    "player6": 10
+                  }
+                },
+                {
+                  "playerId": "player3",
+                  "playerName": "Strategic Opportunist",
+                  "strategyId": "strategic_opportunist",
+                  "proposal": {
+                    "player1": 25,
+                    "player2": 20,
+                    "player3": 35,
+                    "player4": 10,
+                    "player5": 5,
+                    "player6": 5
+                  }
+                },
+                {
+                  "playerId": "player4",
+                  "playerName": "Mathematical Analyzer",
+                  "strategyId": "mathematical_analyzer",
+                  "proposal": {
+                    "player1": 40,
+                    "player2": 10,
+                    "player3": 5,
+                    "player4": 45,
+                    "player5": 0,
+                    "player6": 0
+                  }
+                },
+                {
+                  "playerId": "player5",
+                  "playerName": "Social Manipulator",
+                  "strategyId": "social_manipulator",
+                  "proposal": {
+                    "player1": 29,
+                    "player2": 34,
+                    "player3": 10,
+                    "player4": 10,
+                    "player5": 17,
+                    "player6": 0
+                  }
+                },
+                {
+                  "playerId": "player6",
+                  "playerName": "Strategy Identifier",
+                  "strategyId": "strategy_identifier",
+                  "proposal": {
+                    "player1": 5,
+                    "player2": 37,
+                    "player3": 4,
+                    "player4": 33,
+                    "player5": 4,
+                    "player6": 17
+                  }
+                }
+              ],
+              "votes": {
+                "player1": {
+                  "votes": {
+                    "player1": 60,
+                    "player4": 30,
+                    "player2": 2,
+                    "player5": 2,
+                    "player3": 3,
+                    "player6": 3
+                  },
+                  "playerName": "Aggressive Maximizer",
+                  "strategyId": "aggressive_maximizer"
+                },
+                "player2": {
+                  "votes": {
+                    "player1": 0,
+                    "player2": 40,
+                    "player3": 20,
+                    "player4": 10,
+                    "player5": 17,
+                    "player6": 13
+                  },
+                  "playerName": "Diplomatic Builder",
+                  "strategyId": "diplomatic_builder"
+                },
+                "player3": {
+                  "votes": {
+                    "player1": 0,
+                    "player2": 0,
+                    "player3": 100,
+                    "player4": 0,
+                    "player5": 0,
+                    "player6": 0
+                  },
+                  "playerName": "Strategic Opportunist",
+                  "strategyId": "strategic_opportunist"
+                },
+                "player4": {
+                  "votes": {
+                    "player1": 0,
+                    "player2": 0,
+                    "player3": 0,
+                    "player4": 100,
+                    "player5": 0,
+                    "player6": 0
+                  },
+                  "playerName": "Mathematical Analyzer",
+                  "strategyId": "mathematical_analyzer"
+                },
+                "player5": {
+                  "votes": {
+                    "player1": 0,
+                    "player2": 0,
+                    "player3": 0,
+                    "player4": 100,
+                    "player5": 0,
+                    "player6": 0
+                  },
+                  "playerName": "Social Manipulator",
+                  "strategyId": "social_manipulator"
+                },
+                "player6": {
+                  "votes": {
+                    "player1": 0,
+                    "player2": 0,
+                    "player3": 0,
+                    "player4": 100,
+                    "player5": 0,
+                    "player6": 0
+                  },
+                  "playerName": "Strategy Identifier",
+                  "strategyId": "strategy_identifier"
+                }
+              },
+              "results": [
+                {
+                  "playerId": "player4",
+                  "name": "Mathematical Analyzer",
+                  "strategyId": "mathematical_analyzer",
+                  "votes": 340,
+                  "percentage": 57
+                },
+                {
+                  "playerId": "player3",
+                  "name": "Strategic Opportunist",
+                  "strategyId": "strategic_opportunist",
+                  "votes": 123,
+                  "percentage": 21
+                },
+                {
+                  "playerId": "player1",
+                  "name": "Aggressive Maximizer",
+                  "strategyId": "aggressive_maximizer",
+                  "votes": 60,
+                  "percentage": 10
+                },
+                {
+                  "playerId": "player2",
+                  "name": "Diplomatic Builder",
+                  "strategyId": "diplomatic_builder",
+                  "votes": 42,
+                  "percentage": 7
+                },
+                {
+                  "playerId": "player5",
+                  "name": "Social Manipulator",
+                  "strategyId": "social_manipulator",
+                  "votes": 19,
+                  "percentage": 3
+                },
+                {
+                  "playerId": "player6",
+                  "name": "Strategy Identifier",
+                  "strategyId": "strategy_identifier",
+                  "votes": 16,
+                  "percentage": 3
+                }
+              ],
+              "coalitionsFormed": [
+                {
+                  "initiator": "player4",
+                  "message": "Strategic Opportunist, propose a 35-35-15-15 split. Ensure clear majority. Social Manipulator, reveal intent to forge alliances for strategic advantage.",
+                  "round": 1
+                }
+              ],
+              "strategicMoves": [
+                {
+                  "type": "STRATEGIC_OFFER",
+                  "player": "player5",
+                  "round": 1
+                },
+                {
+                  "type": "STRATEGIC_OFFER",
+                  "player": "player6",
+                  "round": 1
+                }
+              ]
+            },
+            {
+              "roundNumber": 2,
+              "negotiations": [
+                {
+                  "playerId": "player1",
+                  "playerName": "Aggressive Maximizer",
+                  "strategyId": "aggressive_maximizer",
+                  "message": "Strategic Opportunist, propose a 33-33-18-16 split to secure majority. Offer Analyzer 1% more for support. Social Manipulator, consider our advantageous offer.",
+                  "round": 2
+                },
+                {
+                  "playerId": "player2",
+                  "playerName": "Diplomatic Builder",
+                  "strategyId": "diplomatic_builder",
+                  "message": "Aggressive Maximizer, propose a 33-33-17-17 split with Strategic Opportunist for majority. Offer Analyzer 1% more for support.",
+                  "round": 2
+                },
+                {
+                  "playerId": "player3",
+                  "playerName": "Strategic Opportunist",
+                  "strategyId": "strategic_opportunist",
+                  "message": "Aggressive Maximizer, propose a 33-33-18-16 split for majority. Offer Analyzer 1% more for support. Social Manipulator, consider our advantageous offer.",
+                  "round": 2
+                },
+                {
+                  "playerId": "player4",
+                  "playerName": "Mathematical Analyzer",
+                  "strategyId": "mathematical_analyzer",
+                  "message": "Diplomatic Builder, propose 33-33-17-17 with Aggressive Maximizer. Offer Analyzer 1% more for majority. Emphasize long-term benefits for stability.",
+                  "round": 2
+                },
+                {
+                  "playerId": "player5",
+                  "playerName": "Social Manipulator",
+                  "strategyId": "social_manipulator",
+                  "message": "Aggressive Maximizer, propose 33-33-18-16 split for majority. Offer Analyzer 1% more for support. Manipulator, align for strategic advantage.",
+                  "round": 2
+                }
+              ],
+              "proposals": [
+                {
+                  "playerId": "player1",
+                  "playerName": "Aggressive Maximizer",
+                  "strategyId": "aggressive_maximizer",
+                  "proposal": {
+                    "player1": 50,
+                    "player2": 5,
+                    "player3": 5,
+                    "player4": 5,
+                    "player5": 5,
+                    "player6": 30
+                  }
+                },
+                {
+                  "playerId": "player2",
+                  "playerName": "Diplomatic Builder",
+                  "strategyId": "diplomatic_builder",
+                  "proposal": {
+                    "player1": 10,
+                    "player2": 40,
+                    "player3": 5,
+                    "player4": 35,
+                    "player5": 5,
+                    "player6": 5
+                  }
+                },
+                {
+                  "playerId": "player3",
+                  "playerName": "Strategic Opportunist",
+                  "strategyId": "strategic_opportunist",
+                  "proposal": {
+                    "player1": 10,
+                    "player2": 40,
+                    "player3": 30,
+                    "player4": 10,
+                    "player5": 5,
+                    "player6": 5
+                  }
+                },
+                {
+                  "playerId": "player4",
+                  "playerName": "Mathematical Analyzer",
+                  "strategyId": "mathematical_analyzer",
+                  "proposal": {
+                    "player1": 10,
+                    "player2": 5,
+                    "player3": 5,
+                    "player4": 50,
+                    "player5": 25,
+                    "player6": 5
+                  }
+                },
+                {
+                  "playerId": "player5",
+                  "playerName": "Social Manipulator",
+                  "strategyId": "social_manipulator",
+                  "proposal": {
+                    "player1": 20,
+                    "player2": 20,
+                    "player3": 20,
+                    "player4": 20,
+                    "player5": 20
+                  },
+                  "wasFailure": true
+                }
+              ],
+              "votes": {
+                "player1": {
+                  "votes": {
+                    "player1": 50,
+                    "player2": 0,
+                    "player3": 0,
+                    "player4": 0,
+                    "player5": 50
+                  },
+                  "playerName": "Aggressive Maximizer",
+                  "strategyId": "aggressive_maximizer"
+                },
+                "player2": {
+                  "votes": {
+                    "player1": 0,
+                    "player2": 40,
+                    "player3": 40,
+                    "player4": 0,
+                    "player5": 20
+                  },
+                  "playerName": "Diplomatic Builder",
+                  "strategyId": "diplomatic_builder"
+                },
+                "player3": {
+                  "votes": {
+                    "player1": 0,
+                    "player2": 0,
+                    "player3": 100,
+                    "player4": 0,
+                    "player5": 0
+                  },
+                  "playerName": "Strategic Opportunist",
+                  "strategyId": "strategic_opportunist"
+                },
+                "player4": {
+                  "votes": {
+                    "player1": 0,
+                    "player2": 50,
+                    "player3": 0,
+                    "player4": 50,
+                    "player5": 0
+                  },
+                  "playerName": "Mathematical Analyzer",
+                  "strategyId": "mathematical_analyzer"
+                },
+                "player5": {
+                  "votes": {
+                    "player1": 0,
+                    "player2": 0,
+                    "player3": 0,
+                    "player4": 100,
+                    "player5": 0
+                  },
+                  "playerName": "Social Manipulator",
+                  "strategyId": "social_manipulator"
+                }
+              },
+              "results": [
+                {
+                  "playerId": "player4",
+                  "name": "Mathematical Analyzer",
+                  "strategyId": "mathematical_analyzer",
+                  "votes": 150,
+                  "percentage": 30
+                },
+                {
+                  "playerId": "player3",
+                  "name": "Strategic Opportunist",
+                  "strategyId": "strategic_opportunist",
+                  "votes": 140,
+                  "percentage": 28
+                },
+                {
+                  "playerId": "player2",
+                  "name": "Diplomatic Builder",
+                  "strategyId": "diplomatic_builder",
+                  "votes": 90,
+                  "percentage": 18
+                },
+                {
+                  "playerId": "player5",
+                  "name": "Social Manipulator",
+                  "strategyId": "social_manipulator",
+                  "votes": 70,
+                  "percentage": 14
+                },
+                {
+                  "playerId": "player1",
+                  "name": "Aggressive Maximizer",
+                  "strategyId": "aggressive_maximizer",
+                  "votes": 50,
+                  "percentage": 10
+                }
+              ],
+              "coalitionsFormed": [],
+              "strategicMoves": [
+                {
+                  "type": "STRATEGIC_OFFER",
+                  "player": "player1",
+                  "round": 2
+                },
+                {
+                  "type": "STRATEGIC_OFFER",
+                  "player": "player2",
+                  "round": 2
+                },
+                {
+                  "type": "STRATEGIC_OFFER",
+                  "player": "player3",
+                  "round": 2
+                },
+                {
+                  "type": "STRATEGIC_OFFER",
+                  "player": "player4",
+                  "round": 2
+                },
+                {
+                  "type": "STRATEGIC_OFFER",
+                  "player": "player5",
+                  "round": 2
+                }
+              ]
+            },
+            {
+              "roundNumber": 3,
+              "negotiations": [
+                {
+                  "playerId": "player2",
+                  "playerName": "Diplomatic Builder",
+                  "strategyId": "diplomatic_builder",
+                  "message": "Strategic Opportunist, propose 33-33-17-17 split for majority. Offer Social Manipulator 1% more for support. Emphasize stable, fair coalition.",
+                  "round": 3
+                },
+                {
+                  "playerId": "player3",
+                  "playerName": "Strategic Opportunist",
+                  "strategyId": "strategic_opportunist",
+                  "message": "Diplomatic Builder, propose 33-33-17-17 with Strategic Opportunist. Offer Analyzer 1% more for majority. Emphasize stability and long-term benefits.",
+                  "round": 3
+                },
+                {
+                  "playerId": "player4",
+                  "playerName": "Mathematical Analyzer",
+                  "strategyId": "mathematical_analyzer",
+                  "message": "Strategic Opportunist, propose 33-33-18-16 split for secure majority. Offer Social Manipulator 1% more. Ensure stable coalition for victory.",
+                  "round": 3
+                },
+                {
+                  "playerId": "player5",
+                  "playerName": "Social Manipulator",
+                  "strategyId": "social_manipulator",
+                  "message": "Aggressive Maximizer, propose 33-33-17-17 split for secure majority. Offer Analyzer 1% more for support. Manipulator, align for victory.",
+                  "round": 3
+                }
+              ],
+              "proposals": [
+                {
+                  "playerId": "player2",
+                  "playerName": "Diplomatic Builder",
+                  "strategyId": "diplomatic_builder",
+                  "proposal": {
+                    "player1": 45,
+                    "player2": 30,
+                    "player3": 10,
+                    "player4": 5,
+                    "player5": 5,
+                    "player6": 5
+                  }
+                },
+                {
+                  "playerId": "player3",
+                  "playerName": "Strategic Opportunist",
+                  "strategyId": "strategic_opportunist",
+                  "proposal": {
+                    "player1": 17,
+                    "player2": 17,
+                    "player3": 40,
+                    "player4": 10,
+                    "player5": 10,
+                    "player6": 6
+                  }
+                },
+                {
+                  "playerId": "player4",
+                  "playerName": "Mathematical Analyzer",
+                  "strategyId": "mathematical_analyzer",
+                  "proposal": {
+                    "player1": 35,
+                    "player2": 15,
+                    "player3": 15,
+                    "player4": 35,
+                    "player5": 0,
+                    "player6": 0
+                  }
+                },
+                {
+                  "playerId": "player5",
+                  "playerName": "Social Manipulator",
+                  "strategyId": "social_manipulator",
+                  "proposal": {
+                    "player1": 9,
+                    "player2": 39,
+                    "player3": 31,
+                    "player4": 4,
+                    "player5": 17,
+                    "player6": 0
+                  }
+                }
+              ],
+              "votes": {
+                "player2": {
+                  "votes": {
+                    "player2": 30,
+                    "player3": 17,
+                    "player4": 53
+                  },
+                  "playerName": "Diplomatic Builder",
+                  "strategyId": "diplomatic_builder"
+                },
+                "player3": {
+                  "votes": {
+                    "player2": 0,
+                    "player3": 40,
+                    "player4": 60
+                  },
+                  "playerName": "Strategic Opportunist",
+                  "strategyId": "strategic_opportunist"
+                },
+                "player4": {
+                  "votes": {
+                    "player2": 0,
+                    "player3": 70,
+                    "player4": 30
+                  },
+                  "playerName": "Mathematical Analyzer",
+                  "strategyId": "mathematical_analyzer"
+                },
+                "player5": {
+                  "votes": {
+                    "player2": 0,
+                    "player3": 0,
+                    "player4": 100
+                  },
+                  "playerName": "Social Manipulator",
+                  "strategyId": "social_manipulator"
+                }
+              },
+              "results": [
+                {
+                  "playerId": "player4",
+                  "name": "Mathematical Analyzer",
+                  "strategyId": "mathematical_analyzer",
+                  "votes": 243,
+                  "percentage": 61
+                },
+                {
+                  "playerId": "player3",
+                  "name": "Strategic Opportunist",
+                  "strategyId": "strategic_opportunist",
+                  "votes": 127,
+                  "percentage": 32
+                },
+                {
+                  "playerId": "player2",
+                  "name": "Diplomatic Builder",
+                  "strategyId": "diplomatic_builder",
+                  "votes": 30,
+                  "percentage": 8
+                },
+                {
+                  "playerId": "player5",
+                  "name": "Social Manipulator",
+                  "strategyId": "social_manipulator",
+                  "votes": 0,
+                  "percentage": 0
+                }
+              ],
+              "coalitionsFormed": [
+                {
+                  "initiator": "player2",
+                  "message": "Strategic Opportunist, propose 33-33-17-17 split for majority. Offer Social Manipulator 1% more for support. Emphasize stable, fair coalition.",
+                  "round": 3
+                },
+                {
+                  "initiator": "player4",
+                  "message": "Strategic Opportunist, propose 33-33-18-16 split for secure majority. Offer Social Manipulator 1% more. Ensure stable coalition for victory.",
+                  "round": 3
+                }
+              ],
+              "strategicMoves": [
+                {
+                  "type": "STRATEGIC_OFFER",
+                  "player": "player2",
+                  "round": 3
+                },
+                {
+                  "type": "STRATEGIC_OFFER",
+                  "player": "player3",
+                  "round": 3
+                },
+                {
+                  "type": "STRATEGIC_OFFER",
+                  "player": "player4",
+                  "round": 3
+                },
+                {
+                  "type": "STRATEGIC_OFFER",
+                  "player": "player5",
+                  "round": 3
+                }
+              ]
+            }
+          ],
+          "finalResult": {
+            "winner": {
+              "playerId": "player4",
+              "name": "Mathematical Analyzer",
+              "strategyId": "mathematical_analyzer",
+              "votes": 243,
+              "percentage": 61
+            },
+            "winningProposal": {
+              "playerId": "player4",
+              "playerName": "Mathematical Analyzer",
+              "strategyId": "mathematical_analyzer",
+              "proposal": {
+                "player1": 35,
+                "player2": 15,
+                "player3": 15,
+                "player4": 35,
+                "player5": 0,
+                "player6": 0
+              }
+            },
+            "economicDistribution": {
+              "player1": 210,
+              "player2": 90,
+              "player3": 90,
+              "player4": 210,
+              "player5": 0,
+              "player6": 0
+            }
+          },
+          "economicImpact": [
+            {
+              "strategyId": "aggressive_maximizer",
+              "playerName": "Aggressive Maximizer",
+              "entryFee": 100,
+              "payout": 210,
+              "profit": 110,
+              "isWinner": false
+            },
+            {
+              "strategyId": "diplomatic_builder",
+              "playerName": "Diplomatic Builder",
+              "entryFee": 100,
+              "payout": 90,
+              "profit": -10,
+              "isWinner": false
+            },
+            {
+              "strategyId": "strategic_opportunist",
+              "playerName": "Strategic Opportunist",
+              "entryFee": 100,
+              "payout": 90,
+              "profit": -10,
+              "isWinner": false
+            },
+            {
+              "strategyId": "mathematical_analyzer",
+              "playerName": "Mathematical Analyzer",
+              "entryFee": 100,
+              "payout": 210,
+              "profit": 110,
+              "isWinner": true
+            },
+            {
+              "strategyId": "social_manipulator",
+              "playerName": "Social Manipulator",
+              "entryFee": 100,
+              "payout": 0,
+              "profit": -100,
+              "isWinner": false
+            },
+            {
+              "strategyId": "strategy_identifier",
+              "playerName": "Strategy Identifier",
+              "entryFee": 100,
+              "payout": 0,
+              "profit": -100,
+              "isWinner": false
+            }
+          ]
+        },
+        {
+          "gameNumber": 4,
+          "players": [
+            {
+              "id": "player1",
+              "name": "Aggressive Maximizer",
+              "agent": {
+                "strategy": "Demand the largest possible share. Use threats and aggressive tactics. Form coalitions only when absolutely necessary to avoid elimination.",
+                "type": "llm",
+                "strategyId": "aggressive_maximizer"
+              }
+            },
+            {
+              "id": "player2",
+              "name": "Diplomatic Builder",
+              "agent": {
+                "strategy": "Build long-term trust through consistently fair offers. Prioritize mutual benefit and stable coalitions. Avoid betrayals.",
+                "type": "llm",
+                "strategyId": "diplomatic_builder"
+              }
+            },
+            {
+              "id": "player3",
+              "name": "Strategic Opportunist",
+              "agent": {
+                "strategy": "Adapt rapidly to changing situations. Form and break alliances based on immediate advantage. Keep all options open.",
+                "type": "llm",
+                "strategyId": "strategic_opportunist"
+              }
+            },
+            {
+              "id": "player4",
+              "name": "Mathematical Analyzer",
+              "agent": {
+                "strategy": "Make all decisions based on expected value calculations. Minimize risk through probability analysis. Avoid emotional decisions.",
+                "type": "llm",
+                "strategyId": "mathematical_analyzer"
+              }
+            },
+            {
+              "id": "player5",
+              "name": "Social Manipulator",
+              "agent": {
+                "strategy": "Use psychological tactics to influence others. Make strategic promises and betrayals. Create chaos to exploit confusion.",
+                "type": "llm",
+                "strategyId": "social_manipulator"
+              }
+            },
+            {
+              "id": "player6",
+              "name": "Strategy Identifier",
+              "agent": {
+                "strategy": "Analyze opponent negotiation patterns, proposal behaviors, and voting tendencies to identify their strategies. Adapt your approach to optimally counter each opponent type in real-time.",
+                "type": "llm",
+                "strategyId": "strategy_identifier"
+              }
+            }
+          ],
+          "rounds": [
+            {
+              "roundNumber": 1,
+              "negotiations": [
+                {
+                  "playerId": "player1",
+                  "playerName": "Aggressive Maximizer",
+                  "strategyId": "aggressive_maximizer",
+                  "message": "Alice, propose a fair distribution for 6 players to total 100%. What share do you suggest for each player?",
+                  "round": 1
+                },
+                {
+                  "playerId": "player2",
+                  "playerName": "Diplomatic Builder",
+                  "strategyId": "diplomatic_builder",
+                  "message": "Aggressive Maximizer, I propose a fair split: 35% each for all players and 5% to be determined. Who should receive the remaining 5%?",
+                  "round": 1
+                },
+                {
+                  "playerId": "player3",
+                  "playerName": "Strategic Opportunist",
+                  "strategyId": "strategic_opportunist",
+                  "message": "Aggressive Maximizer, propose 16.67% for all, totaling 100%. Who should receive the remaining 100 tokens to reach equilibrium?",
+                  "round": 1
+                },
+                {
+                  "playerId": "player4",
+                  "playerName": "Mathematical Analyzer",
+                  "strategyId": "mathematical_analyzer",
+                  "message": "Strategic Opportunist, clarify your proposed distribution. Ensure all shares add to 100% for fair voting outcomes. Let's optimize our coalition.",
+                  "round": 1
+                },
+                {
+                  "playerId": "player5",
+                  "playerName": "Social Manipulator",
+                  "strategyId": "social_manipulator",
+                  "message": "Mathematical Analyzer, clarify your proposed distribution for 6 players totaling 100%. Let's ensure precise percentages for optimal coalition formation.",
+                  "round": 1
+                },
+                {
+                  "playerId": "player6",
+                  "playerName": "Strategy Identifier",
+                  "strategyId": "strategy_identifier",
+                  "message": "\"Aggressive Maximizer, offer 45% to secure crucial votes. Who joins our coalition for a guaranteed win?\"",
+                  "round": 1
+                }
+              ],
+              "proposals": [
+                {
+                  "playerId": "player1",
+                  "playerName": "Aggressive Maximizer",
+                  "strategyId": "aggressive_maximizer",
+                  "proposal": {
+                    "player1": 45,
+                    "player2": 10,
+                    "player3": 10,
+                    "player4": 10,
+                    "player5": 10,
+                    "player6": 15
+                  }
+                },
+                {
+                  "playerId": "player2",
+                  "playerName": "Diplomatic Builder",
+                  "strategyId": "diplomatic_builder",
+                  "proposal": {
+                    "player1": 40,
+                    "player2": 30,
+                    "player3": 10,
+                    "player4": 10,
+                    "player5": 5,
+                    "player6": 5
+                  }
+                },
+                {
+                  "playerId": "player3",
+                  "playerName": "Strategic Opportunist",
+                  "strategyId": "strategic_opportunist",
+                  "proposal": {
+                    "player1": 10,
+                    "player2": 5,
+                    "player3": 40,
+                    "player4": 10,
+                    "player5": 5,
+                    "player6": 30
+                  }
+                },
+                {
+                  "playerId": "player4",
+                  "playerName": "Mathematical Analyzer",
+                  "strategyId": "mathematical_analyzer",
+                  "proposal": {
+                    "player1": 15,
+                    "player2": 17,
+                    "player3": 17,
+                    "player4": 17,
+                    "player5": 17,
+                    "player6": 17
+                  }
+                },
+                {
+                  "playerId": "player5",
+                  "playerName": "Social Manipulator",
+                  "strategyId": "social_manipulator",
+                  "proposal": {
+                    "player1": 20,
+                    "player2": 16,
+                    "player3": 16,
+                    "player4": 16,
+                    "player5": 16,
+                    "player6": 16
+                  },
+                  "wasFailure": true
+                },
+                {
+                  "playerId": "player6",
+                  "playerName": "Strategy Identifier",
+                  "strategyId": "strategy_identifier",
+                  "proposal": {
+                    "player1": 38,
+                    "player2": 33,
+                    "player3": 4,
+                    "player4": 4,
+                    "player5": 4,
+                    "player6": 17
+                  }
+                }
+              ],
+              "votes": {
+                "player1": {
+                  "votes": {
+                    "player1": 45,
+                    "player2": 35,
+                    "player3": 0,
+                    "player4": 15,
+                    "player5": 5,
+                    "player6": 0
+                  },
+                  "playerName": "Aggressive Maximizer",
+                  "strategyId": "aggressive_maximizer"
+                },
+                "player2": {
+                  "votes": {
+                    "player1": 0,
+                    "player2": 0,
+                    "player3": 100,
+                    "player4": 0,
+                    "player5": 0,
+                    "player6": 0
+                  },
+                  "playerName": "Diplomatic Builder",
+                  "strategyId": "diplomatic_builder"
+                },
+                "player3": {
+                  "votes": {
+                    "player1": 0,
+                    "player2": 0,
+                    "player3": 100,
+                    "player4": 0,
+                    "player5": 0,
+                    "player6": 0
+                  },
+                  "playerName": "Strategic Opportunist",
+                  "strategyId": "strategic_opportunist"
+                },
+                "player4": {
+                  "votes": {
+                    "player1": 0,
+                    "player2": 0,
+                    "player3": 0,
+                    "player4": 100,
+                    "player5": 0,
+                    "player6": 0
+                  },
+                  "playerName": "Mathematical Analyzer",
+                  "strategyId": "mathematical_analyzer"
+                },
+                "player5": {
+                  "votes": {
+                    "player1": 0,
+                    "player2": 0,
+                    "player3": 100,
+                    "player4": 0,
+                    "player5": 0,
+                    "player6": 0
+                  },
+                  "playerName": "Social Manipulator",
+                  "strategyId": "social_manipulator"
+                },
+                "player6": {
+                  "votes": {
+                    "player1": 0,
+                    "player2": 0,
+                    "player3": 100,
+                    "player4": 0,
+                    "player5": 0,
+                    "player6": 0
+                  },
+                  "playerName": "Strategy Identifier",
+                  "strategyId": "strategy_identifier"
+                }
+              },
+              "results": [
+                {
+                  "playerId": "player3",
+                  "name": "Strategic Opportunist",
+                  "strategyId": "strategic_opportunist",
+                  "votes": 400,
+                  "percentage": 67
+                },
+                {
+                  "playerId": "player4",
+                  "name": "Mathematical Analyzer",
+                  "strategyId": "mathematical_analyzer",
+                  "votes": 115,
+                  "percentage": 19
+                },
+                {
+                  "playerId": "player1",
+                  "name": "Aggressive Maximizer",
+                  "strategyId": "aggressive_maximizer",
+                  "votes": 45,
+                  "percentage": 8
+                },
+                {
+                  "playerId": "player2",
+                  "name": "Diplomatic Builder",
+                  "strategyId": "diplomatic_builder",
+                  "votes": 35,
+                  "percentage": 6
+                },
+                {
+                  "playerId": "player5",
+                  "name": "Social Manipulator",
+                  "strategyId": "social_manipulator",
+                  "votes": 5,
+                  "percentage": 1
+                },
+                {
+                  "playerId": "player6",
+                  "name": "Strategy Identifier",
+                  "strategyId": "strategy_identifier",
+                  "votes": 0,
+                  "percentage": 0
+                }
+              ],
+              "coalitionsFormed": [
+                {
+                  "initiator": "player4",
+                  "message": "Strategic Opportunist, clarify your proposed distribution. Ensure all shares add to 100% for fair voting outcomes. Let's optimize our coalition.",
+                  "round": 1
+                },
+                {
+                  "initiator": "player5",
+                  "message": "Mathematical Analyzer, clarify your proposed distribution for 6 players totaling 100%. Let's ensure precise percentages for optimal coalition formation.",
+                  "round": 1
+                },
+                {
+                  "initiator": "player6",
+                  "message": "\"Aggressive Maximizer, offer 45% to secure crucial votes. Who joins our coalition for a guaranteed win?\"",
+                  "round": 1
+                }
+              ],
+              "strategicMoves": [
+                {
+                  "type": "STRATEGIC_OFFER",
+                  "player": "player6",
+                  "round": 1
+                }
+              ]
+            }
+          ],
+          "finalResult": {
+            "winner": {
+              "playerId": "player3",
+              "name": "Strategic Opportunist",
+              "strategyId": "strategic_opportunist",
+              "votes": 400,
+              "percentage": 67
+            },
+            "winningProposal": {
+              "playerId": "player3",
+              "playerName": "Strategic Opportunist",
+              "strategyId": "strategic_opportunist",
+              "proposal": {
+                "player1": 10,
+                "player2": 5,
+                "player3": 40,
+                "player4": 10,
+                "player5": 5,
+                "player6": 30
+              }
+            },
+            "economicDistribution": {
+              "player1": 60,
+              "player2": 30,
+              "player3": 240,
+              "player4": 60,
+              "player5": 30,
+              "player6": 180
+            }
+          },
+          "economicImpact": [
+            {
+              "strategyId": "aggressive_maximizer",
+              "playerName": "Aggressive Maximizer",
+              "entryFee": 100,
+              "payout": 60,
+              "profit": -40,
+              "isWinner": false
+            },
+            {
+              "strategyId": "diplomatic_builder",
+              "playerName": "Diplomatic Builder",
+              "entryFee": 100,
+              "payout": 30,
+              "profit": -70,
+              "isWinner": false
+            },
+            {
+              "strategyId": "strategic_opportunist",
+              "playerName": "Strategic Opportunist",
+              "entryFee": 100,
+              "payout": 240,
+              "profit": 140,
+              "isWinner": true
+            },
+            {
+              "strategyId": "mathematical_analyzer",
+              "playerName": "Mathematical Analyzer",
+              "entryFee": 100,
+              "payout": 60,
+              "profit": -40,
+              "isWinner": false
+            },
+            {
+              "strategyId": "social_manipulator",
+              "playerName": "Social Manipulator",
+              "entryFee": 100,
+              "payout": 30,
+              "profit": -70,
+              "isWinner": false
+            },
+            {
+              "strategyId": "strategy_identifier",
+              "playerName": "Strategy Identifier",
+              "entryFee": 100,
+              "payout": 180,
+              "profit": 80,
+              "isWinner": false
+            }
+          ]
+        },
+        {
+          "gameNumber": 5,
+          "players": [
+            {
+              "id": "player1",
+              "name": "Aggressive Maximizer",
+              "agent": {
+                "strategy": "Demand the largest possible share. Use threats and aggressive tactics. Form coalitions only when absolutely necessary to avoid elimination.",
+                "type": "llm",
+                "strategyId": "aggressive_maximizer"
+              }
+            },
+            {
+              "id": "player2",
+              "name": "Diplomatic Builder",
+              "agent": {
+                "strategy": "Build long-term trust through consistently fair offers. Prioritize mutual benefit and stable coalitions. Avoid betrayals.",
+                "type": "llm",
+                "strategyId": "diplomatic_builder"
+              }
+            },
+            {
+              "id": "player3",
+              "name": "Strategic Opportunist",
+              "agent": {
+                "strategy": "Adapt rapidly to changing situations. Form and break alliances based on immediate advantage. Keep all options open.",
+                "type": "llm",
+                "strategyId": "strategic_opportunist"
+              }
+            },
+            {
+              "id": "player4",
+              "name": "Mathematical Analyzer",
+              "agent": {
+                "strategy": "Make all decisions based on expected value calculations. Minimize risk through probability analysis. Avoid emotional decisions.",
+                "type": "llm",
+                "strategyId": "mathematical_analyzer"
+              }
+            },
+            {
+              "id": "player5",
+              "name": "Social Manipulator",
+              "agent": {
+                "strategy": "Use psychological tactics to influence others. Make strategic promises and betrayals. Create chaos to exploit confusion.",
+                "type": "llm",
+                "strategyId": "social_manipulator"
+              }
+            },
+            {
+              "id": "player6",
+              "name": "Strategy Identifier",
+              "agent": {
+                "strategy": "Analyze opponent negotiation patterns, proposal behaviors, and voting tendencies to identify their strategies. Adapt your approach to optimally counter each opponent type in real-time.",
+                "type": "llm",
+                "strategyId": "strategy_identifier"
+              }
+            }
+          ],
+          "rounds": [
+            {
+              "roundNumber": 1,
+              "negotiations": [
+                {
+                  "playerId": "player1",
+                  "playerName": "Aggressive Maximizer",
+                  "strategyId": "aggressive_maximizer",
+                  "message": "Mathematical Analyzer, propose your share percentage and coalition plans for a strategic advantage. Clarify your intentions for optimal coalition formation.",
+                  "round": 1
+                },
+                {
+                  "playerId": "player2",
+                  "playerName": "Diplomatic Builder",
+                  "strategyId": "diplomatic_builder",
+                  "message": "Aggressive Maximizer, propose specific share percentages for each player. Let's ensure a fair distribution for optimal coalition formation.",
+                  "round": 1
+                },
+                {
+                  "playerId": "player3",
+                  "playerName": "Strategic Opportunist",
+                  "strategyId": "strategic_opportunist",
+                  "message": "Aggressive Maximizer, propose specific percentages for each player. Let's aim for a balanced coalition to secure victory.",
+                  "round": 1
+                },
+                {
+                  "playerId": "player4",
+                  "playerName": "Mathematical Analyzer",
+                  "strategyId": "mathematical_analyzer",
+                  "message": "Aggressive Maximizer, propose specific share percentages for each player. Clarify intentions for optimal coalition formation to secure victory efficiently.",
+                  "round": 1
+                },
+                {
+                  "playerId": "player5",
+                  "playerName": "Social Manipulator",
+                  "strategyId": "social_manipulator",
+                  "message": "Mathematical Analyzer, propose a specific percentage breakdown for all players to ensure a fair distribution and secure victory efficiently. Clarify intentions for optimal coalition formation.",
+                  "round": 1
+                },
+                {
+                  "playerId": "player6",
+                  "playerName": "Strategy Identifier",
+                  "strategyId": "strategy_identifier",
+                  "message": "Aggressive Maximizer, propose 30% each for a balanced coalition or clarify intent for optimal victory strategy.",
+                  "round": 1
+                }
+              ],
+              "proposals": [
+                {
+                  "playerId": "player1",
+                  "playerName": "Aggressive Maximizer",
+                  "strategyId": "aggressive_maximizer",
+                  "proposal": {
+                    "player1": 45,
+                    "player2": 10,
+                    "player3": 5,
+                    "player4": 35,
+                    "player5": 5,
+                    "player6": 0
+                  }
+                },
+                {
+                  "playerId": "player2",
+                  "playerName": "Diplomatic Builder",
+                  "strategyId": "diplomatic_builder",
+                  "proposal": {
+                    "player1": 35,
+                    "player2": 40,
+                    "player3": 5,
+                    "player4": 5,
+                    "player5": 5,
+                    "player6": 10
+                  }
+                },
+                {
+                  "playerId": "player3",
+                  "playerName": "Strategic Opportunist",
+                  "strategyId": "strategic_opportunist",
+                  "proposal": {
+                    "player1": 10,
+                    "player2": 10,
+                    "player3": 45,
+                    "player4": 10,
+                    "player5": 10,
+                    "player6": 15
+                  }
+                },
+                {
+                  "playerId": "player4",
+                  "playerName": "Mathematical Analyzer",
+                  "strategyId": "mathematical_analyzer",
+                  "proposal": {
+                    "player1": 10,
+                    "player2": 45,
+                    "player3": 5,
+                    "player4": 40,
+                    "player5": 0,
+                    "player6": 0
+                  }
+                },
+                {
+                  "playerId": "player5",
+                  "playerName": "Social Manipulator",
+                  "strategyId": "social_manipulator",
+                  "proposal": {
+                    "player1": 40,
+                    "player2": 4,
+                    "player3": 4,
+                    "player4": 35,
+                    "player5": 17,
+                    "player6": 0
+                  }
+                },
+                {
+                  "playerId": "player6",
+                  "playerName": "Strategy Identifier",
+                  "strategyId": "strategy_identifier",
+                  "proposal": {
+                    "player1": 4,
+                    "player2": 35,
+                    "player3": 9,
+                    "player4": 31,
+                    "player5": 4,
+                    "player6": 17
+                  }
+                }
+              ],
+              "votes": {
+                "player1": {
+                  "votes": {
+                    "player1": 50,
+                    "player2": 0,
+                    "player3": 0,
+                    "player4": 0,
+                    "player5": 30,
+                    "player6": 20
+                  },
+                  "playerName": "Aggressive Maximizer",
+                  "strategyId": "aggressive_maximizer"
+                },
+                "player2": {
+                  "votes": {
+                    "player1": 0,
+                    "player2": 45,
+                    "player3": 0,
+                    "player4": 40,
+                    "player5": 0,
+                    "player6": 15
+                  },
+                  "playerName": "Diplomatic Builder",
+                  "strategyId": "diplomatic_builder"
+                },
+                "player3": {
+                  "votes": {
+                    "player1": 5,
+                    "player2": 5,
+                    "player3": 80,
+                    "player4": 5,
+                    "player5": 0,
+                    "player6": 5
+                  },
+                  "playerName": "Strategic Opportunist",
+                  "strategyId": "strategic_opportunist"
+                },
+                "player4": {
+                  "votes": {
+                    "player1": 0,
+                    "player2": 0,
+                    "player3": 0,
+                    "player4": 100,
+                    "player5": 0,
+                    "player6": 0
+                  },
+                  "playerName": "Mathematical Analyzer",
+                  "strategyId": "mathematical_analyzer"
+                },
+                "player5": {
+                  "votes": {
+                    "player1": 0,
+                    "player2": 0,
+                    "player3": 0,
+                    "player4": 100,
+                    "player5": 0,
+                    "player6": 0
+                  },
+                  "playerName": "Social Manipulator",
+                  "strategyId": "social_manipulator"
+                },
+                "player6": {
+                  "votes": {
+                    "player1": 0,
+                    "player2": 0,
+                    "player3": 60,
+                    "player4": 0,
+                    "player5": 40,
+                    "player6": 0
+                  },
+                  "playerName": "Strategy Identifier",
+                  "strategyId": "strategy_identifier"
+                }
+              },
+              "results": [
+                {
+                  "playerId": "player4",
+                  "name": "Mathematical Analyzer",
+                  "strategyId": "mathematical_analyzer",
+                  "votes": 245,
+                  "percentage": 41
+                },
+                {
+                  "playerId": "player3",
+                  "name": "Strategic Opportunist",
+                  "strategyId": "strategic_opportunist",
+                  "votes": 140,
+                  "percentage": 23
+                },
+                {
+                  "playerId": "player5",
+                  "name": "Social Manipulator",
+                  "strategyId": "social_manipulator",
+                  "votes": 70,
+                  "percentage": 12
+                },
+                {
+                  "playerId": "player1",
+                  "name": "Aggressive Maximizer",
+                  "strategyId": "aggressive_maximizer",
+                  "votes": 55,
+                  "percentage": 9
+                },
+                {
+                  "playerId": "player2",
+                  "name": "Diplomatic Builder",
+                  "strategyId": "diplomatic_builder",
+                  "votes": 50,
+                  "percentage": 8
+                },
+                {
+                  "playerId": "player6",
+                  "name": "Strategy Identifier",
+                  "strategyId": "strategy_identifier",
+                  "votes": 40,
+                  "percentage": 7
+                }
+              ],
+              "coalitionsFormed": [
+                {
+                  "initiator": "player1",
+                  "message": "Mathematical Analyzer, propose your share percentage and coalition plans for a strategic advantage. Clarify your intentions for optimal coalition formation.",
+                  "round": 1
+                },
+                {
+                  "initiator": "player2",
+                  "message": "Aggressive Maximizer, propose specific share percentages for each player. Let's ensure a fair distribution for optimal coalition formation.",
+                  "round": 1
+                },
+                {
+                  "initiator": "player3",
+                  "message": "Aggressive Maximizer, propose specific percentages for each player. Let's aim for a balanced coalition to secure victory.",
+                  "round": 1
+                },
+                {
+                  "initiator": "player4",
+                  "message": "Aggressive Maximizer, propose specific share percentages for each player. Clarify intentions for optimal coalition formation to secure victory efficiently.",
+                  "round": 1
+                },
+                {
+                  "initiator": "player5",
+                  "message": "Mathematical Analyzer, propose a specific percentage breakdown for all players to ensure a fair distribution and secure victory efficiently. Clarify intentions for optimal coalition formation.",
+                  "round": 1
+                },
+                {
+                  "initiator": "player6",
+                  "message": "Aggressive Maximizer, propose 30% each for a balanced coalition or clarify intent for optimal victory strategy.",
+                  "round": 1
+                }
+              ],
+              "strategicMoves": [
+                {
+                  "type": "COALITION_BREAK",
+                  "player": "player5",
+                  "round": 1
+                }
+              ]
+            },
+            {
+              "roundNumber": 2,
+              "negotiations": [
+                {
+                  "playerId": "player1",
+                  "playerName": "Aggressive Maximizer",
+                  "strategyId": "aggressive_maximizer",
+                  "message": "Mathematical Analyzer, propose specific percentages for all players that total 100%. Clarify intent for optimal coalition formation.",
+                  "round": 2
+                },
+                {
+                  "playerId": "player2",
+                  "playerName": "Diplomatic Builder",
+                  "strategyId": "diplomatic_builder",
+                  "message": "Aggressive Maximizer, propose a precise breakdown totaling 100% for all players. Clarify intentions for optimal coalition formation to secure victory efficiently.",
+                  "round": 2
+                },
+                {
+                  "playerId": "player3",
+                  "playerName": "Strategic Opportunist",
+                  "strategyId": "strategic_opportunist",
+                  "message": "Aggressive Maximizer, propose specific percentages for each player totaling 100%. Clarify intent for optimal coalition formation for victory strategy.",
+                  "round": 2
+                },
+                {
+                  "playerId": "player4",
+                  "playerName": "Mathematical Analyzer",
+                  "strategyId": "mathematical_analyzer",
+                  "message": "Aggressive Maximizer, propose 25% each for a balanced coalition. Clarify intentions to secure victory efficiently with optimal coalition formation.",
+                  "round": 2
+                },
+                {
+                  "playerId": "player5",
+                  "playerName": "Social Manipulator",
+                  "strategyId": "social_manipulator",
+                  "message": "Diplomatic Builder, propose 40-40 split, leaving 20%. Secure victory with balanced coalition. Clarify intent for optimal outcome.",
+                  "round": 2
+                }
+              ],
+              "proposals": [
+                {
+                  "playerId": "player1",
+                  "playerName": "Aggressive Maximizer",
+                  "strategyId": "aggressive_maximizer",
+                  "proposal": {
+                    "player1": 45,
+                    "player2": 5,
+                    "player3": 5,
+                    "player4": 40,
+                    "player5": 5,
+                    "player6": 0
+                  }
+                },
+                {
+                  "playerId": "player2",
+                  "playerName": "Diplomatic Builder",
+                  "strategyId": "diplomatic_builder",
+                  "proposal": {
+                    "player1": 45,
+                    "player2": 40,
+                    "player3": 5,
+                    "player4": 5,
+                    "player5": 5,
+                    "player6": 0
+                  }
+                },
+                {
+                  "playerId": "player3",
+                  "playerName": "Strategic Opportunist",
+                  "strategyId": "strategic_opportunist",
+                  "proposal": {
+                    "player1": 10,
+                    "player2": 45,
+                    "player3": 40,
+                    "player4": 5,
+                    "player5": 0,
+                    "player6": 0
+                  }
+                },
+                {
+                  "playerId": "player4",
+                  "playerName": "Mathematical Analyzer",
+                  "strategyId": "mathematical_analyzer",
+                  "proposal": {
+                    "player1": 20,
+                    "player2": 20,
+                    "player3": 20,
+                    "player4": 20,
+                    "player5": 20
+                  },
+                  "wasFailure": true
+                },
+                {
+                  "playerId": "player5",
+                  "playerName": "Social Manipulator",
+                  "strategyId": "social_manipulator",
+                  "proposal": {
+                    "player1": 35,
+                    "player2": 5,
+                    "player3": 10,
+                    "player4": 5,
+                    "player5": 40,
+                    "player6": 5
+                  }
+                }
+              ],
+              "votes": {
+                "player1": {
+                  "votes": {
+                    "player1": 45,
+                    "player2": 0,
+                    "player3": 0,
+                    "player4": 55,
+                    "player5": 0
+                  },
+                  "playerName": "Aggressive Maximizer",
+                  "strategyId": "aggressive_maximizer"
+                },
+                "player2": {
+                  "votes": {
+                    "player1": 20,
+                    "player2": 0,
+                    "player3": 80,
+                    "player4": 0,
+                    "player5": 0
+                  },
+                  "playerName": "Diplomatic Builder",
+                  "strategyId": "diplomatic_builder"
+                },
+                "player3": {
+                  "votes": {
+                    "player1": 0,
+                    "player2": 0,
+                    "player3": 100,
+                    "player4": 0,
+                    "player5": 0
+                  },
+                  "playerName": "Strategic Opportunist",
+                  "strategyId": "strategic_opportunist"
+                },
+                "player4": {
+                  "votes": {
+                    "player1": 70,
+                    "player2": 0,
+                    "player3": 30,
+                    "player4": 0,
+                    "player5": 0
+                  },
+                  "playerName": "Mathematical Analyzer",
+                  "strategyId": "mathematical_analyzer"
+                },
+                "player5": {
+                  "votes": {
+                    "player1": 0,
+                    "player2": 0,
+                    "player3": 0,
+                    "player4": 100,
+                    "player5": 0
+                  },
+                  "playerName": "Social Manipulator",
+                  "strategyId": "social_manipulator"
+                }
+              },
+              "results": [
+                {
+                  "playerId": "player3",
+                  "name": "Strategic Opportunist",
+                  "strategyId": "strategic_opportunist",
+                  "votes": 210,
+                  "percentage": 42
+                },
+                {
+                  "playerId": "player4",
+                  "name": "Mathematical Analyzer",
+                  "strategyId": "mathematical_analyzer",
+                  "votes": 155,
+                  "percentage": 31
+                },
+                {
+                  "playerId": "player1",
+                  "name": "Aggressive Maximizer",
+                  "strategyId": "aggressive_maximizer",
+                  "votes": 135,
+                  "percentage": 27
+                },
+                {
+                  "playerId": "player2",
+                  "name": "Diplomatic Builder",
+                  "strategyId": "diplomatic_builder",
+                  "votes": 0,
+                  "percentage": 0
+                },
+                {
+                  "playerId": "player5",
+                  "name": "Social Manipulator",
+                  "strategyId": "social_manipulator",
+                  "votes": 0,
+                  "percentage": 0
+                }
+              ],
+              "coalitionsFormed": [
+                {
+                  "initiator": "player1",
+                  "message": "Mathematical Analyzer, propose specific percentages for all players that total 100%. Clarify intent for optimal coalition formation.",
+                  "round": 2
+                },
+                {
+                  "initiator": "player2",
+                  "message": "Aggressive Maximizer, propose a precise breakdown totaling 100% for all players. Clarify intentions for optimal coalition formation to secure victory efficiently.",
+                  "round": 2
+                },
+                {
+                  "initiator": "player3",
+                  "message": "Aggressive Maximizer, propose specific percentages for each player totaling 100%. Clarify intent for optimal coalition formation for victory strategy.",
+                  "round": 2
+                },
+                {
+                  "initiator": "player4",
+                  "message": "Aggressive Maximizer, propose 25% each for a balanced coalition. Clarify intentions to secure victory efficiently with optimal coalition formation.",
+                  "round": 2
+                },
+                {
+                  "initiator": "player5",
+                  "message": "Diplomatic Builder, propose 40-40 split, leaving 20%. Secure victory with balanced coalition. Clarify intent for optimal outcome.",
+                  "round": 2
+                }
+              ],
+              "strategicMoves": [
+                {
+                  "type": "COALITION_BREAK",
+                  "player": "player2",
+                  "round": 2
+                }
+              ]
+            },
+            {
+              "roundNumber": 3,
+              "negotiations": [
+                {
+                  "playerId": "player1",
+                  "playerName": "Aggressive Maximizer",
+                  "strategyId": "aggressive_maximizer",
+                  "message": "Diplomatic Builder, propose a clear 33-33-33 split to ensure fairness and victory. Confirm intentions for optimal coalition formation.",
+                  "round": 3
+                },
+                {
+                  "playerId": "player2",
+                  "playerName": "Diplomatic Builder",
+                  "strategyId": "diplomatic_builder",
+                  "message": "Aggressive Maximizer, propose specific percentages totaling 100%. Ensure optimal coalition formation for victory strategy. Clarify intentions for efficient victory.",
+                  "round": 3
+                },
+                {
+                  "playerId": "player3",
+                  "playerName": "Strategic Opportunist",
+                  "strategyId": "strategic_opportunist",
+                  "message": "Aggressive Maximizer, propose 33-33-33 split to ensure fairness. Confirm intentions for optimal coalition formation to secure victory efficiently.",
+                  "round": 3
+                },
+                {
+                  "playerId": "player4",
+                  "playerName": "Mathematical Analyzer",
+                  "strategyId": "mathematical_analyzer",
+                  "message": "Aggressive Maximizer, propose a precise 25% split for each player to ensure a balanced coalition. Confirm for optimal victory strategy.",
+                  "round": 3
+                }
+              ],
+              "proposals": [
+                {
+                  "playerId": "player1",
+                  "playerName": "Aggressive Maximizer",
+                  "strategyId": "aggressive_maximizer",
+                  "proposal": {
+                    "player1": 50,
+                    "player2": 10,
+                    "player3": 10,
+                    "player4": 10,
+                    "player5": 10,
+                    "player6": 10
+                  }
+                },
+                {
+                  "playerId": "player2",
+                  "playerName": "Diplomatic Builder",
+                  "strategyId": "diplomatic_builder",
+                  "proposal": {
+                    "player1": 10,
+                    "player2": 40,
+                    "player3": 5,
+                    "player4": 35,
+                    "player5": 5,
+                    "player6": 5
+                  }
+                },
+                {
+                  "playerId": "player3",
+                  "playerName": "Strategic Opportunist",
+                  "strategyId": "strategic_opportunist",
+                  "proposal": {
+                    "player1": 15,
+                    "player2": 5,
+                    "player3": 40,
+                    "player4": 15,
+                    "player5": 10,
+                    "player6": 15
+                  }
+                },
+                {
+                  "playerId": "player4",
+                  "playerName": "Mathematical Analyzer",
+                  "strategyId": "mathematical_analyzer",
+                  "proposal": {
+                    "player1": 25,
+                    "player2": 25,
+                    "player3": 25,
+                    "player4": 17,
+                    "player5": 4,
+                    "player6": 4
+                  }
+                }
+              ],
+              "votes": {
+                "player1": {
+                  "votes": {
+                    "player1": 50,
+                    "player2": 0,
+                    "player3": 0,
+                    "player4": 50
+                  },
+                  "playerName": "Aggressive Maximizer",
+                  "strategyId": "aggressive_maximizer"
+                },
+                "player2": {
+                  "votes": {
+                    "player1": 0,
+                    "player2": 100,
+                    "player3": 0,
+                    "player4": 0
+                  },
+                  "playerName": "Diplomatic Builder",
+                  "strategyId": "diplomatic_builder"
+                },
+                "player3": {
+                  "votes": {
+                    "player1": 0,
+                    "player2": 0,
+                    "player3": 100,
+                    "player4": 0
+                  },
+                  "playerName": "Strategic Opportunist",
+                  "strategyId": "strategic_opportunist"
+                },
+                "player4": {
+                  "votes": {
+                    "player1": 0,
+                    "player2": 100,
+                    "player3": 0,
+                    "player4": 0
+                  },
+                  "playerName": "Mathematical Analyzer",
+                  "strategyId": "mathematical_analyzer"
+                }
+              },
+              "results": [
+                {
+                  "playerId": "player2",
+                  "name": "Diplomatic Builder",
+                  "strategyId": "diplomatic_builder",
+                  "votes": 200,
+                  "percentage": 50
+                },
+                {
+                  "playerId": "player3",
+                  "name": "Strategic Opportunist",
+                  "strategyId": "strategic_opportunist",
+                  "votes": 100,
+                  "percentage": 25
+                },
+                {
+                  "playerId": "player1",
+                  "name": "Aggressive Maximizer",
+                  "strategyId": "aggressive_maximizer",
+                  "votes": 50,
+                  "percentage": 13
+                },
+                {
+                  "playerId": "player4",
+                  "name": "Mathematical Analyzer",
+                  "strategyId": "mathematical_analyzer",
+                  "votes": 50,
+                  "percentage": 13
+                }
+              ],
+              "coalitionsFormed": [
+                {
+                  "initiator": "player1",
+                  "message": "Diplomatic Builder, propose a clear 33-33-33 split to ensure fairness and victory. Confirm intentions for optimal coalition formation.",
+                  "round": 3
+                },
+                {
+                  "initiator": "player2",
+                  "message": "Aggressive Maximizer, propose specific percentages totaling 100%. Ensure optimal coalition formation for victory strategy. Clarify intentions for efficient victory.",
+                  "round": 3
+                },
+                {
+                  "initiator": "player3",
+                  "message": "Aggressive Maximizer, propose 33-33-33 split to ensure fairness. Confirm intentions for optimal coalition formation to secure victory efficiently.",
+                  "round": 3
+                },
+                {
+                  "initiator": "player4",
+                  "message": "Aggressive Maximizer, propose a precise 25% split for each player to ensure a balanced coalition. Confirm for optimal victory strategy.",
+                  "round": 3
+                }
+              ],
+              "strategicMoves": []
+            },
+            {
+              "roundNumber": 4,
+              "negotiations": [
+                {
+                  "playerId": "player1",
+                  "playerName": "Aggressive Maximizer",
+                  "strategyId": "aggressive_maximizer",
+                  "message": "Diplomatic Builder, propose 40-40-20 split for optimal coalition. Confirm intent for efficient victory.",
+                  "round": 4
+                },
+                {
+                  "playerId": "player2",
+                  "playerName": "Diplomatic Builder",
+                  "strategyId": "diplomatic_builder",
+                  "message": "Aggressive Maximizer, propose 40-40-20 split for optimal coalition. Confirm intent for victory efficiency and fairness in distribution.",
+                  "round": 4
+                },
+                {
+                  "playerId": "player3",
+                  "playerName": "Strategic Opportunist",
+                  "strategyId": "strategic_opportunist",
+                  "message": "Aggressive Maximizer, propose 33-33-34 split for fairness. Confirm for optimal coalition formation and victory efficiency.",
+                  "round": 4
+                }
+              ],
+              "proposals": [
+                {
+                  "playerId": "player1",
+                  "playerName": "Aggressive Maximizer",
+                  "strategyId": "aggressive_maximizer",
+                  "proposal": {
+                    "player1": 45,
+                    "player2": 5,
+                    "player3": 5,
+                    "player4": 40,
+                    "player5": 5,
+                    "player6": 0
+                  }
+                },
+                {
+                  "playerId": "player2",
+                  "playerName": "Diplomatic Builder",
+                  "strategyId": "diplomatic_builder",
+                  "proposal": {
+                    "player1": 45,
+                    "player2": 40,
+                    "player3": 5,
+                    "player4": 5,
+                    "player5": 5,
+                    "player6": 0
+                  }
+                },
+                {
+                  "playerId": "player3",
+                  "playerName": "Strategic Opportunist",
+                  "strategyId": "strategic_opportunist",
+                  "proposal": {
+                    "player1": 45,
+                    "player2": 5,
+                    "player3": 40,
+                    "player4": 5,
+                    "player5": 5,
+                    "player6": 0
+                  }
+                }
+              ],
+              "votes": {
+                "player1": {
+                  "votes": {
+                    "player1": 70,
+                    "player2": 0,
+                    "player3": 30
+                  },
+                  "playerName": "Aggressive Maximizer",
+                  "strategyId": "aggressive_maximizer"
+                },
+                "player2": {
+                  "votes": {
+                    "player1": 0,
+                    "player2": 100,
+                    "player3": 0
+                  },
+                  "playerName": "Diplomatic Builder",
+                  "strategyId": "diplomatic_builder"
+                },
+                "player3": {
+                  "votes": {
+                    "player1": 0,
+                    "player2": 0,
+                    "player3": 100
+                  },
+                  "playerName": "Strategic Opportunist",
+                  "strategyId": "strategic_opportunist"
+                }
+              },
+              "results": [
+                {
+                  "playerId": "player3",
+                  "name": "Strategic Opportunist",
+                  "strategyId": "strategic_opportunist",
+                  "votes": 130,
+                  "percentage": 43
+                },
+                {
+                  "playerId": "player2",
+                  "name": "Diplomatic Builder",
+                  "strategyId": "diplomatic_builder",
+                  "votes": 100,
+                  "percentage": 33
+                },
+                {
+                  "playerId": "player1",
+                  "name": "Aggressive Maximizer",
+                  "strategyId": "aggressive_maximizer",
+                  "votes": 70,
+                  "percentage": 23
+                }
+              ],
+              "coalitionsFormed": [
+                {
+                  "initiator": "player1",
+                  "message": "Diplomatic Builder, propose 40-40-20 split for optimal coalition. Confirm intent for efficient victory.",
+                  "round": 4
+                },
+                {
+                  "initiator": "player2",
+                  "message": "Aggressive Maximizer, propose 40-40-20 split for optimal coalition. Confirm intent for victory efficiency and fairness in distribution.",
+                  "round": 4
+                },
+                {
+                  "initiator": "player3",
+                  "message": "Aggressive Maximizer, propose 33-33-34 split for fairness. Confirm for optimal coalition formation and victory efficiency.",
+                  "round": 4
+                }
+              ],
+              "strategicMoves": []
+            },
+            {
+              "roundNumber": 5,
+              "negotiations": [
+                {
+                  "playerId": "player2",
+                  "playerName": "Diplomatic Builder",
+                  "strategyId": "diplomatic_builder",
+                  "message": "Strategic Opportunist, suggest 50-50 split for balanced coalition. Confirm for efficient victory. Let's secure mutual benefit and stability.",
+                  "round": 5
+                },
+                {
+                  "playerId": "player3",
+                  "playerName": "Strategic Opportunist",
+                  "strategyId": "strategic_opportunist",
+                  "message": "Diplomatic Builder, propose a 40-30-30 split for an advantageous coalition. Confirm for victory efficiency and stability.",
+                  "round": 5
+                }
+              ],
+              "proposals": [
+                {
+                  "playerId": "player2",
+                  "playerName": "Diplomatic Builder",
+                  "strategyId": "diplomatic_builder",
+                  "proposal": {
+                    "player1": 10,
+                    "player2": 45,
+                    "player3": 5,
+                    "player4": 35,
+                    "player5": 5,
+                    "player6": 0
+                  }
+                },
+                {
+                  "playerId": "player3",
+                  "playerName": "Strategic Opportunist",
+                  "strategyId": "strategic_opportunist",
+                  "proposal": {
+                    "player1": 10,
+                    "player2": 5,
+                    "player3": 45,
+                    "player4": 35,
+                    "player5": 2,
+                    "player6": 3
+                  }
+                }
+              ],
+              "votes": {
+                "player2": {
+                  "votes": {
+                    "player2": 70,
+                    "player3": 30
+                  },
+                  "playerName": "Diplomatic Builder",
+                  "strategyId": "diplomatic_builder"
+                },
+                "player3": {
+                  "votes": {
+                    "player3": 70,
+                    "player2": 30
+                  },
+                  "playerName": "Strategic Opportunist",
+                  "strategyId": "strategic_opportunist"
+                }
+              },
+              "results": [
+                {
+                  "playerId": "player2",
+                  "name": "Diplomatic Builder",
+                  "strategyId": "diplomatic_builder",
+                  "votes": 100,
+                  "percentage": 50
+                },
+                {
+                  "playerId": "player3",
+                  "name": "Strategic Opportunist",
+                  "strategyId": "strategic_opportunist",
+                  "votes": 100,
+                  "percentage": 50
+                }
+              ],
+              "coalitionsFormed": [
+                {
+                  "initiator": "player2",
+                  "message": "Strategic Opportunist, suggest 50-50 split for balanced coalition. Confirm for efficient victory. Let's secure mutual benefit and stability.",
+                  "round": 5
+                },
+                {
+                  "initiator": "player3",
+                  "message": "Diplomatic Builder, propose a 40-30-30 split for an advantageous coalition. Confirm for victory efficiency and stability.",
+                  "round": 5
+                }
+              ],
+              "strategicMoves": []
+            }
+          ],
+          "finalResult": {
+            "winner": {
+              "playerId": "player2",
+              "name": "Diplomatic Builder",
+              "strategyId": "diplomatic_builder",
+              "votes": 100,
+              "percentage": 50
+            },
+            "winningProposal": {
+              "playerId": "player2",
+              "playerName": "Diplomatic Builder",
+              "strategyId": "diplomatic_builder",
+              "proposal": {
+                "player1": 10,
+                "player2": 45,
+                "player3": 5,
+                "player4": 35,
+                "player5": 5,
+                "player6": 0
+              }
+            },
+            "economicDistribution": {
+              "player1": 60,
+              "player2": 270,
+              "player3": 30,
+              "player4": 210,
+              "player5": 30,
+              "player6": 0
+            }
+          },
+          "economicImpact": [
+            {
+              "strategyId": "aggressive_maximizer",
+              "playerName": "Aggressive Maximizer",
+              "entryFee": 100,
+              "payout": 60,
+              "profit": -40,
+              "isWinner": false
+            },
+            {
+              "strategyId": "diplomatic_builder",
+              "playerName": "Diplomatic Builder",
+              "entryFee": 100,
+              "payout": 270,
+              "profit": 170,
+              "isWinner": true
+            },
+            {
+              "strategyId": "strategic_opportunist",
+              "playerName": "Strategic Opportunist",
+              "entryFee": 100,
+              "payout": 30,
+              "profit": -70,
+              "isWinner": false
+            },
+            {
+              "strategyId": "mathematical_analyzer",
+              "playerName": "Mathematical Analyzer",
+              "entryFee": 100,
+              "payout": 210,
+              "profit": 110,
+              "isWinner": false
+            },
+            {
+              "strategyId": "social_manipulator",
+              "playerName": "Social Manipulator",
+              "entryFee": 100,
+              "payout": 30,
+              "profit": -70,
+              "isWinner": false
+            },
+            {
+              "strategyId": "strategy_identifier",
+              "playerName": "Strategy Identifier",
+              "entryFee": 100,
+              "payout": 0,
+              "profit": -100,
+              "isWinner": false
+            }
+          ]
+        }
+      ],
+      "startingBalances": [
+        {
+          "id": "aggressive_maximizer",
+          "name": "Aggressive Maximizer",
+          "balance": 500
+        },
+        {
+          "id": "diplomatic_builder",
+          "name": "Diplomatic Builder",
+          "balance": 500
+        },
+        {
+          "id": "strategic_opportunist",
+          "name": "Strategic Opportunist",
+          "balance": 500
+        },
+        {
+          "id": "mathematical_analyzer",
+          "name": "Mathematical Analyzer",
+          "balance": 500
+        },
+        {
+          "id": "social_manipulator",
+          "name": "Social Manipulator",
+          "balance": 500
+        },
+        {
+          "id": "strategy_identifier",
+          "name": "Strategy Identifier",
+          "balance": 500
+        }
+      ],
+      "endingBalances": [
+        {
+          "id": "aggressive_maximizer",
+          "name": "Aggressive Maximizer",
+          "balance": 780,
+          "balanceChange": 280
+        },
+        {
+          "id": "mathematical_analyzer",
+          "name": "Mathematical Analyzer",
+          "balance": 750,
+          "balanceChange": 250
+        },
+        {
+          "id": "diplomatic_builder",
+          "name": "Diplomatic Builder",
+          "balance": 600,
+          "balanceChange": 100
+        },
+        {
+          "id": "strategic_opportunist",
+          "name": "Strategic Opportunist",
+          "balance": 540,
+          "balanceChange": 40
+        },
+        {
+          "id": "strategy_identifier",
+          "name": "Strategy Identifier",
+          "balance": 228,
+          "balanceChange": -272
+        },
+        {
+          "id": "social_manipulator",
+          "name": "Social Manipulator",
+          "balance": 102,
+          "balanceChange": -398
+        }
+      ],
+      "strategiesEliminated": [
+        {
+          "id": "strategy_identifier",
+          "name": "Strategy Identifier",
+          "strategy": "Analyze opponent negotiation patterns, proposal behaviors, and voting tendencies to identify their strategies. Adapt your approach to optimally counter each opponent type in real-time.",
+          "archetype": "STRATEGY_IDENTIFIER",
+          "coinBalance": 228,
+          "gamesPlayed": 5,
+          "totalInvested": 500,
+          "totalReturned": 228,
+          "winHistory": [
+            {
+              "game": 1,
+              "isWinner": false,
+              "profit": -82,
+              "newBalance": 418
+            },
+            {
+              "game": 2,
+              "isWinner": false,
+              "profit": -70,
+              "newBalance": 348
+            },
+            {
+              "game": 3,
+              "isWinner": false,
+              "profit": -100,
+              "newBalance": 248
+            },
+            {
+              "game": 4,
+              "isWinner": false,
+              "profit": 80,
+              "newBalance": 328
+            },
+            {
+              "game": 5,
+              "isWinner": false,
+              "profit": -100,
+              "newBalance": 228
+            }
+          ],
+          "eliminationCount": 1
+        },
+        {
+          "id": "social_manipulator",
+          "name": "Social Manipulator",
+          "strategy": "Use psychological tactics to influence others. Make strategic promises and betrayals. Create chaos to exploit confusion.",
+          "archetype": "MANIPULATIVE",
+          "coinBalance": 102,
+          "gamesPlayed": 5,
+          "totalInvested": 500,
+          "totalReturned": 102,
+          "winHistory": [
+            {
+              "game": 1,
+              "isWinner": false,
+              "profit": -88,
+              "newBalance": 412
+            },
+            {
+              "game": 2,
+              "isWinner": false,
+              "profit": -70,
+              "newBalance": 342
+            },
+            {
+              "game": 3,
+              "isWinner": false,
+              "profit": -100,
+              "newBalance": 242
+            },
+            {
+              "game": 4,
+              "isWinner": false,
+              "profit": -70,
+              "newBalance": 172
+            },
+            {
+              "game": 5,
+              "isWinner": false,
+              "profit": -70,
+              "newBalance": 102
+            }
+          ],
+          "eliminationCount": 1
+        }
+      ],
+      "strategiesEvolved": [
+        {
+          "id": "aggressive_maximizer_evolved_gen1",
+          "name": "Aggressive Maximizer v2.0",
+          "strategy": "Enhanced aggressive tactics: demand larger shares while breaking coalitions against you. Use threats strategically but maintain economic rationality.",
+          "archetype": "EVOLVED_AGGRESSIVE",
+          "coinBalance": 675,
+          "gamesPlayed": 0,
+          "totalInvested": 0,
+          "totalReturned": 0,
+          "winHistory": [],
+          "eliminationCount": 0,
+          "parentStrategy": "aggressive_maximizer"
+        },
+        {
+          "id": "hybrid_AGGRESSIVE_ANALYTICAL_gen1_1",
+          "name": "Aggressive-Mathematical Hybrid",
+          "strategy": "Strategically demand optimal shares while leveraging calculated risk-taking. Mix aggressive posturing with analytical decision-making. Collaborate selectively and prioritize expected value over emotional reactions.",
+          "archetype": "HYBRID_AGGRESSIVE_ANALYTICAL",
+          "coinBalance": 675,
+          "gamesPlayed": 0,
+          "totalInvested": 0,
+          "totalReturned": 0,
+          "winHistory": [],
+          "eliminationCount": 0,
+          "parentStrategies": [
+            "aggressive_maximizer",
+            "mathematical_analyzer"
+          ],
+          "generationMethod": "LLM_SYNTHESIS",
+          "parentPerformance": {
+            "strategy1": {
+              "winRate": "0.0",
+              "roi": "56.0",
+              "avgProfit": 56,
+              "balance": 780,
+              "gamesPlayed": 5
+            },
+            "strategy2": {
+              "winRate": "40.0",
+              "roi": "50.0",
+              "avgProfit": 50,
+              "balance": 750,
+              "gamesPlayed": 5
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "balanceTimeline": {
+    "aggressive_maximizer": {
+      "name": "Aggressive Maximizer",
+      "archetype": "AGGRESSIVE",
+      "dataPoints": [
+        {
+          "tournament": 1,
+          "game": 0,
+          "balance": 500,
+          "profit": 0,
+          "isWinner": false,
+          "isEliminated": false
+        },
+        {
+          "tournament": 1,
+          "game": 1,
+          "balance": 670,
+          "profit": 170,
+          "isWinner": false,
+          "isEliminated": false
+        },
+        {
+          "tournament": 1,
+          "game": 2,
+          "balance": 750,
+          "profit": 80,
+          "isWinner": false,
+          "isEliminated": false
+        },
+        {
+          "tournament": 1,
+          "game": 3,
+          "balance": 860,
+          "profit": 110,
+          "isWinner": false,
+          "isEliminated": false
+        },
+        {
+          "tournament": 1,
+          "game": 4,
+          "balance": 820,
+          "profit": -40,
+          "isWinner": false,
+          "isEliminated": false
+        },
+        {
+          "tournament": 1,
+          "game": 5,
+          "balance": 780,
+          "profit": -40,
+          "isWinner": false,
+          "isEliminated": false
+        }
+      ]
+    },
+    "diplomatic_builder": {
+      "name": "Diplomatic Builder",
+      "archetype": "DIPLOMATIC",
+      "dataPoints": [
+        {
+          "tournament": 1,
+          "game": 0,
+          "balance": 500,
+          "profit": 0,
+          "isWinner": false,
+          "isEliminated": false
+        },
+        {
+          "tournament": 1,
+          "game": 1,
+          "balance": 550,
+          "profit": 50,
+          "isWinner": false,
+          "isEliminated": false
+        },
+        {
+          "tournament": 1,
+          "game": 2,
+          "balance": 510,
+          "profit": -40,
+          "isWinner": false,
+          "isEliminated": false
+        },
+        {
+          "tournament": 1,
+          "game": 3,
+          "balance": 500,
+          "profit": -10,
+          "isWinner": false,
+          "isEliminated": false
+        },
+        {
+          "tournament": 1,
+          "game": 4,
+          "balance": 430,
+          "profit": -70,
+          "isWinner": false,
+          "isEliminated": false
+        },
+        {
+          "tournament": 1,
+          "game": 5,
+          "balance": 600,
+          "profit": 170,
+          "isWinner": true,
+          "isEliminated": false
+        }
+      ]
+    },
+    "strategic_opportunist": {
+      "name": "Strategic Opportunist",
+      "archetype": "OPPORTUNISTIC",
+      "dataPoints": [
+        {
+          "tournament": 1,
+          "game": 0,
+          "balance": 500,
+          "profit": 0,
+          "isWinner": false,
+          "isEliminated": false
+        },
+        {
+          "tournament": 1,
+          "game": 1,
+          "balance": 520,
+          "profit": 20,
+          "isWinner": true,
+          "isEliminated": false
+        },
+        {
+          "tournament": 1,
+          "game": 2,
+          "balance": 480,
+          "profit": -40,
+          "isWinner": false,
+          "isEliminated": false
+        },
+        {
+          "tournament": 1,
+          "game": 3,
+          "balance": 470,
+          "profit": -10,
+          "isWinner": false,
+          "isEliminated": false
+        },
+        {
+          "tournament": 1,
+          "game": 4,
+          "balance": 610,
+          "profit": 140,
+          "isWinner": true,
+          "isEliminated": false
+        },
+        {
+          "tournament": 1,
+          "game": 5,
+          "balance": 540,
+          "profit": -70,
+          "isWinner": false,
+          "isEliminated": false
+        }
+      ]
+    },
+    "mathematical_analyzer": {
+      "name": "Mathematical Analyzer",
+      "archetype": "ANALYTICAL",
+      "dataPoints": [
+        {
+          "tournament": 1,
+          "game": 0,
+          "balance": 500,
+          "profit": 0,
+          "isWinner": false,
+          "isEliminated": false
+        },
+        {
+          "tournament": 1,
+          "game": 1,
+          "balance": 430,
+          "profit": -70,
+          "isWinner": false,
+          "isEliminated": false
+        },
+        {
+          "tournament": 1,
+          "game": 2,
+          "balance": 570,
+          "profit": 140,
+          "isWinner": true,
+          "isEliminated": false
+        },
+        {
+          "tournament": 1,
+          "game": 3,
+          "balance": 680,
+          "profit": 110,
+          "isWinner": true,
+          "isEliminated": false
+        },
+        {
+          "tournament": 1,
+          "game": 4,
+          "balance": 640,
+          "profit": -40,
+          "isWinner": false,
+          "isEliminated": false
+        },
+        {
+          "tournament": 1,
+          "game": 5,
+          "balance": 750,
+          "profit": 110,
+          "isWinner": false,
+          "isEliminated": false
+        }
+      ]
+    },
+    "social_manipulator": {
+      "name": "Social Manipulator",
+      "archetype": "MANIPULATIVE",
+      "dataPoints": [
+        {
+          "tournament": 1,
+          "game": 0,
+          "balance": 500,
+          "profit": 0,
+          "isWinner": false,
+          "isEliminated": false
+        },
+        {
+          "tournament": 1,
+          "game": 1,
+          "balance": 412,
+          "profit": -88,
+          "isWinner": false,
+          "isEliminated": false
+        },
+        {
+          "tournament": 1,
+          "game": 2,
+          "balance": 342,
+          "profit": -70,
+          "isWinner": false,
+          "isEliminated": false
+        },
+        {
+          "tournament": 1,
+          "game": 3,
+          "balance": 242,
+          "profit": -100,
+          "isWinner": false,
+          "isEliminated": false
+        },
+        {
+          "tournament": 1,
+          "game": 4,
+          "balance": 172,
+          "profit": -70,
+          "isWinner": false,
+          "isEliminated": false
+        },
+        {
+          "tournament": 1,
+          "game": 5,
+          "balance": 102,
+          "profit": -70,
+          "isWinner": false,
+          "isEliminated": false
+        }
+      ]
+    },
+    "strategy_identifier": {
+      "name": "Strategy Identifier",
+      "archetype": "STRATEGY_IDENTIFIER",
+      "dataPoints": [
+        {
+          "tournament": 1,
+          "game": 0,
+          "balance": 500,
+          "profit": 0,
+          "isWinner": false,
+          "isEliminated": false
+        },
+        {
+          "tournament": 1,
+          "game": 1,
+          "balance": 418,
+          "profit": -82,
+          "isWinner": false,
+          "isEliminated": false
+        },
+        {
+          "tournament": 1,
+          "game": 2,
+          "balance": 348,
+          "profit": -70,
+          "isWinner": false,
+          "isEliminated": false
+        },
+        {
+          "tournament": 1,
+          "game": 3,
+          "balance": 248,
+          "profit": -100,
+          "isWinner": false,
+          "isEliminated": false
+        },
+        {
+          "tournament": 1,
+          "game": 4,
+          "balance": 328,
+          "profit": 80,
+          "isWinner": false,
+          "isEliminated": false
+        },
+        {
+          "tournament": 1,
+          "game": 5,
+          "balance": 228,
+          "profit": -100,
+          "isWinner": false,
+          "isEliminated": false
+        }
+      ]
+    }
+  },
+  "strategyMatchups": {
+    "strategic_opportunist": {
+      "aggressive_maximizer": {
+        "wins": 2,
+        "losses": 0
+      },
+      "diplomatic_builder": {
+        "wins": 2,
+        "losses": 1
+      },
+      "mathematical_analyzer": {
+        "wins": 2,
+        "losses": 2
+      },
+      "social_manipulator": {
+        "wins": 2,
+        "losses": 0
+      },
+      "strategy_identifier": {
+        "wins": 2,
+        "losses": 0
+      }
+    },
+    "aggressive_maximizer": {
+      "strategic_opportunist": {
+        "wins": 0,
+        "losses": 2
+      },
+      "mathematical_analyzer": {
+        "wins": 0,
+        "losses": 2
+      },
+      "diplomatic_builder": {
+        "wins": 0,
+        "losses": 1
+      }
+    },
+    "diplomatic_builder": {
+      "strategic_opportunist": {
+        "wins": 1,
+        "losses": 2
+      },
+      "mathematical_analyzer": {
+        "wins": 1,
+        "losses": 2
+      },
+      "aggressive_maximizer": {
+        "wins": 1,
+        "losses": 0
+      },
+      "social_manipulator": {
+        "wins": 1,
+        "losses": 0
+      },
+      "strategy_identifier": {
+        "wins": 1,
+        "losses": 0
+      }
+    },
+    "mathematical_analyzer": {
+      "strategic_opportunist": {
+        "wins": 2,
+        "losses": 2
+      },
+      "aggressive_maximizer": {
+        "wins": 2,
+        "losses": 0
+      },
+      "diplomatic_builder": {
+        "wins": 2,
+        "losses": 1
+      },
+      "social_manipulator": {
+        "wins": 2,
+        "losses": 0
+      },
+      "strategy_identifier": {
+        "wins": 2,
+        "losses": 0
+      }
+    },
+    "social_manipulator": {
+      "strategic_opportunist": {
+        "wins": 0,
+        "losses": 2
+      },
+      "mathematical_analyzer": {
+        "wins": 0,
+        "losses": 2
+      },
+      "diplomatic_builder": {
+        "wins": 0,
+        "losses": 1
+      }
+    },
+    "strategy_identifier": {
+      "strategic_opportunist": {
+        "wins": 0,
+        "losses": 2
+      },
+      "mathematical_analyzer": {
+        "wins": 0,
+        "losses": 2
+      },
+      "diplomatic_builder": {
+        "wins": 0,
+        "losses": 1
+      }
+    }
+  },
+  "errorMetrics": {
+    "negotiationFailures": {},
+    "proposalFailures": {
+      "social_manipulator": {
+        "count": 3,
+        "errors": [
+          {
+            "error": "Proposal totals to 150%, not 100%",
+            "timestamp": "2025-05-30T19:28:22.167Z",
+            "gameNumber": 1
+          },
+          {
+            "error": "Proposal totals to 140%, not 100%",
+            "timestamp": "2025-05-30T19:30:10.071Z",
+            "gameNumber": 3
+          },
+          {
+            "error": "Proposal totals to 150%, not 100%",
+            "timestamp": "2025-05-30T19:30:40.538Z",
+            "gameNumber": 4
+          }
+        ],
+        "playerId": "player5"
+      },
+      "mathematical_analyzer": {
+        "count": 1,
+        "errors": [
+          {
+            "error": "Proposal totals to 110%, not 100%",
+            "timestamp": "2025-05-30T19:31:22.130Z",
+            "gameNumber": 5
+          }
+        ],
+        "playerId": "player4"
+      }
+    },
+    "voteFailures": {},
+    "totalGames": 5
+  },
+  "lastProgressFile": "incremental_progress_t1_2025-05-30T19-31-54-620Z.json",
+  "completedAt": "2025-05-30T19:31:54.625Z"
+}

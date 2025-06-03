@@ -1,0 +1,12 @@
+{
+  "functions": {
+    "api/**/*.js": {
+      "includeFiles": "database.js"
+    }
+  },
+  "routes": [
+    { "src": "/api/(.*)", "dest": "/api/$1.js" },
+    { "src": "/assets/(.*)", "dest": "/assets/$1" },
+    { "src": "/(.*)", "dest": "/index.html" }
+  ]
+} 

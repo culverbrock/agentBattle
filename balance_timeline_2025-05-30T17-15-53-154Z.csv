@@ -1,0 +1,73 @@
+Strategy,StrategyId,Tournament,Game,Balance,Profit,IsWinner,IsEliminated
+"Aggressive Maximizer","aggressive_maximizer",1,0,500,0,false,false
+"Aggressive Maximizer","aggressive_maximizer",1,1,460,-40,false,false
+"Aggressive Maximizer","aggressive_maximizer",1,2,420,-40,false,false
+"Aggressive Maximizer","aggressive_maximizer",1,3,350,-70,false,false
+"Aggressive Maximizer","aggressive_maximizer",1,4,370,20,false,false
+"Aggressive Maximizer","aggressive_maximizer",1,5,570,200,true,false
+"Aggressive Maximizer","aggressive_maximizer",2,0,570,0,false,false
+"Aggressive Maximizer","aggressive_maximizer",2,1,710,140,false,false
+"Aggressive Maximizer","aggressive_maximizer",2,2,880,170,true,false
+"Aggressive Maximizer","aggressive_maximizer",2,3,810,-70,false,false
+"Aggressive Maximizer","aggressive_maximizer",2,4,950,140,true,false
+"Aggressive Maximizer","aggressive_maximizer",2,5,910,-40,false,false
+"Diplomatic Builder","diplomatic_builder",1,0,500,0,false,false
+"Diplomatic Builder","diplomatic_builder",1,1,670,170,false,false
+"Diplomatic Builder","diplomatic_builder",1,2,630,-40,false,false
+"Diplomatic Builder","diplomatic_builder",1,3,560,-70,false,false
+"Diplomatic Builder","diplomatic_builder",1,4,580,20,false,false
+"Diplomatic Builder","diplomatic_builder",1,5,510,-70,false,false
+"Diplomatic Builder","diplomatic_builder",2,0,510,0,false,false
+"Diplomatic Builder","diplomatic_builder",2,1,440,-70,false,false
+"Diplomatic Builder","diplomatic_builder",2,2,370,-70,false,false
+"Diplomatic Builder","diplomatic_builder",2,3,540,170,true,false
+"Diplomatic Builder","diplomatic_builder",2,4,500,-40,false,false
+"Diplomatic Builder","diplomatic_builder",2,5,670,170,true,false
+"Strategic Opportunist","strategic_opportunist",1,0,500,0,false,false
+"Strategic Opportunist","strategic_opportunist",1,1,640,140,true,false
+"Strategic Opportunist","strategic_opportunist",1,2,810,170,true,false
+"Strategic Opportunist","strategic_opportunist",1,3,980,170,true,false
+"Strategic Opportunist","strategic_opportunist",1,4,1000,20,true,false
+"Strategic Opportunist","strategic_opportunist",1,5,1140,140,false,false
+"Strategic Opportunist","strategic_opportunist",2,0,1140,0,false,false
+"Strategic Opportunist","strategic_opportunist",2,1,1070,-70,false,false
+"Strategic Opportunist","strategic_opportunist",2,2,1000,-70,false,false
+"Strategic Opportunist","strategic_opportunist",2,3,930,-70,false,false
+"Strategic Opportunist","strategic_opportunist",2,4,950,20,false,false
+"Strategic Opportunist","strategic_opportunist",2,5,880,-70,false,false
+"Mathematical Analyzer","mathematical_analyzer",1,0,500,0,false,false
+"Mathematical Analyzer","mathematical_analyzer",1,1,412,-88,false,false
+"Mathematical Analyzer","mathematical_analyzer",1,2,462,50,false,false
+"Mathematical Analyzer","mathematical_analyzer",1,3,572,110,false,false
+"Mathematical Analyzer","mathematical_analyzer",1,4,592,20,false,false
+"Mathematical Analyzer","mathematical_analyzer",1,5,492,-100,false,false
+"Mathematical Analyzer","mathematical_analyzer",2,0,492,0,false,false
+"Mathematical Analyzer","mathematical_analyzer",2,1,662,170,true,false
+"Mathematical Analyzer","mathematical_analyzer",2,2,802,140,false,false
+"Mathematical Analyzer","mathematical_analyzer",2,3,912,110,false,false
+"Mathematical Analyzer","mathematical_analyzer",2,4,842,-70,false,false
+"Mathematical Analyzer","mathematical_analyzer",2,5,952,110,false,false
+"Social Manipulator","social_manipulator",1,0,500,0,false,false
+"Social Manipulator","social_manipulator",1,1,406,-94,false,false
+"Social Manipulator","social_manipulator",1,2,336,-70,false,false
+"Social Manipulator","social_manipulator",1,3,266,-70,false,false
+"Social Manipulator","social_manipulator",1,4,286,20,false,false
+"Social Manipulator","social_manipulator",1,5,216,-70,false,false
+"Social Manipulator","social_manipulator",2,0,216,0,false,false
+"Social Manipulator","social_manipulator",2,1,146,-70,false,false
+"Social Manipulator","social_manipulator",2,2,58,-88,false,true
+"Social Manipulator","social_manipulator",2,3,-12,-70,false,true
+"Social Manipulator","social_manipulator",2,4,-82,-70,false,true
+"Social Manipulator","social_manipulator",2,5,-170,-88,false,true
+"Strategy Identifier","strategy_identifier",1,0,500,0,false,false
+"Strategy Identifier","strategy_identifier",1,1,412,-88,false,false
+"Strategy Identifier","strategy_identifier",1,2,342,-70,false,false
+"Strategy Identifier","strategy_identifier",1,3,272,-70,false,false
+"Strategy Identifier","strategy_identifier",1,4,172,-100,false,false
+"Strategy Identifier","strategy_identifier",1,5,72,-100,false,true
+"Strategic Opportunist v2.0","strategic_opportunist_evolved_gen1",2,0,500,0,false,false
+"Strategic Opportunist v2.0","strategic_opportunist_evolved_gen1",2,1,400,-100,false,false
+"Strategic Opportunist v2.0","strategic_opportunist_evolved_gen1",2,2,318,-82,false,false
+"Strategic Opportunist v2.0","strategic_opportunist_evolved_gen1",2,3,248,-70,false,false
+"Strategic Opportunist v2.0","strategic_opportunist_evolved_gen1",2,4,268,20,false,false
+"Strategic Opportunist v2.0","strategic_opportunist_evolved_gen1",2,5,186,-82,false,false

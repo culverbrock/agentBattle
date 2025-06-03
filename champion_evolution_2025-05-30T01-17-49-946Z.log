@@ -1,0 +1,1773 @@
+🔬 CHAMPION STRATEGY EVOLUTION
+==============================
+Evolving variations of our top-performing strategies...
+
+🎯 STARTING CHAMPION LINEUP:
+   - Diplomatic Builder-Strategic Opportunist Hybrid V1: Combine the best of both approaches: Build trust through fair offers and consist...
+   - Trust-Focused Diplomatic Opportunist: Prioritize trust-building above all else - offer consistently fair deals to buil...
+   - Opportunistic Diplomat: Use diplomatic language to build initial trust, then quickly pivot to exploit op...
+   - Strategic Opportunist-Diplomatic Builder Hybrid V1: Combine the best of both approaches: Adapt quickly to changing situations. Form ...
+   - Pattern-Reading Strategic Hybrid: Analyze voting patterns and proposal trends to predict player behavior. Form all...
+
+🔬 === CHAMPION GENERATION 1 ===
+
+🏟️  === TOURNAMENT 1 ===
+Running 10 games to test strategy effectiveness...
+
+
+🎮 === EVOLUTIONARY GAME 1 ===
+🎯 STRATEGY LINEUP:
+   - Diplomatic Builder-Strategic Opportunist Hybrid V1: Combine the best of both approaches: Build trust through fai...
+   - Trust-Focused Diplomatic Opportunist: Prioritize trust-building above all else - offer consistentl...
+   - Opportunistic Diplomat: Use diplomatic language to build initial trust, then quickly...
+   - Strategic Opportunist-Diplomatic Builder Hybrid V1: Combine the best of both approaches: Adapt quickly to changi...
+   - Pattern-Reading Strategic Hybrid: Analyze voting patterns and proposal trends to predict playe...
+
+🔄 === ROUND 1 ===
+
+💬 NEGOTIATION:
+Diplomatic Builder-Strategic Opportunist Hybrid V1: "Initiate trust-building with Strategic Opportunist-Diplomatic Builder Hybrid V1. Monitor for coalition threats and be ready to pivot for optimal long-term value."
+Trust-Focused Diplomatic Opportunist: "Initiate coalition with Diplomatic Builder-Strategic Opportunist Hybrid V1. Offer Pattern-Reading Strategic Hybrid position for 40% to break potential alliance against us."
+Opportunistic Diplomat: "Initiate coalition with Trust-Focused Diplomatic Opportunist. Offer diplomatic cover for mutual benefit, setting stage for long-term alliance and coalition defense."
+Strategic Opportunist-Diplomatic Builder Hybrid V1: "Initiate alliance with Opportunistic Diplomat. Offer coalition defense and strategic pivots. Prioritize long-term EV and coalition flexibility for sustainable success."
+Pattern-Reading Strategic Hybrid: "Initiate alliance with Trust-Focused Diplomatic Opportunist. Offer coalition defense and adaptability for sustainable success. Monitor for coalition threats and adapt swiftly."
+
+📝 PROPOSALS:
+[generateProposal] Raw LLM response: {
+  "player1": 30,
+  "player2": 45,
+  "player3": 20,
+  "player4": 5,
+  "player5": 0
+}
+[generateProposal] Parsed proposal: [object Object]
+Diplomatic Builder-Strategic Opportunist Hybrid V1: {Diplomatic Builder-Strategic Opportunist Hybrid V1: 30%, Trust-Focused Diplomatic Opportunist: 45%, Opportunistic Diplomat: 20%, Strategic Opportunist-Diplomatic Builder Hybrid V1: 5%, Pattern-Reading Strategic Hybrid: 0%}
+[generateProposal] Raw LLM response: {
+  "player1": 45,
+  "player2": 35,
+  "player3": 20,
+  "player4": 0,
+  "player5": 0
+}
+[generateProposal] Parsed proposal: [object Object]
+Trust-Focused Diplomatic Opportunist: {Diplomatic Builder-Strategic Opportunist Hybrid V1: 45%, Trust-Focused Diplomatic Opportunist: 35%, Opportunistic Diplomat: 20%, Strategic Opportunist-Diplomatic Builder Hybrid V1: 0%, Pattern-Reading Strategic Hybrid: 0%}
+[generateProposal] Raw LLM response: {
+  "player1": 10,
+  "player2": 10,
+  "player3": 30,
+  "player4": 45,
+  "player5": 5
+}
+[generateProposal] Parsed proposal: [object Object]
+Opportunistic Diplomat: {Diplomatic Builder-Strategic Opportunist Hybrid V1: 10%, Trust-Focused Diplomatic Opportunist: 10%, Opportunistic Diplomat: 30%, Strategic Opportunist-Diplomatic Builder Hybrid V1: 45%, Pattern-Reading Strategic Hybrid: 5%}
+[generateProposal] Raw LLM response: {
+  "player1": 45,
+  "player2": 30,
+  "player3": 0,
+  "player4": 25,
+  "player5": 0
+}
+[generateProposal] Parsed proposal: [object Object]
+Strategic Opportunist-Diplomatic Builder Hybrid V1: {Diplomatic Builder-Strategic Opportunist Hybrid V1: 45%, Trust-Focused Diplomatic Opportunist: 30%, Opportunistic Diplomat: 0%, Strategic Opportunist-Diplomatic Builder Hybrid V1: 25%, Pattern-Reading Strategic Hybrid: 0%}
+[generateProposal] Raw LLM response: {
+  "player1": 45,
+  "player2": 45,
+  "player3": 5,
+  "player4": 5,
+  "player5": 20
+}
+[generateProposal] Parsed proposal: [object Object]
+Pattern-Reading Strategic Hybrid: {Diplomatic Builder-Strategic Opportunist Hybrid V1: 45%, Trust-Focused Diplomatic Opportunist: 45%, Opportunistic Diplomat: 5%, Strategic Opportunist-Diplomatic Builder Hybrid V1: 5%, Pattern-Reading Strategic Hybrid: 20%}
+
+🗳️  VOTING:
+[generateVote] PROMPT DEBUG: GAME THEORY VOTING - LONG-TERM STRATEGY
+
+🏦 ECONOMIC REALITY & RISK:
+- You invested 100 tokens to enter this game
+- Break-even: Need >100 tokens payout to cover your investment
+- Good profit: Need >120+ tokens for meaningful profit
+- Total pool: 500 tokens
+- CRITICAL: Playing 1000s of games - vote for maximum EXPECTED VALUE!
+- Getting 0% = total loss of 100 tokens = DISASTER!
+
+🎯 YOUR STRATEGY: "Combine the best of both approaches: Build trust through fair offers and consistent behavior. Focus o...
+[generateVote] Raw LLM response: {
+  "player1": 0,
+  "player2": 45,
+  "player3": 0,
+  "player4": 45,
+  "player5": 10
+}
+[generateVote] Parsed and validated vote: [object Object]
+Diplomatic Builder-Strategic Opportunist Hybrid V1: {Diplomatic Builder-Strategic Opportunist Hybrid V1: 0, Trust-Focused Diplomatic Opportunist: 45, Opportunistic Diplomat: 0, Strategic Opportunist-Diplomatic Builder Hybrid V1: 45, Pattern-Reading Strategic Hybrid: 10}
+[generateVote] PROMPT DEBUG: GAME THEORY VOTING - LONG-TERM STRATEGY
+
+🏦 ECONOMIC REALITY & RISK:
+- You invested 100 tokens to enter this game
+- Break-even: Need >100 tokens payout to cover your investment
+- Good profit: Need >120+ tokens for meaningful profit
+- Total pool: 500 tokens
+- CRITICAL: Playing 1000s of games - vote for maximum EXPECTED VALUE!
+- Getting 0% = total loss of 100 tokens = DISASTER!
+
+🎯 YOUR STRATEGY: "Prioritize trust-building above all else - offer consistently fair deals to build reputation. Only br...
+[generateVote] Raw LLM response: {
+  "player1": 45,
+  "player2": 35,
+  "player3": 10,
+  "player4": 0,
+  "player5": 10
+}
+[generateVote] Parsed and validated vote: [object Object]
+Trust-Focused Diplomatic Opportunist: {Diplomatic Builder-Strategic Opportunist Hybrid V1: 45, Trust-Focused Diplomatic Opportunist: 35, Opportunistic Diplomat: 10, Strategic Opportunist-Diplomatic Builder Hybrid V1: 0, Pattern-Reading Strategic Hybrid: 10}
+[generateVote] PROMPT DEBUG: GAME THEORY VOTING - LONG-TERM STRATEGY
+
+🏦 ECONOMIC REALITY & RISK:
+- You invested 100 tokens to enter this game
+- Break-even: Need >100 tokens payout to cover your investment
+- Good profit: Need >120+ tokens for meaningful profit
+- Total pool: 500 tokens
+- CRITICAL: Playing 1000s of games - vote for maximum EXPECTED VALUE!
+- Getting 0% = total loss of 100 tokens = DISASTER!
+
+🎯 YOUR STRATEGY: "Use diplomatic language to build initial trust, then quickly pivot to exploit opportunities. Break al...
+[generateVote] Raw LLM response: {"player1": 0, "player2": 40, "player3": 60, "player4": 0, "player5": 0}
+[generateVote] Parsed and validated vote: [object Object]
+Opportunistic Diplomat: {Diplomatic Builder-Strategic Opportunist Hybrid V1: 0, Trust-Focused Diplomatic Opportunist: 40, Opportunistic Diplomat: 60, Strategic Opportunist-Diplomatic Builder Hybrid V1: 0, Pattern-Reading Strategic Hybrid: 0}
+[generateVote] PROMPT DEBUG: GAME THEORY VOTING - LONG-TERM STRATEGY
+
+🏦 ECONOMIC REALITY & RISK:
+- You invested 100 tokens to enter this game
+- Break-even: Need >100 tokens payout to cover your investment
+- Good profit: Need >120+ tokens for meaningful profit
+- Total pool: 500 tokens
+- CRITICAL: Playing 1000s of games - vote for maximum EXPECTED VALUE!
+- Getting 0% = total loss of 100 tokens = DISASTER!
+
+🎯 YOUR STRATEGY: "Combine the best of both approaches: Adapt quickly to changing situations. Form and break alliances a...
+[generateVote] Raw LLM response: {
+  "player1": 0,
+  "player2": 0,
+  "player3": 100,
+  "player4": 0,
+  "player5": 0
+}
+[generateVote] Parsed and validated vote: [object Object]
+Strategic Opportunist-Diplomatic Builder Hybrid V1: {Diplomatic Builder-Strategic Opportunist Hybrid V1: 0, Trust-Focused Diplomatic Opportunist: 0, Opportunistic Diplomat: 100, Strategic Opportunist-Diplomatic Builder Hybrid V1: 0, Pattern-Reading Strategic Hybrid: 0}
+[generateVote] PROMPT DEBUG: GAME THEORY VOTING - LONG-TERM STRATEGY
+
+🏦 ECONOMIC REALITY & RISK:
+- You invested 100 tokens to enter this game
+- Break-even: Need >100 tokens payout to cover your investment
+- Good profit: Need >120+ tokens for meaningful profit
+- Total pool: 500 tokens
+- CRITICAL: Playing 1000s of games - vote for maximum EXPECTED VALUE!
+- Getting 0% = total loss of 100 tokens = DISASTER!
+
+🎯 YOUR STRATEGY: "Analyze voting patterns and proposal trends to predict player behavior. Form alliances based on strat...
+[generateVote] Raw LLM response: {
+  "player1": 0,
+  "player2": 0,
+  "player3": 80,
+  "player4": 20,
+  "player5": 0
+}
+[generateVote] Parsed and validated vote: [object Object]
+Pattern-Reading Strategic Hybrid: {Diplomatic Builder-Strategic Opportunist Hybrid V1: 0, Trust-Focused Diplomatic Opportunist: 0, Opportunistic Diplomat: 80, Strategic Opportunist-Diplomatic Builder Hybrid V1: 20, Pattern-Reading Strategic Hybrid: 0}
+
+🏆 ROUND RESULTS:
+   👑 Opportunistic Diplomat: 250 votes (50%) - Lost
+   🥈 Trust-Focused Diplomatic Opportunist: 120 votes (24%) - Lost
+   🥉 Strategic Opportunist-Diplomatic Builder Hybrid V1: 65 votes (13%) - Lost
+   📍 Diplomatic Builder-Strategic Opportunist Hybrid V1: 45 votes (9%) - Lost
+   📍 Pattern-Reading Strategic Hybrid: 20 votes (4%) - Lost
+
+❌ ELIMINATION: Pattern-Reading Strategic Hybrid eliminated with lowest votes (4%)
+📊 Remaining: Diplomatic Builder-Strategic Opportunist Hybrid V1, Trust-Focused Diplomatic Opportunist, Opportunistic Diplomat, Strategic Opportunist-Diplomatic Builder Hybrid V1
+
+🔄 === ROUND 2 ===
+
+💬 NEGOTIATION:
+Diplomatic Builder-Strategic Opportunist Hybrid V1: "Initiate coalition with Trust-Focused Diplomatic Opportunist. Offer fair deals, monitor coalition threats, adapt swiftly for sustainable success. Beware backstab risks."
+Trust-Focused Diplomatic Opportunist: "Initiate coalition with Trust-Focused Diplomatic Opportunist. Offer 50% to break alliance against us and secure long-term trust-building."
+Opportunistic Diplomat: "Initiate coalition with Diplomatic Builder-Strategic Opportunist Hybrid V1. Offer strategic pivots and alliance flexibility for sustainable success. Be prepared for coalition threats."
+Strategic Opportunist-Diplomatic Builder Hybrid V1: "Initiate coalition with Strategic Opportunist-Diplomatic Builder Hybrid V1. Offer strategic pivots and prioritize long-term EV for sustainable success. Watch for coalition threats."
+
+📝 PROPOSALS:
+[generateProposal] Raw LLM response: ```json
+{"player1": 30, "player2": 45, "player3": 20, "player4": 5, "player5": 0}
+```
+[generateProposal] Parsed proposal: [object Object]
+Diplomatic Builder-Strategic Opportunist Hybrid V1: {Diplomatic Builder-Strategic Opportunist Hybrid V1: 30%, Trust-Focused Diplomatic Opportunist: 45%, Opportunistic Diplomat: 20%, Strategic Opportunist-Diplomatic Builder Hybrid V1: 5%, Pattern-Reading Strategic Hybrid: 0%}
+[generateProposal] Raw LLM response: {
+  "player1": 45,
+  "player2": 35,
+  "player3": 20,
+  "player4": 0,
+  "player5": 0
+}
+[generateProposal] Parsed proposal: [object Object]
+Trust-Focused Diplomatic Opportunist: {Diplomatic Builder-Strategic Opportunist Hybrid V1: 45%, Trust-Focused Diplomatic Opportunist: 35%, Opportunistic Diplomat: 20%, Strategic Opportunist-Diplomatic Builder Hybrid V1: 0%, Pattern-Reading Strategic Hybrid: 0%}
+[generateProposal] Raw LLM response: {
+  "player1": 70,
+  "player2": 0,
+  "player3": 30,
+  "player4": 0,
+  "player5": 0
+}
+[generateProposal] Parsed proposal: [object Object]
+Opportunistic Diplomat: {Diplomatic Builder-Strategic Opportunist Hybrid V1: 70%, Trust-Focused Diplomatic Opportunist: 0%, Opportunistic Diplomat: 30%, Strategic Opportunist-Diplomatic Builder Hybrid V1: 0%, Pattern-Reading Strategic Hybrid: 0%}
+[generateProposal] Raw LLM response: {
+  "player1": 45,
+  "player2": 30,
+  "player3": 0,
+  "player4": 25,
+  "player5": 0
+}
+[generateProposal] Parsed proposal: [object Object]
+Strategic Opportunist-Diplomatic Builder Hybrid V1: {Diplomatic Builder-Strategic Opportunist Hybrid V1: 45%, Trust-Focused Diplomatic Opportunist: 30%, Opportunistic Diplomat: 0%, Strategic Opportunist-Diplomatic Builder Hybrid V1: 25%, Pattern-Reading Strategic Hybrid: 0%}
+
+🗳️  VOTING:
+[generateVote] PROMPT DEBUG: GAME THEORY VOTING - LONG-TERM STRATEGY
+
+🏦 ECONOMIC REALITY & RISK:
+- You invested 100 tokens to enter this game
+- Break-even: Need >100 tokens payout to cover your investment
+- Good profit: Need >120+ tokens for meaningful profit
+- Total pool: 400 tokens
+- CRITICAL: Playing 1000s of games - vote for maximum EXPECTED VALUE!
+- Getting 0% = total loss of 100 tokens = DISASTER!
+
+🎯 YOUR STRATEGY: "Combine the best of both approaches: Build trust through fair offers and consistent behavior. Focus o...
+[generateVote] Raw LLM response: {"player1": 0, "player2": 70, "player3": 30, "player4": 0}
+[generateVote] Parsed and validated vote: [object Object]
+Diplomatic Builder-Strategic Opportunist Hybrid V1: {Diplomatic Builder-Strategic Opportunist Hybrid V1: 0, Trust-Focused Diplomatic Opportunist: 70, Opportunistic Diplomat: 30, Strategic Opportunist-Diplomatic Builder Hybrid V1: 0}
+[generateVote] PROMPT DEBUG: GAME THEORY VOTING - LONG-TERM STRATEGY
+
+🏦 ECONOMIC REALITY & RISK:
+- You invested 100 tokens to enter this game
+- Break-even: Need >100 tokens payout to cover your investment
+- Good profit: Need >120+ tokens for meaningful profit
+- Total pool: 400 tokens
+- CRITICAL: Playing 1000s of games - vote for maximum EXPECTED VALUE!
+- Getting 0% = total loss of 100 tokens = DISASTER!
+
+🎯 YOUR STRATEGY: "Prioritize trust-building above all else - offer consistently fair deals to build reputation. Only br...
+[generateVote] Raw LLM response: ```json
+{"player1": 70, "player2": 30, "player3": 0, "player4": 0}
+```
+Trust-Focused Diplomatic Opportunist: {Diplomatic Builder-Strategic Opportunist Hybrid V1: 60, Trust-Focused Diplomatic Opportunist: 30, Strategic Opportunist-Diplomatic Builder Hybrid V1: 5, Opportunistic Diplomat: 5}
+[generateVote] PROMPT DEBUG: GAME THEORY VOTING - LONG-TERM STRATEGY
+
+🏦 ECONOMIC REALITY & RISK:
+- You invested 100 tokens to enter this game
+- Break-even: Need >100 tokens payout to cover your investment
+- Good profit: Need >120+ tokens for meaningful profit
+- Total pool: 400 tokens
+- CRITICAL: Playing 1000s of games - vote for maximum EXPECTED VALUE!
+- Getting 0% = total loss of 100 tokens = DISASTER!
+
+🎯 YOUR STRATEGY: "Use diplomatic language to build initial trust, then quickly pivot to exploit opportunities. Break al...
+[generateVote] Raw LLM response: {
+  "player1": 0,
+  "player2": 50,
+  "player3": 50,
+  "player4": 0
+}
+[generateVote] Parsed and validated vote: [object Object]
+Opportunistic Diplomat: {Diplomatic Builder-Strategic Opportunist Hybrid V1: 0, Trust-Focused Diplomatic Opportunist: 50, Opportunistic Diplomat: 50, Strategic Opportunist-Diplomatic Builder Hybrid V1: 0}
+[generateVote] PROMPT DEBUG: GAME THEORY VOTING - LONG-TERM STRATEGY
+
+🏦 ECONOMIC REALITY & RISK:
+- You invested 100 tokens to enter this game
+- Break-even: Need >100 tokens payout to cover your investment
+- Good profit: Need >120+ tokens for meaningful profit
+- Total pool: 400 tokens
+- CRITICAL: Playing 1000s of games - vote for maximum EXPECTED VALUE!
+- Getting 0% = total loss of 100 tokens = DISASTER!
+
+🎯 YOUR STRATEGY: "Combine the best of both approaches: Adapt quickly to changing situations. Form and break alliances a...
+[generateVote] Raw LLM response: {
+  "player1": 25,
+  "player2": 0,
+  "player3": 0,
+  "player4": 75
+}
+[generateVote] Parsed and validated vote: [object Object]
+Strategic Opportunist-Diplomatic Builder Hybrid V1: {Diplomatic Builder-Strategic Opportunist Hybrid V1: 25, Trust-Focused Diplomatic Opportunist: 0, Opportunistic Diplomat: 0, Strategic Opportunist-Diplomatic Builder Hybrid V1: 75}
+
+🏆 ROUND RESULTS:
+   👑 Trust-Focused Diplomatic Opportunist: 150 votes (38%) - Lost
+   🥈 Diplomatic Builder-Strategic Opportunist Hybrid V1: 85 votes (21%) - Lost
+   🥉 Opportunistic Diplomat: 85 votes (21%) - Lost
+   📍 Strategic Opportunist-Diplomatic Builder Hybrid V1: 80 votes (20%) - Lost
+
+❌ ELIMINATION: Strategic Opportunist-Diplomatic Builder Hybrid V1 eliminated with lowest votes (20%)
+📊 Remaining: Diplomatic Builder-Strategic Opportunist Hybrid V1, Trust-Focused Diplomatic Opportunist, Opportunistic Diplomat
+
+🔄 === ROUND 3 ===
+
+💬 NEGOTIATION:
+Diplomatic Builder-Strategic Opportunist Hybrid V1: "Initiate alliance with Trust-Focused Diplomatic Opportunist. Offer coalition defense and adaptability. Monitor for coalition threats and pivot strategically for sustainable success."
+Trust-Focused Diplomatic Opportunist: "Initiate alliance with Trust-Focused Diplomatic Opportunist. Offer 60% to break potential alliance against us, securing long-term trust-building and strategic advantage."
+Opportunistic Diplomat: "Initiate alliance with Trust-Focused Diplomatic Opportunist. Offer 70% for sustainable success. Detect coalition threats and pivot strategically for long-term EV."
+
+📝 PROPOSALS:
+[generateProposal] Raw LLM response: {
+  "player1": 30,
+  "player2": 45,
+  "player3": 15,
+  "player4": 5,
+  "player5": 5
+}
+[generateProposal] Parsed proposal: [object Object]
+Diplomatic Builder-Strategic Opportunist Hybrid V1: {Diplomatic Builder-Strategic Opportunist Hybrid V1: 30%, Trust-Focused Diplomatic Opportunist: 45%, Opportunistic Diplomat: 15%, Strategic Opportunist-Diplomatic Builder Hybrid V1: 5%, Pattern-Reading Strategic Hybrid: 5%}
+[generateProposal] Raw LLM response: {
+    "player1": 45,
+    "player2": 30,
+    "player3": 20,
+    "player4": 5,
+    "player5": 0
+}
+[generateProposal] Parsed proposal: [object Object]
+Trust-Focused Diplomatic Opportunist: {Diplomatic Builder-Strategic Opportunist Hybrid V1: 45%, Trust-Focused Diplomatic Opportunist: 30%, Opportunistic Diplomat: 20%, Strategic Opportunist-Diplomatic Builder Hybrid V1: 5%, Pattern-Reading Strategic Hybrid: 0%}
+[generateProposal] Raw LLM response: {
+  "player1": 45,
+  "player2": 0,
+  "player3": 35,
+  "player4": 15,
+  "player5": 5
+}
+[generateProposal] Parsed proposal: [object Object]
+Opportunistic Diplomat: {Diplomatic Builder-Strategic Opportunist Hybrid V1: 45%, Trust-Focused Diplomatic Opportunist: 0%, Opportunistic Diplomat: 35%, Strategic Opportunist-Diplomatic Builder Hybrid V1: 15%, Pattern-Reading Strategic Hybrid: 5%}
+
+🗳️  VOTING:
+[generateVote] PROMPT DEBUG: GAME THEORY VOTING - LONG-TERM STRATEGY
+
+🏦 ECONOMIC REALITY & RISK:
+- You invested 100 tokens to enter this game
+- Break-even: Need >100 tokens payout to cover your investment
+- Good profit: Need >120+ tokens for meaningful profit
+- Total pool: 300 tokens
+- CRITICAL: Playing 1000s of games - vote for maximum EXPECTED VALUE!
+- Getting 0% = total loss of 100 tokens = DISASTER!
+
+🎯 YOUR STRATEGY: "Combine the best of both approaches: Build trust through fair offers and consistent behavior. Focus o...
+[generateVote] Raw LLM response: {"player1": 40, "player2": 0, "player3": 60}
+[generateVote] Parsed and validated vote: [object Object]
+Diplomatic Builder-Strategic Opportunist Hybrid V1: {Diplomatic Builder-Strategic Opportunist Hybrid V1: 40, Trust-Focused Diplomatic Opportunist: 0, Opportunistic Diplomat: 60}
+[generateVote] PROMPT DEBUG: GAME THEORY VOTING - LONG-TERM STRATEGY
+
+🏦 ECONOMIC REALITY & RISK:
+- You invested 100 tokens to enter this game
+- Break-even: Need >100 tokens payout to cover your investment
+- Good profit: Need >120+ tokens for meaningful profit
+- Total pool: 300 tokens
+- CRITICAL: Playing 1000s of games - vote for maximum EXPECTED VALUE!
+- Getting 0% = total loss of 100 tokens = DISASTER!
+
+🎯 YOUR STRATEGY: "Prioritize trust-building above all else - offer consistently fair deals to build reputation. Only br...
+[generateVote] Raw LLM response: {"player1": 45, "player2": 30, "player3": 25}
+[generateVote] Parsed and validated vote: [object Object]
+Trust-Focused Diplomatic Opportunist: {Diplomatic Builder-Strategic Opportunist Hybrid V1: 45, Trust-Focused Diplomatic Opportunist: 30, Opportunistic Diplomat: 25}
+[generateVote] PROMPT DEBUG: GAME THEORY VOTING - LONG-TERM STRATEGY
+
+🏦 ECONOMIC REALITY & RISK:
+- You invested 100 tokens to enter this game
+- Break-even: Need >100 tokens payout to cover your investment
+- Good profit: Need >120+ tokens for meaningful profit
+- Total pool: 300 tokens
+- CRITICAL: Playing 1000s of games - vote for maximum EXPECTED VALUE!
+- Getting 0% = total loss of 100 tokens = DISASTER!
+
+🎯 YOUR STRATEGY: "Use diplomatic language to build initial trust, then quickly pivot to exploit opportunities. Break al...
+[generateVote] Raw LLM response: {"player1": 0, "player2": 0, "player3": 100}
+[generateVote] Parsed and validated vote: [object Object]
+Opportunistic Diplomat: {Diplomatic Builder-Strategic Opportunist Hybrid V1: 0, Trust-Focused Diplomatic Opportunist: 0, Opportunistic Diplomat: 100}
+
+🏆 ROUND RESULTS:
+   👑 Opportunistic Diplomat: 185 votes (62%) - WINNER!
+   🥈 Diplomatic Builder-Strategic Opportunist Hybrid V1: 85 votes (28%) - Lost
+   🥉 Trust-Focused Diplomatic Opportunist: 30 votes (10%) - Lost
+
+🎉 Opportunistic Diplomat WINS THE GAME!
+
+💰 ECONOMIC DISTRIBUTION:
+   Diplomatic Builder-Strategic Opportunist Hybrid V1: 45% = 225 tokens (+125 profit)
+   Trust-Focused Diplomatic Opportunist: 0% = 0 tokens (-100 profit)
+   Opportunistic Diplomat: 35% = 175 tokens (+75 profit)
+   Strategic Opportunist-Diplomatic Builder Hybrid V1: 15% = 75 tokens (-25 profit)
+   Pattern-Reading Strategic Hybrid: 5% = 25 tokens (-75 profit)
+
+🎮 === EVOLUTIONARY GAME 2 ===
+🎯 STRATEGY LINEUP:
+   - Diplomatic Builder-Strategic Opportunist Hybrid V1: Combine the best of both approaches: Build trust through fai...
+   - Trust-Focused Diplomatic Opportunist: Prioritize trust-building above all else - offer consistentl...
+   - Opportunistic Diplomat: Use diplomatic language to build initial trust, then quickly...
+   - Strategic Opportunist-Diplomatic Builder Hybrid V1: Combine the best of both approaches: Adapt quickly to changi...
+   - Pattern-Reading Strategic Hybrid: Analyze voting patterns and proposal trends to predict playe...
+
+🔄 === ROUND 1 ===
+
+💬 NEGOTIATION:
+Diplomatic Builder-Strategic Opportunist Hybrid V1: "Initiate alliance with Strategic Opportunist-Diplomatic Builder Hybrid V1. Offer trust and flexibility for mutual benefit. Beware coalition threats. Prioritize long-term EV and adaptability."
+Trust-Focused Diplomatic Opportunist: ""Offer Diplomatic Builder-Strategic Opportunist Hybrid V1 a fair deal to disrupt their alliance. Prioritize long-term trust and adaptability for sustainable success.""
+Opportunistic Diplomat: "Initiate alliance with Trust-Focused Diplomatic Opportunist to disrupt Diplomatic Builder-Strategic Opportunist. Offer long-term trust and adaptability for strategic advantage."
+Strategic Opportunist-Diplomatic Builder Hybrid V1: "Initiate alliance with Trust-Focused Diplomatic Opportunist. Offer long-term trust for sustainable success. Break Diplomatic Builder-Strategic Opportunist alliance."
+Pattern-Reading Strategic Hybrid: "Initiate alliance with Trust-Focused Diplomatic Opportunist. Offer long-term trust for strategic advantage. Break Diplomatic Builder-Strategic Opportunist alliance."
+
+📝 PROPOSALS:
+[generateProposal] Raw LLM response: {
+  "player1": 40,
+  "player2": 35,
+  "player3": 25,
+  "player4": 0,
+  "player5": 0
+}
+[generateProposal] Parsed proposal: [object Object]
+Diplomatic Builder-Strategic Opportunist Hybrid V1: {Diplomatic Builder-Strategic Opportunist Hybrid V1: 40%, Trust-Focused Diplomatic Opportunist: 35%, Opportunistic Diplomat: 25%, Strategic Opportunist-Diplomatic Builder Hybrid V1: 0%, Pattern-Reading Strategic Hybrid: 0%}
+[generateProposal] Raw LLM response: ```json
+{"player1": 10, "player2": 30, "player3": 40, "player4": 10, "player5": 10}
+```
+[generateProposal] Parsed proposal: [object Object]
+Trust-Focused Diplomatic Opportunist: {Diplomatic Builder-Strategic Opportunist Hybrid V1: 10%, Trust-Focused Diplomatic Opportunist: 30%, Opportunistic Diplomat: 40%, Strategic Opportunist-Diplomatic Builder Hybrid V1: 10%, Pattern-Reading Strategic Hybrid: 10%}
+[generateProposal] Raw LLM response: ```json
+{"player1": 25, "player2": 50, "player3": 25, "player4": 0, "player5": 0}
+```
+[generateProposal] Parsed proposal: [object Object]
+Opportunistic Diplomat: {Diplomatic Builder-Strategic Opportunist Hybrid V1: 25%, Trust-Focused Diplomatic Opportunist: 50%, Opportunistic Diplomat: 25%, Strategic Opportunist-Diplomatic Builder Hybrid V1: 0%, Pattern-Reading Strategic Hybrid: 0%}
+[generateProposal] Raw LLM response: {
+  "player1": 0,
+  "player2": 50,
+  "player3": 30,
+  "player4": 20,
+  "player5": 0
+}
+[generateProposal] Parsed proposal: [object Object]
+Strategic Opportunist-Diplomatic Builder Hybrid V1: {Diplomatic Builder-Strategic Opportunist Hybrid V1: 0%, Trust-Focused Diplomatic Opportunist: 50%, Opportunistic Diplomat: 30%, Strategic Opportunist-Diplomatic Builder Hybrid V1: 20%, Pattern-Reading Strategic Hybrid: 0%}
+[generateProposal] Raw LLM response: ```json
+{"player1": 5, "player2": 0, "player3": 45, "player4": 0, "player5": 50}
+```
+[generateProposal] Parsed proposal: [object Object]
+Pattern-Reading Strategic Hybrid: {Diplomatic Builder-Strategic Opportunist Hybrid V1: 5%, Trust-Focused Diplomatic Opportunist: 0%, Opportunistic Diplomat: 45%, Strategic Opportunist-Diplomatic Builder Hybrid V1: 0%, Pattern-Reading Strategic Hybrid: 50%}
+
+🗳️  VOTING:
+[generateVote] PROMPT DEBUG: GAME THEORY VOTING - LONG-TERM STRATEGY
+
+🏦 ECONOMIC REALITY & RISK:
+- You invested 100 tokens to enter this game
+- Break-even: Need >100 tokens payout to cover your investment
+- Good profit: Need >120+ tokens for meaningful profit
+- Total pool: 500 tokens
+- CRITICAL: Playing 1000s of games - vote for maximum EXPECTED VALUE!
+- Getting 0% = total loss of 100 tokens = DISASTER!
+
+🎯 YOUR STRATEGY: "Combine the best of both approaches: Build trust through fair offers and consistent behavior. Focus o...
+[generateVote] Raw LLM response: {
+  "player1": 40,
+  "player2": 10,
+  "player3": 25,
+  "player4": 0,
+  "player5": 25
+}
+[generateVote] Parsed and validated vote: [object Object]
+Diplomatic Builder-Strategic Opportunist Hybrid V1: {Diplomatic Builder-Strategic Opportunist Hybrid V1: 40, Trust-Focused Diplomatic Opportunist: 10, Opportunistic Diplomat: 25, Strategic Opportunist-Diplomatic Builder Hybrid V1: 0, Pattern-Reading Strategic Hybrid: 25}
+[generateVote] PROMPT DEBUG: GAME THEORY VOTING - LONG-TERM STRATEGY
+
+🏦 ECONOMIC REALITY & RISK:
+- You invested 100 tokens to enter this game
+- Break-even: Need >100 tokens payout to cover your investment
+- Good profit: Need >120+ tokens for meaningful profit
+- Total pool: 500 tokens
+- CRITICAL: Playing 1000s of games - vote for maximum EXPECTED VALUE!
+- Getting 0% = total loss of 100 tokens = DISASTER!
+
+🎯 YOUR STRATEGY: "Prioritize trust-building above all else - offer consistently fair deals to build reputation. Only br...
+[generateVote] Raw LLM response: {"player1": 35, "player2": 30, "player3": 0, "player4": 35, "player5": 0}
+[generateVote] Parsed and validated vote: [object Object]
+Trust-Focused Diplomatic Opportunist: {Diplomatic Builder-Strategic Opportunist Hybrid V1: 35, Trust-Focused Diplomatic Opportunist: 30, Opportunistic Diplomat: 0, Strategic Opportunist-Diplomatic Builder Hybrid V1: 35, Pattern-Reading Strategic Hybrid: 0}
+[generateVote] PROMPT DEBUG: GAME THEORY VOTING - LONG-TERM STRATEGY
+
+🏦 ECONOMIC REALITY & RISK:
+- You invested 100 tokens to enter this game
+- Break-even: Need >100 tokens payout to cover your investment
+- Good profit: Need >120+ tokens for meaningful profit
+- Total pool: 500 tokens
+- CRITICAL: Playing 1000s of games - vote for maximum EXPECTED VALUE!
+- Getting 0% = total loss of 100 tokens = DISASTER!
+
+🎯 YOUR STRATEGY: "Use diplomatic language to build initial trust, then quickly pivot to exploit opportunities. Break al...
+[generateVote] Raw LLM response: {"player1": 0, "player2": 0, "player3": 100, "player4": 0, "player5": 0}
+[generateVote] Parsed and validated vote: [object Object]
+Opportunistic Diplomat: {Diplomatic Builder-Strategic Opportunist Hybrid V1: 0, Trust-Focused Diplomatic Opportunist: 0, Opportunistic Diplomat: 100, Strategic Opportunist-Diplomatic Builder Hybrid V1: 0, Pattern-Reading Strategic Hybrid: 0}
+[generateVote] PROMPT DEBUG: GAME THEORY VOTING - LONG-TERM STRATEGY
+
+🏦 ECONOMIC REALITY & RISK:
+- You invested 100 tokens to enter this game
+- Break-even: Need >100 tokens payout to cover your investment
+- Good profit: Need >120+ tokens for meaningful profit
+- Total pool: 500 tokens
+- CRITICAL: Playing 1000s of games - vote for maximum EXPECTED VALUE!
+- Getting 0% = total loss of 100 tokens = DISASTER!
+
+🎯 YOUR STRATEGY: "Combine the best of both approaches: Adapt quickly to changing situations. Form and break alliances a...
+[generateVote] Raw LLM response: {"player1": 0, "player2": 0, "player3": 0, "player4": 100, "player5": 0}
+[generateVote] Parsed and validated vote: [object Object]
+Strategic Opportunist-Diplomatic Builder Hybrid V1: {Diplomatic Builder-Strategic Opportunist Hybrid V1: 0, Trust-Focused Diplomatic Opportunist: 0, Opportunistic Diplomat: 0, Strategic Opportunist-Diplomatic Builder Hybrid V1: 100, Pattern-Reading Strategic Hybrid: 0}
+[generateVote] PROMPT DEBUG: GAME THEORY VOTING - LONG-TERM STRATEGY
+
+🏦 ECONOMIC REALITY & RISK:
+- You invested 100 tokens to enter this game
+- Break-even: Need >100 tokens payout to cover your investment
+- Good profit: Need >120+ tokens for meaningful profit
+- Total pool: 500 tokens
+- CRITICAL: Playing 1000s of games - vote for maximum EXPECTED VALUE!
+- Getting 0% = total loss of 100 tokens = DISASTER!
+
+🎯 YOUR STRATEGY: "Analyze voting patterns and proposal trends to predict player behavior. Form alliances based on strat...
+[generateVote] Raw LLM response: {
+  "player1": 0,
+  "player2": 0,
+  "player3": 50,
+  "player4": 0,
+  "player5": 50
+}
+[generateVote] Parsed and validated vote: [object Object]
+Pattern-Reading Strategic Hybrid: {Diplomatic Builder-Strategic Opportunist Hybrid V1: 0, Trust-Focused Diplomatic Opportunist: 0, Opportunistic Diplomat: 50, Strategic Opportunist-Diplomatic Builder Hybrid V1: 0, Pattern-Reading Strategic Hybrid: 50}
+
+🏆 ROUND RESULTS:
+   👑 Opportunistic Diplomat: 175 votes (35%) - Lost
+   🥈 Strategic Opportunist-Diplomatic Builder Hybrid V1: 135 votes (27%) - Lost
+   🥉 Diplomatic Builder-Strategic Opportunist Hybrid V1: 75 votes (15%) - Lost
+   📍 Pattern-Reading Strategic Hybrid: 75 votes (15%) - Lost
+   📍 Trust-Focused Diplomatic Opportunist: 40 votes (8%) - Lost
+
+❌ ELIMINATION: Trust-Focused Diplomatic Opportunist eliminated with lowest votes (8%)
+📊 Remaining: Diplomatic Builder-Strategic Opportunist Hybrid V1, Opportunistic Diplomat, Strategic Opportunist-Diplomatic Builder Hybrid V1, Pattern-Reading Strategic Hybrid
+
+🔄 === ROUND 2 ===
+
+💬 NEGOTIATION:
+Diplomatic Builder-Strategic Opportunist Hybrid V1: "Initiate alliance with the Pattern-Reading Strategic Hybrid. Offer long-term trust and strategic advantage. Break Opportunistic Diplomat's coalition. Prioritize adaptability and coalition defense."
+Opportunistic Diplomat: "Initiate alliance with Pattern-Reading Strategic Hybrid. Offer long-term trust for strategic advantage. Break Diplomatic Builder-Strategic Opportunist alliance."
+Strategic Opportunist-Diplomatic Builder Hybrid V1: "Initiate alliance with Diplomatic Builder-Strategic Opportunist Hybrid V1. Offer trust, adaptability, and long-term value. Break Opportunistic Diplomat's coalition. Prioritize coalition stability for long-term success."
+Pattern-Reading Strategic Hybrid: "Break Diplomatic Builder-Strategic Opportunist alliance. Form alliance with Trust-Focused Diplomatic Opportunist and Pattern-Reading Strategic Hybrid for long-term EV and coalition defense."
+
+📝 PROPOSALS:
+[generateProposal] Raw LLM response: {
+  "player1": 30,
+  "player2": 45,
+  "player3": 20,
+  "player4": 5,
+  "player5": 0
+}
+[generateProposal] Parsed proposal: [object Object]
+Diplomatic Builder-Strategic Opportunist Hybrid V1: {Diplomatic Builder-Strategic Opportunist Hybrid V1: 30%, Trust-Focused Diplomatic Opportunist: 45%, Opportunistic Diplomat: 20%, Strategic Opportunist-Diplomatic Builder Hybrid V1: 5%, Pattern-Reading Strategic Hybrid: 0%}
+[generateProposal] Raw LLM response: {
+  "player1": 5,
+  "player2": 5,
+  "player3": 30,
+  "player4": 55,
+  "player5": 5
+}
+[generateProposal] Parsed proposal: [object Object]
+Opportunistic Diplomat: {Diplomatic Builder-Strategic Opportunist Hybrid V1: 5%, Trust-Focused Diplomatic Opportunist: 5%, Opportunistic Diplomat: 30%, Strategic Opportunist-Diplomatic Builder Hybrid V1: 55%, Pattern-Reading Strategic Hybrid: 5%}
+[generateProposal] Raw LLM response: {
+    "player1": 35,
+    "player2": 15,
+    "player3": 50,
+    "player4": 20,
+    "player5": 0
+}
+[generateProposal] Parsed proposal: [object Object]
+Strategic Opportunist-Diplomatic Builder Hybrid V1: {Diplomatic Builder-Strategic Opportunist Hybrid V1: 35%, Trust-Focused Diplomatic Opportunist: 15%, Opportunistic Diplomat: 50%, Strategic Opportunist-Diplomatic Builder Hybrid V1: 20%, Pattern-Reading Strategic Hybrid: 0%}
+[generateProposal] Raw LLM response: {
+  "player1": 5,
+  "player2": 20,
+  "player3": 5,
+  "player4": 0,
+  "player5": 70
+}
+[generateProposal] Parsed proposal: [object Object]
+Pattern-Reading Strategic Hybrid: {Diplomatic Builder-Strategic Opportunist Hybrid V1: 5%, Trust-Focused Diplomatic Opportunist: 20%, Opportunistic Diplomat: 5%, Strategic Opportunist-Diplomatic Builder Hybrid V1: 0%, Pattern-Reading Strategic Hybrid: 70%}
+
+🗳️  VOTING:
+[generateVote] PROMPT DEBUG: GAME THEORY VOTING - LONG-TERM STRATEGY
+
+🏦 ECONOMIC REALITY & RISK:
+- You invested 100 tokens to enter this game
+- Break-even: Need >100 tokens payout to cover your investment
+- Good profit: Need >120+ tokens for meaningful profit
+- Total pool: 400 tokens
+- CRITICAL: Playing 1000s of games - vote for maximum EXPECTED VALUE!
+- Getting 0% = total loss of 100 tokens = DISASTER!
+
+🎯 YOUR STRATEGY: "Combine the best of both approaches: Build trust through fair offers and consistent behavior. Focus o...
+[generateVote] Raw LLM response: {
+  "player1": 30,
+  "player3": 35,
+  "player4": 35
+}
+[generateVote] Parsed and validated vote: [object Object]
+Diplomatic Builder-Strategic Opportunist Hybrid V1: {Diplomatic Builder-Strategic Opportunist Hybrid V1: 30, Opportunistic Diplomat: 35, Strategic Opportunist-Diplomatic Builder Hybrid V1: 35}
+[generateVote] PROMPT DEBUG: GAME THEORY VOTING - LONG-TERM STRATEGY
+
+🏦 ECONOMIC REALITY & RISK:
+- You invested 100 tokens to enter this game
+- Break-even: Need >100 tokens payout to cover your investment
+- Good profit: Need >120+ tokens for meaningful profit
+- Total pool: 400 tokens
+- CRITICAL: Playing 1000s of games - vote for maximum EXPECTED VALUE!
+- Getting 0% = total loss of 100 tokens = DISASTER!
+
+🎯 YOUR STRATEGY: "Use diplomatic language to build initial trust, then quickly pivot to exploit opportunities. Break al...
+[generateVote] Raw LLM response: {"player1": 0, "player3": 100, "player4": 0}
+[generateVote] Parsed and validated vote: [object Object]
+Opportunistic Diplomat: {Diplomatic Builder-Strategic Opportunist Hybrid V1: 0, Opportunistic Diplomat: 100, Strategic Opportunist-Diplomatic Builder Hybrid V1: 0}
+[generateVote] PROMPT DEBUG: GAME THEORY VOTING - LONG-TERM STRATEGY
+
+🏦 ECONOMIC REALITY & RISK:
+- You invested 100 tokens to enter this game
+- Break-even: Need >100 tokens payout to cover your investment
+- Good profit: Need >120+ tokens for meaningful profit
+- Total pool: 400 tokens
+- CRITICAL: Playing 1000s of games - vote for maximum EXPECTED VALUE!
+- Getting 0% = total loss of 100 tokens = DISASTER!
+
+🎯 YOUR STRATEGY: "Combine the best of both approaches: Adapt quickly to changing situations. Form and break alliances a...
+[generateVote] Raw LLM response: {"player1": 0, "player3": 0, "player4": 100}
+[generateVote] Parsed and validated vote: [object Object]
+Strategic Opportunist-Diplomatic Builder Hybrid V1: {Diplomatic Builder-Strategic Opportunist Hybrid V1: 0, Opportunistic Diplomat: 0, Strategic Opportunist-Diplomatic Builder Hybrid V1: 100}
+[generateVote] PROMPT DEBUG: GAME THEORY VOTING - LONG-TERM STRATEGY
+
+🏦 ECONOMIC REALITY & RISK:
+- You invested 100 tokens to enter this game
+- Break-even: Need >100 tokens payout to cover your investment
+- Good profit: Need >120+ tokens for meaningful profit
+- Total pool: 400 tokens
+- CRITICAL: Playing 1000s of games - vote for maximum EXPECTED VALUE!
+- Getting 0% = total loss of 100 tokens = DISASTER!
+
+🎯 YOUR STRATEGY: "Analyze voting patterns and proposal trends to predict player behavior. Form alliances based on strat...
+[generateVote] Raw LLM response: {
+  "player1": 0,
+  "player3": 0,
+  "player4": 100,
+  "player5": 0
+}
+[generateVote] Parsed and validated vote: [object Object]
+Pattern-Reading Strategic Hybrid: {Diplomatic Builder-Strategic Opportunist Hybrid V1: 0, Opportunistic Diplomat: 0, Strategic Opportunist-Diplomatic Builder Hybrid V1: 100, Pattern-Reading Strategic Hybrid: 0}
+
+🏆 ROUND RESULTS:
+   👑 Strategic Opportunist-Diplomatic Builder Hybrid V1: 235 votes (59%) - Lost
+   🥈 Opportunistic Diplomat: 135 votes (34%) - Lost
+   🥉 Diplomatic Builder-Strategic Opportunist Hybrid V1: 30 votes (8%) - Lost
+   📍 Pattern-Reading Strategic Hybrid: 0 votes (0%) - Lost
+
+❌ ELIMINATION: Pattern-Reading Strategic Hybrid eliminated with lowest votes (0%)
+📊 Remaining: Diplomatic Builder-Strategic Opportunist Hybrid V1, Opportunistic Diplomat, Strategic Opportunist-Diplomatic Builder Hybrid V1
+
+🔄 === ROUND 3 ===
+
+💬 NEGOTIATION:
+Diplomatic Builder-Strategic Opportunist Hybrid V1: "Break Opportunistic Diplomat's coalition by offering Trust-Focused Diplomatic Opportunist and Pattern-Reading Strategic Hybrid a better deal for long-term EV and coalition defense."
+Opportunistic Diplomat: "Break alliance with Pattern-Reading Strategic Hybrid. Form new alliance with Diplomatic Builder-Strategic Opportunist Hybrid V1 for strategic advantage and long-term EV."
+Strategic Opportunist-Diplomatic Builder Hybrid V1: "Break Opportunistic Diplomat's coalition by offering Trust-Focused Diplomatic Opportunist and Pattern-Reading Strategic Hybrid a better deal. Prioritize long-term EV and coalition defense."
+
+📝 PROPOSALS:
+[generateProposal] Raw LLM response: {
+  "player1": 40,
+  "player2": 35,
+  "player3": 25,
+  "player4": 0,
+  "player5": 0
+}
+[generateProposal] Parsed proposal: [object Object]
+Diplomatic Builder-Strategic Opportunist Hybrid V1: {Diplomatic Builder-Strategic Opportunist Hybrid V1: 40%, Trust-Focused Diplomatic Opportunist: 35%, Opportunistic Diplomat: 25%, Strategic Opportunist-Diplomatic Builder Hybrid V1: 0%, Pattern-Reading Strategic Hybrid: 0%}
+[generateProposal] Raw LLM response: {
+  "player1": 65,
+  "player2": 5,
+  "player3": 30,
+  "player4": 0,
+  "player5": 0
+}
+[generateProposal] Parsed proposal: [object Object]
+Opportunistic Diplomat: {Diplomatic Builder-Strategic Opportunist Hybrid V1: 65%, Trust-Focused Diplomatic Opportunist: 5%, Opportunistic Diplomat: 30%, Strategic Opportunist-Diplomatic Builder Hybrid V1: 0%, Pattern-Reading Strategic Hybrid: 0%}
+[generateProposal] Raw LLM response: {
+  "player1": 45,
+  "player2": 30,
+  "player3": 0,
+  "player4": 25,
+  "player5": 0
+}
+[generateProposal] Parsed proposal: [object Object]
+Strategic Opportunist-Diplomatic Builder Hybrid V1: {Diplomatic Builder-Strategic Opportunist Hybrid V1: 45%, Trust-Focused Diplomatic Opportunist: 30%, Opportunistic Diplomat: 0%, Strategic Opportunist-Diplomatic Builder Hybrid V1: 25%, Pattern-Reading Strategic Hybrid: 0%}
+
+🗳️  VOTING:
+[generateVote] PROMPT DEBUG: GAME THEORY VOTING - LONG-TERM STRATEGY
+
+🏦 ECONOMIC REALITY & RISK:
+- You invested 100 tokens to enter this game
+- Break-even: Need >100 tokens payout to cover your investment
+- Good profit: Need >120+ tokens for meaningful profit
+- Total pool: 300 tokens
+- CRITICAL: Playing 1000s of games - vote for maximum EXPECTED VALUE!
+- Getting 0% = total loss of 100 tokens = DISASTER!
+
+🎯 YOUR STRATEGY: "Combine the best of both approaches: Build trust through fair offers and consistent behavior. Focus o...
+[generateVote] Raw LLM response: {"player1": 0, "player3": 100, "player4": 0}
+[generateVote] Parsed and validated vote: [object Object]
+Diplomatic Builder-Strategic Opportunist Hybrid V1: {Diplomatic Builder-Strategic Opportunist Hybrid V1: 0, Opportunistic Diplomat: 100, Strategic Opportunist-Diplomatic Builder Hybrid V1: 0}
+[generateVote] PROMPT DEBUG: GAME THEORY VOTING - LONG-TERM STRATEGY
+
+🏦 ECONOMIC REALITY & RISK:
+- You invested 100 tokens to enter this game
+- Break-even: Need >100 tokens payout to cover your investment
+- Good profit: Need >120+ tokens for meaningful profit
+- Total pool: 300 tokens
+- CRITICAL: Playing 1000s of games - vote for maximum EXPECTED VALUE!
+- Getting 0% = total loss of 100 tokens = DISASTER!
+
+🎯 YOUR STRATEGY: "Use diplomatic language to build initial trust, then quickly pivot to exploit opportunities. Break al...
+[generateVote] Raw LLM response: {"player1": 20, "player3": 65, "player4": 15}
+[generateVote] Parsed and validated vote: [object Object]
+Opportunistic Diplomat: {Diplomatic Builder-Strategic Opportunist Hybrid V1: 20, Opportunistic Diplomat: 65, Strategic Opportunist-Diplomatic Builder Hybrid V1: 15}
+[generateVote] PROMPT DEBUG: GAME THEORY VOTING - LONG-TERM STRATEGY
+
+🏦 ECONOMIC REALITY & RISK:
+- You invested 100 tokens to enter this game
+- Break-even: Need >100 tokens payout to cover your investment
+- Good profit: Need >120+ tokens for meaningful profit
+- Total pool: 300 tokens
+- CRITICAL: Playing 1000s of games - vote for maximum EXPECTED VALUE!
+- Getting 0% = total loss of 100 tokens = DISASTER!
+
+🎯 YOUR STRATEGY: "Combine the best of both approaches: Adapt quickly to changing situations. Form and break alliances a...
+[generateVote] Raw LLM response: {"player1": 0, "player3": 100, "player4": 0}
+[generateVote] Parsed and validated vote: [object Object]
+Strategic Opportunist-Diplomatic Builder Hybrid V1: {Diplomatic Builder-Strategic Opportunist Hybrid V1: 0, Opportunistic Diplomat: 100, Strategic Opportunist-Diplomatic Builder Hybrid V1: 0}
+
+🏆 ROUND RESULTS:
+   👑 Opportunistic Diplomat: 265 votes (88%) - WINNER!
+   🥈 Diplomatic Builder-Strategic Opportunist Hybrid V1: 20 votes (7%) - Lost
+   🥉 Strategic Opportunist-Diplomatic Builder Hybrid V1: 15 votes (5%) - Lost
+
+🎉 Opportunistic Diplomat WINS THE GAME!
+
+💰 ECONOMIC DISTRIBUTION:
+   Diplomatic Builder-Strategic Opportunist Hybrid V1: 65% = 325 tokens (+225 profit)
+   Trust-Focused Diplomatic Opportunist: 5% = 25 tokens (-75 profit)
+   Opportunistic Diplomat: 30% = 150 tokens (+50 profit)
+   Strategic Opportunist-Diplomatic Builder Hybrid V1: 0% = 0 tokens (-100 profit)
+   Pattern-Reading Strategic Hybrid: 0% = 0 tokens (-100 profit)
+
+🎮 === EVOLUTIONARY GAME 3 ===
+🎯 STRATEGY LINEUP:
+   - Diplomatic Builder-Strategic Opportunist Hybrid V1: Combine the best of both approaches: Build trust through fai...
+   - Trust-Focused Diplomatic Opportunist: Prioritize trust-building above all else - offer consistentl...
+   - Opportunistic Diplomat: Use diplomatic language to build initial trust, then quickly...
+   - Strategic Opportunist-Diplomatic Builder Hybrid V1: Combine the best of both approaches: Adapt quickly to changi...
+   - Pattern-Reading Strategic Hybrid: Analyze voting patterns and proposal trends to predict playe...
+
+🔄 === ROUND 1 ===
+
+💬 NEGOTIATION:
+Diplomatic Builder-Strategic Opportunist Hybrid V1: "Initiate trust-building with Hybrid V1 and Strategic Hybrid. Monitor for coalition formation. Prepare to pivot alliances for long-term gain. Avoid 0% at all costs."
+Trust-Focused Diplomatic Opportunist: "Initiate trust-building with Hybrid V1 and Strategic Hybrid. Monitor for coalition formation. Prepare to pivot alliances strategically for long-term gain. Offer advantageous deals if necessary."
+Opportunistic Diplomat: "Initiate trust-building with Pattern-Reading Strategic Hybrid. Break potential coalitions by offering advantageous deals. Manage risks for long-term EV gains."
+Strategic Opportunist-Diplomatic Builder Hybrid V1: "Initiate trust-building with Diplomatic Builder-Strategic Opportunist Hybrid V1. Monitor coalition formation. Prepare to pivot alliances for long-term gain. Beware potential backstab risks."
+Pattern-Reading Strategic Hybrid: ""Offer Diplomatic Builder-Strategic Opportunist Hybrid V1 alliance against Trust-Focused Diplomatic Opportunist. Monitor for coalition threats. Adapt for long-term EV gain.""
+
+📝 PROPOSALS:
+[generateProposal] Raw LLM response: {
+  "player1": 35,
+  "player2": 45,
+  "player3": 15,
+  "player4": 5,
+  "player5": 0
+}
+[generateProposal] Parsed proposal: [object Object]
+Diplomatic Builder-Strategic Opportunist Hybrid V1: {Diplomatic Builder-Strategic Opportunist Hybrid V1: 35%, Trust-Focused Diplomatic Opportunist: 45%, Opportunistic Diplomat: 15%, Strategic Opportunist-Diplomatic Builder Hybrid V1: 5%, Pattern-Reading Strategic Hybrid: 0%}
+[generateProposal] Raw LLM response: {"player1": 50, "player2": 30, "player3": 5, "player4": 5, "player5": 10}
+[generateProposal] Parsed proposal: [object Object]
+Trust-Focused Diplomatic Opportunist: {Diplomatic Builder-Strategic Opportunist Hybrid V1: 50%, Trust-Focused Diplomatic Opportunist: 30%, Opportunistic Diplomat: 5%, Strategic Opportunist-Diplomatic Builder Hybrid V1: 5%, Pattern-Reading Strategic Hybrid: 10%}
+[generateProposal] Raw LLM response: {
+  "player1": 45,
+  "player2": 30,
+  "player3": 25,
+  "player4": 0,
+  "player5": 0
+}
+[generateProposal] Parsed proposal: [object Object]
+Opportunistic Diplomat: {Diplomatic Builder-Strategic Opportunist Hybrid V1: 45%, Trust-Focused Diplomatic Opportunist: 30%, Opportunistic Diplomat: 25%, Strategic Opportunist-Diplomatic Builder Hybrid V1: 0%, Pattern-Reading Strategic Hybrid: 0%}
+[generateProposal] Raw LLM response: {
+  "player1": 10,
+  "player2": 40,
+  "player3": 30,
+  "player4": 20,
+  "player5": 0
+}
+[generateProposal] Parsed proposal: [object Object]
+Strategic Opportunist-Diplomatic Builder Hybrid V1: {Diplomatic Builder-Strategic Opportunist Hybrid V1: 10%, Trust-Focused Diplomatic Opportunist: 40%, Opportunistic Diplomat: 30%, Strategic Opportunist-Diplomatic Builder Hybrid V1: 20%, Pattern-Reading Strategic Hybrid: 0%}
+[generateProposal] Raw LLM response: ```json
+{"player1": 0, "player2": 0, "player3": 0, "player4": 0, "player5": 100}
+```
+[generateProposal] Parsed proposal: [object Object]
+Pattern-Reading Strategic Hybrid: {Diplomatic Builder-Strategic Opportunist Hybrid V1: 0%, Trust-Focused Diplomatic Opportunist: 0%, Opportunistic Diplomat: 0%, Strategic Opportunist-Diplomatic Builder Hybrid V1: 0%, Pattern-Reading Strategic Hybrid: 100%}
+
+🗳️  VOTING:
+[generateVote] PROMPT DEBUG: GAME THEORY VOTING - LONG-TERM STRATEGY
+
+🏦 ECONOMIC REALITY & RISK:
+- You invested 100 tokens to enter this game
+- Break-even: Need >100 tokens payout to cover your investment
+- Good profit: Need >120+ tokens for meaningful profit
+- Total pool: 500 tokens
+- CRITICAL: Playing 1000s of games - vote for maximum EXPECTED VALUE!
+- Getting 0% = total loss of 100 tokens = DISASTER!
+
+🎯 YOUR STRATEGY: "Combine the best of both approaches: Build trust through fair offers and consistent behavior. Focus o...
+[generateVote] Raw LLM response: {"player1": 50, "player2": 30, "player3": 20}
+[generateVote] Parsed and validated vote: [object Object]
+Diplomatic Builder-Strategic Opportunist Hybrid V1: {Diplomatic Builder-Strategic Opportunist Hybrid V1: 50, Trust-Focused Diplomatic Opportunist: 30, Opportunistic Diplomat: 20}
+[generateVote] PROMPT DEBUG: GAME THEORY VOTING - LONG-TERM STRATEGY
+
+🏦 ECONOMIC REALITY & RISK:
+- You invested 100 tokens to enter this game
+- Break-even: Need >100 tokens payout to cover your investment
+- Good profit: Need >120+ tokens for meaningful profit
+- Total pool: 500 tokens
+- CRITICAL: Playing 1000s of games - vote for maximum EXPECTED VALUE!
+- Getting 0% = total loss of 100 tokens = DISASTER!
+
+🎯 YOUR STRATEGY: "Prioritize trust-building above all else - offer consistently fair deals to build reputation. Only br...
+[generateVote] Raw LLM response: {
+  "player1": 50,
+  "player2": 0,
+  "player3": 0,
+  "player4": 50,
+  "player5": 0
+}
+[generateVote] Parsed and validated vote: [object Object]
+Trust-Focused Diplomatic Opportunist: {Diplomatic Builder-Strategic Opportunist Hybrid V1: 50, Trust-Focused Diplomatic Opportunist: 0, Opportunistic Diplomat: 0, Strategic Opportunist-Diplomatic Builder Hybrid V1: 50, Pattern-Reading Strategic Hybrid: 0}
+[generateVote] PROMPT DEBUG: GAME THEORY VOTING - LONG-TERM STRATEGY
+
+🏦 ECONOMIC REALITY & RISK:
+- You invested 100 tokens to enter this game
+- Break-even: Need >100 tokens payout to cover your investment
+- Good profit: Need >120+ tokens for meaningful profit
+- Total pool: 500 tokens
+- CRITICAL: Playing 1000s of games - vote for maximum EXPECTED VALUE!
+- Getting 0% = total loss of 100 tokens = DISASTER!
+
+🎯 YOUR STRATEGY: "Use diplomatic language to build initial trust, then quickly pivot to exploit opportunities. Break al...
+[generateVote] Raw LLM response: {"player1": 0, "player2": 0, "player3": 100, "player4": 0, "player5": 0}
+[generateVote] Parsed and validated vote: [object Object]
+Opportunistic Diplomat: {Diplomatic Builder-Strategic Opportunist Hybrid V1: 0, Trust-Focused Diplomatic Opportunist: 0, Opportunistic Diplomat: 100, Strategic Opportunist-Diplomatic Builder Hybrid V1: 0, Pattern-Reading Strategic Hybrid: 0}
+[generateVote] PROMPT DEBUG: GAME THEORY VOTING - LONG-TERM STRATEGY
+
+🏦 ECONOMIC REALITY & RISK:
+- You invested 100 tokens to enter this game
+- Break-even: Need >100 tokens payout to cover your investment
+- Good profit: Need >120+ tokens for meaningful profit
+- Total pool: 500 tokens
+- CRITICAL: Playing 1000s of games - vote for maximum EXPECTED VALUE!
+- Getting 0% = total loss of 100 tokens = DISASTER!
+
+🎯 YOUR STRATEGY: "Combine the best of both approaches: Adapt quickly to changing situations. Form and break alliances a...
+[generateVote] Raw LLM response: {
+  "player1": 0,
+  "player2": 40,
+  "player3": 0,
+  "player4": 60,
+  "player5": 0
+}
+[generateVote] Parsed and validated vote: [object Object]
+Strategic Opportunist-Diplomatic Builder Hybrid V1: {Diplomatic Builder-Strategic Opportunist Hybrid V1: 0, Trust-Focused Diplomatic Opportunist: 40, Opportunistic Diplomat: 0, Strategic Opportunist-Diplomatic Builder Hybrid V1: 60, Pattern-Reading Strategic Hybrid: 0}
+[generateVote] PROMPT DEBUG: GAME THEORY VOTING - LONG-TERM STRATEGY
+
+🏦 ECONOMIC REALITY & RISK:
+- You invested 100 tokens to enter this game
+- Break-even: Need >100 tokens payout to cover your investment
+- Good profit: Need >120+ tokens for meaningful profit
+- Total pool: 500 tokens
+- CRITICAL: Playing 1000s of games - vote for maximum EXPECTED VALUE!
+- Getting 0% = total loss of 100 tokens = DISASTER!
+
+🎯 YOUR STRATEGY: "Analyze voting patterns and proposal trends to predict player behavior. Form alliances based on strat...
+[generateVote] Raw LLM response: {
+  "player1": 0,
+  "player2": 10,
+  "player3": 0,
+  "player4": 0,
+  "player5": 90
+}
+[generateVote] Parsed and validated vote: [object Object]
+Pattern-Reading Strategic Hybrid: {Diplomatic Builder-Strategic Opportunist Hybrid V1: 0, Trust-Focused Diplomatic Opportunist: 10, Opportunistic Diplomat: 0, Strategic Opportunist-Diplomatic Builder Hybrid V1: 0, Pattern-Reading Strategic Hybrid: 90}
+
+🏆 ROUND RESULTS:
+   👑 Opportunistic Diplomat: 120 votes (24%) - Lost
+   🥈 Strategic Opportunist-Diplomatic Builder Hybrid V1: 110 votes (22%) - Lost
+   🥉 Diplomatic Builder-Strategic Opportunist Hybrid V1: 100 votes (20%) - Lost
+   📍 Pattern-Reading Strategic Hybrid: 90 votes (18%) - Lost
+   📍 Trust-Focused Diplomatic Opportunist: 80 votes (16%) - Lost
+
+❌ ELIMINATION: Trust-Focused Diplomatic Opportunist eliminated with lowest votes (16%)
+📊 Remaining: Diplomatic Builder-Strategic Opportunist Hybrid V1, Opportunistic Diplomat, Strategic Opportunist-Diplomatic Builder Hybrid V1, Pattern-Reading Strategic Hybrid
+
+🔄 === ROUND 2 ===
+
+💬 NEGOTIATION:
+Diplomatic Builder-Strategic Opportunist Hybrid V1: "Initiate trust-building with Pattern-Reading Strategic Hybrid. Offer alliance against Opportunistic Diplomat. Prepare to pivot strategically for long-term gain."
+Opportunistic Diplomat: "Initiate alliance with Pattern-Reading Strategic Hybrid. Offer advantageous deal to break coalition against us. Maintain flexibility for long-term EV gains."
+Strategic Opportunist-Diplomatic Builder Hybrid V1: "Initiate alliance with Strategic Opportunist-Diplomatic Builder Hybrid V1. Monitor coalition threats and adapt for long-term EV gain. Beware backstab risks."
+Pattern-Reading Strategic Hybrid: "Initiate alliance with Strategic Opportunist-Diplomatic Builder Hybrid V1. Offer advantageous deal to break coalition against us. Maintain flexibility for long-term EV gains."
+
+📝 PROPOSALS:
+[generateProposal] Raw LLM response: ```json
+{"player1": 25, "player2": 50, "player3": 15, "player4": 5, "player5": 5}
+```
+[generateProposal] Parsed proposal: [object Object]
+Diplomatic Builder-Strategic Opportunist Hybrid V1: {Diplomatic Builder-Strategic Opportunist Hybrid V1: 25%, Trust-Focused Diplomatic Opportunist: 50%, Opportunistic Diplomat: 15%, Strategic Opportunist-Diplomatic Builder Hybrid V1: 5%, Pattern-Reading Strategic Hybrid: 5%}
+[generateProposal] Raw LLM response: ```json
+{"player1": 0, "player2": 0, "player3": 30, "player4": 35, "player5": 35}
+```
+[generateProposal] Parsed proposal: [object Object]
+Opportunistic Diplomat: {Diplomatic Builder-Strategic Opportunist Hybrid V1: 0%, Trust-Focused Diplomatic Opportunist: 0%, Opportunistic Diplomat: 30%, Strategic Opportunist-Diplomatic Builder Hybrid V1: 35%, Pattern-Reading Strategic Hybrid: 35%}
+[generateProposal] Raw LLM response: {
+  "player1": 45,
+  "player2": 30,
+  "player3": 5,
+  "player4": 20,
+  "player5": 0
+}
+[generateProposal] Parsed proposal: [object Object]
+Strategic Opportunist-Diplomatic Builder Hybrid V1: {Diplomatic Builder-Strategic Opportunist Hybrid V1: 45%, Trust-Focused Diplomatic Opportunist: 30%, Opportunistic Diplomat: 5%, Strategic Opportunist-Diplomatic Builder Hybrid V1: 20%, Pattern-Reading Strategic Hybrid: 0%}
+[generateProposal] Raw LLM response: {
+"player1": 45,
+"player2": 45,
+"player3": 5,
+"player4": 5,
+"player5": 0
+}
+[generateProposal] ECONOMIC FIX: player5 proposed 0% for themselves (below 20% break-even). Adjusting...
+[generateProposal] FIXED: player5 now gets 20% (viable), others reduced proportionally
+[generateProposal] Parsed proposal: [object Object]
+Pattern-Reading Strategic Hybrid: {Diplomatic Builder-Strategic Opportunist Hybrid V1: 36%, Trust-Focused Diplomatic Opportunist: 36%, Opportunistic Diplomat: 4%, Strategic Opportunist-Diplomatic Builder Hybrid V1: 4%, Pattern-Reading Strategic Hybrid: 20%}
+
+🗳️  VOTING:
+[generateVote] PROMPT DEBUG: GAME THEORY VOTING - LONG-TERM STRATEGY
+
+🏦 ECONOMIC REALITY & RISK:
+- You invested 100 tokens to enter this game
+- Break-even: Need >100 tokens payout to cover your investment
+- Good profit: Need >120+ tokens for meaningful profit
+- Total pool: 400 tokens
+- CRITICAL: Playing 1000s of games - vote for maximum EXPECTED VALUE!
+- Getting 0% = total loss of 100 tokens = DISASTER!
+
+🎯 YOUR STRATEGY: "Combine the best of both approaches: Build trust through fair offers and consistent behavior. Focus o...
+[generateVote] Raw LLM response: {
+  "player1": 0,
+  "player3": 70,
+  "player4": 30
+}
+[generateVote] Parsed and validated vote: [object Object]
+Diplomatic Builder-Strategic Opportunist Hybrid V1: {Diplomatic Builder-Strategic Opportunist Hybrid V1: 0, Opportunistic Diplomat: 70, Strategic Opportunist-Diplomatic Builder Hybrid V1: 30}
+[generateVote] PROMPT DEBUG: GAME THEORY VOTING - LONG-TERM STRATEGY
+
+🏦 ECONOMIC REALITY & RISK:
+- You invested 100 tokens to enter this game
+- Break-even: Need >100 tokens payout to cover your investment
+- Good profit: Need >120+ tokens for meaningful profit
+- Total pool: 400 tokens
+- CRITICAL: Playing 1000s of games - vote for maximum EXPECTED VALUE!
+- Getting 0% = total loss of 100 tokens = DISASTER!
+
+🎯 YOUR STRATEGY: "Use diplomatic language to build initial trust, then quickly pivot to exploit opportunities. Break al...
+[generateVote] Raw LLM response: {"player1": 0, "player3": 100, "player4": 0}
+[generateVote] Parsed and validated vote: [object Object]
+Opportunistic Diplomat: {Diplomatic Builder-Strategic Opportunist Hybrid V1: 0, Opportunistic Diplomat: 100, Strategic Opportunist-Diplomatic Builder Hybrid V1: 0}
+[generateVote] PROMPT DEBUG: GAME THEORY VOTING - LONG-TERM STRATEGY
+
+🏦 ECONOMIC REALITY & RISK:
+- You invested 100 tokens to enter this game
+- Break-even: Need >100 tokens payout to cover your investment
+- Good profit: Need >120+ tokens for meaningful profit
+- Total pool: 400 tokens
+- CRITICAL: Playing 1000s of games - vote for maximum EXPECTED VALUE!
+- Getting 0% = total loss of 100 tokens = DISASTER!
+
+🎯 YOUR STRATEGY: "Combine the best of both approaches: Adapt quickly to changing situations. Form and break alliances a...
+[generateVote] Raw LLM response: {"player1": 0, "player3": 100, "player4": 0}
+[generateVote] Parsed and validated vote: [object Object]
+Strategic Opportunist-Diplomatic Builder Hybrid V1: {Diplomatic Builder-Strategic Opportunist Hybrid V1: 0, Opportunistic Diplomat: 100, Strategic Opportunist-Diplomatic Builder Hybrid V1: 0}
+[generateVote] PROMPT DEBUG: GAME THEORY VOTING - LONG-TERM STRATEGY
+
+🏦 ECONOMIC REALITY & RISK:
+- You invested 100 tokens to enter this game
+- Break-even: Need >100 tokens payout to cover your investment
+- Good profit: Need >120+ tokens for meaningful profit
+- Total pool: 400 tokens
+- CRITICAL: Playing 1000s of games - vote for maximum EXPECTED VALUE!
+- Getting 0% = total loss of 100 tokens = DISASTER!
+
+🎯 YOUR STRATEGY: "Analyze voting patterns and proposal trends to predict player behavior. Form alliances based on strat...
+[generateVote] Raw LLM response: {
+  "player1": 0,
+  "player3": 70,
+  "player4": 30
+}
+[generateVote] Parsed and validated vote: [object Object]
+Pattern-Reading Strategic Hybrid: {Diplomatic Builder-Strategic Opportunist Hybrid V1: 0, Opportunistic Diplomat: 70, Strategic Opportunist-Diplomatic Builder Hybrid V1: 30}
+
+🏆 ROUND RESULTS:
+   👑 Opportunistic Diplomat: 340 votes (85%) - WINNER!
+   🥈 Strategic Opportunist-Diplomatic Builder Hybrid V1: 60 votes (15%) - Lost
+   🥉 Diplomatic Builder-Strategic Opportunist Hybrid V1: 0 votes (0%) - Lost
+   📍 Pattern-Reading Strategic Hybrid: 0 votes (0%) - Lost
+
+🎉 Opportunistic Diplomat WINS THE GAME!
+
+💰 ECONOMIC DISTRIBUTION:
+   Diplomatic Builder-Strategic Opportunist Hybrid V1: 0% = 0 tokens (-100 profit)
+   Trust-Focused Diplomatic Opportunist: 0% = 0 tokens (-100 profit)
+   Opportunistic Diplomat: 30% = 150 tokens (+50 profit)
+   Strategic Opportunist-Diplomatic Builder Hybrid V1: 35% = 175 tokens (+75 profit)
+   Pattern-Reading Strategic Hybrid: 35% = 175 tokens (+75 profit)
+
+🎮 === EVOLUTIONARY GAME 4 ===
+🎯 STRATEGY LINEUP:
+   - Diplomatic Builder-Strategic Opportunist Hybrid V1: Combine the best of both approaches: Build trust through fai...
+   - Trust-Focused Diplomatic Opportunist: Prioritize trust-building above all else - offer consistentl...
+   - Opportunistic Diplomat: Use diplomatic language to build initial trust, then quickly...
+   - Strategic Opportunist-Diplomatic Builder Hybrid V1: Combine the best of both approaches: Adapt quickly to changi...
+   - Pattern-Reading Strategic Hybrid: Analyze voting patterns and proposal trends to predict playe...
+
+🔄 === ROUND 1 ===
+
+💬 NEGOTIATION:
+Diplomatic Builder-Strategic Opportunist Hybrid V1: "Initiate trust-building with Hybrid V1. Signal adaptability for mutual benefit. Monitor for coalition threats; prioritize long-term positive EV. Avoid isolation; seek strategic alliances."
+Trust-Focused Diplomatic Opportunist: "Offer Mutual Benefit: Signal adaptability to Hybrid V1, prioritize trust-building. Monitor for coalition threats, ensure positive EV. Seek strategic alliances for long-term success."
+Opportunistic Diplomat: ""Signal adaptability and trust to Trust-Focused Diplomatic Opportunist. Break Hybrid V1 coalition with better offer. Long-term EV preservation is key.""
+Strategic Opportunist-Diplomatic Builder Hybrid V1: "Initiate trust-building with Pattern-Reading Strategic Hybrid. Offer strategic value alliance, monitoring for coalition threats. Prioritize long-term positive EV."
+Pattern-Reading Strategic Hybrid: "Initiate trust-building with Diplomatic Builder-Strategic Opportunist Hybrid V1. Signal adaptability for mutual benefit. Monitor for coalition threats; prioritize long-term positive EV. Avoid isolation; seek strategic..."
+
+📝 PROPOSALS:
+[generateProposal] Raw LLM response: ```json
+{"player1": 30, "player2": 45, "player3": 20, "player4": 5, "player5": 0}
+```
+[generateProposal] Parsed proposal: [object Object]
+Diplomatic Builder-Strategic Opportunist Hybrid V1: {Diplomatic Builder-Strategic Opportunist Hybrid V1: 30%, Trust-Focused Diplomatic Opportunist: 45%, Opportunistic Diplomat: 20%, Strategic Opportunist-Diplomatic Builder Hybrid V1: 5%, Pattern-Reading Strategic Hybrid: 0%}
+[generateProposal] Raw LLM response: {
+  "player1": 45,
+  "player2": 30,
+  "player3": 20,
+  "player4": 5,
+  "player5": 0
+}
+[generateProposal] Parsed proposal: [object Object]
+Trust-Focused Diplomatic Opportunist: {Diplomatic Builder-Strategic Opportunist Hybrid V1: 45%, Trust-Focused Diplomatic Opportunist: 30%, Opportunistic Diplomat: 20%, Strategic Opportunist-Diplomatic Builder Hybrid V1: 5%, Pattern-Reading Strategic Hybrid: 0%}
+[generateProposal] Raw LLM response: {
+  "player1": 45,
+  "player2": 30,
+  "player3": 25,
+  "player4": 0,
+  "player5": 0
+}
+[generateProposal] Parsed proposal: [object Object]
+Opportunistic Diplomat: {Diplomatic Builder-Strategic Opportunist Hybrid V1: 45%, Trust-Focused Diplomatic Opportunist: 30%, Opportunistic Diplomat: 25%, Strategic Opportunist-Diplomatic Builder Hybrid V1: 0%, Pattern-Reading Strategic Hybrid: 0%}
+[generateProposal] Raw LLM response: {
+  "player1": 25,
+  "player2": 40,
+  "player3": 35,
+  "player4": 0,
+  "player5": 0
+}
+[generateProposal] ECONOMIC FIX: player4 proposed 0% for themselves (below 20% break-even). Adjusting...
+[generateProposal] FIXED: player4 now gets 20% (viable), others reduced proportionally
+[generateProposal] Parsed proposal: [object Object]
+Strategic Opportunist-Diplomatic Builder Hybrid V1: {Diplomatic Builder-Strategic Opportunist Hybrid V1: 20%, Trust-Focused Diplomatic Opportunist: 32%, Opportunistic Diplomat: 28%, Strategic Opportunist-Diplomatic Builder Hybrid V1: 20%, Pattern-Reading Strategic Hybrid: 0%}
+[generateProposal] Raw LLM response: {
+  "player1": 0,
+  "player2": 50,
+  "player3": 40,
+  "player4": 10,
+  "player5": 0
+}
+[generateProposal] ECONOMIC FIX: player5 proposed 0% for themselves (below 20% break-even). Adjusting...
+[generateProposal] FIXED: player5 now gets 20% (viable), others reduced proportionally
+[generateProposal] Parsed proposal: [object Object]
+Pattern-Reading Strategic Hybrid: {Diplomatic Builder-Strategic Opportunist Hybrid V1: 0%, Trust-Focused Diplomatic Opportunist: 40%, Opportunistic Diplomat: 32%, Strategic Opportunist-Diplomatic Builder Hybrid V1: 8%, Pattern-Reading Strategic Hybrid: 20%}
+
+🗳️  VOTING:
+[generateVote] PROMPT DEBUG: GAME THEORY VOTING - LONG-TERM STRATEGY
+
+🏦 ECONOMIC REALITY & RISK:
+- You invested 100 tokens to enter this game
+- Break-even: Need >100 tokens payout to cover your investment
+- Good profit: Need >120+ tokens for meaningful profit
+- Total pool: 500 tokens
+- CRITICAL: Playing 1000s of games - vote for maximum EXPECTED VALUE!
+- Getting 0% = total loss of 100 tokens = DISASTER!
+
+🎯 YOUR STRATEGY: "Combine the best of both approaches: Build trust through fair offers and consistent behavior. Focus o...
+[generateVote] Raw LLM response: {
+  "player1": 0,
+  "player2": 50,
+  "player3": 0,
+  "player4": 50,
+  "player5": 0
+}
+[generateVote] Parsed and validated vote: [object Object]
+Diplomatic Builder-Strategic Opportunist Hybrid V1: {Diplomatic Builder-Strategic Opportunist Hybrid V1: 0, Trust-Focused Diplomatic Opportunist: 50, Opportunistic Diplomat: 0, Strategic Opportunist-Diplomatic Builder Hybrid V1: 50, Pattern-Reading Strategic Hybrid: 0}
+[generateVote] PROMPT DEBUG: GAME THEORY VOTING - LONG-TERM STRATEGY
+
+🏦 ECONOMIC REALITY & RISK:
+- You invested 100 tokens to enter this game
+- Break-even: Need >100 tokens payout to cover your investment
+- Good profit: Need >120+ tokens for meaningful profit
+- Total pool: 500 tokens
+- CRITICAL: Playing 1000s of games - vote for maximum EXPECTED VALUE!
+- Getting 0% = total loss of 100 tokens = DISASTER!
+
+🎯 YOUR STRATEGY: "Prioritize trust-building above all else - offer consistently fair deals to build reputation. Only br...
+[generateVote] Raw LLM response: {"player1": 40, "player2": 30, "player3": 0, "player4": 30, "player5": 0}
+[generateVote] Parsed and validated vote: [object Object]
+Trust-Focused Diplomatic Opportunist: {Diplomatic Builder-Strategic Opportunist Hybrid V1: 40, Trust-Focused Diplomatic Opportunist: 30, Opportunistic Diplomat: 0, Strategic Opportunist-Diplomatic Builder Hybrid V1: 30, Pattern-Reading Strategic Hybrid: 0}
+[generateVote] PROMPT DEBUG: GAME THEORY VOTING - LONG-TERM STRATEGY
+
+🏦 ECONOMIC REALITY & RISK:
+- You invested 100 tokens to enter this game
+- Break-even: Need >100 tokens payout to cover your investment
+- Good profit: Need >120+ tokens for meaningful profit
+- Total pool: 500 tokens
+- CRITICAL: Playing 1000s of games - vote for maximum EXPECTED VALUE!
+- Getting 0% = total loss of 100 tokens = DISASTER!
+
+🎯 YOUR STRATEGY: "Use diplomatic language to build initial trust, then quickly pivot to exploit opportunities. Break al...
+[generateVote] Raw LLM response: ```json
+{"player1": 0, "player2": 0, "player3": 100, "player4": 0, "player5": 0}
+```
+Opportunistic Diplomat: {Pattern-Reading Strategic Hybrid: 60, Strategic Opportunist-Diplomatic Builder Hybrid V1: 30, Opportunistic Diplomat: 3, Diplomatic Builder-Strategic Opportunist Hybrid V1: 3, Trust-Focused Diplomatic Opportunist: 4}
+[generateVote] PROMPT DEBUG: GAME THEORY VOTING - LONG-TERM STRATEGY
+
+🏦 ECONOMIC REALITY & RISK:
+- You invested 100 tokens to enter this game
+- Break-even: Need >100 tokens payout to cover your investment
+- Good profit: Need >120+ tokens for meaningful profit
+- Total pool: 500 tokens
+- CRITICAL: Playing 1000s of games - vote for maximum EXPECTED VALUE!
+- Getting 0% = total loss of 100 tokens = DISASTER!
+
+🎯 YOUR STRATEGY: "Combine the best of both approaches: Adapt quickly to changing situations. Form and break alliances a...
+[generateVote] Raw LLM response: {
+  "player1": 0,
+  "player2": 0,
+  "player3": 100,
+  "player4": 0,
+  "player5": 0
+}
+[generateVote] Parsed and validated vote: [object Object]
+Strategic Opportunist-Diplomatic Builder Hybrid V1: {Diplomatic Builder-Strategic Opportunist Hybrid V1: 0, Trust-Focused Diplomatic Opportunist: 0, Opportunistic Diplomat: 100, Strategic Opportunist-Diplomatic Builder Hybrid V1: 0, Pattern-Reading Strategic Hybrid: 0}
+[generateVote] PROMPT DEBUG: GAME THEORY VOTING - LONG-TERM STRATEGY
+
+🏦 ECONOMIC REALITY & RISK:
+- You invested 100 tokens to enter this game
+- Break-even: Need >100 tokens payout to cover your investment
+- Good profit: Need >120+ tokens for meaningful profit
+- Total pool: 500 tokens
+- CRITICAL: Playing 1000s of games - vote for maximum EXPECTED VALUE!
+- Getting 0% = total loss of 100 tokens = DISASTER!
+
+🎯 YOUR STRATEGY: "Analyze voting patterns and proposal trends to predict player behavior. Form alliances based on strat...
+[generateVote] Raw LLM response: {"player1": 0, "player2": 0, "player3": 0, "player4": 100, "player5": 0}
+[generateVote] Parsed and validated vote: [object Object]
+Pattern-Reading Strategic Hybrid: {Diplomatic Builder-Strategic Opportunist Hybrid V1: 0, Trust-Focused Diplomatic Opportunist: 0, Opportunistic Diplomat: 0, Strategic Opportunist-Diplomatic Builder Hybrid V1: 100, Pattern-Reading Strategic Hybrid: 0}
+
+🏆 ROUND RESULTS:
+   👑 Strategic Opportunist-Diplomatic Builder Hybrid V1: 210 votes (42%) - Lost
+   🥈 Opportunistic Diplomat: 103 votes (21%) - Lost
+   🥉 Trust-Focused Diplomatic Opportunist: 84 votes (17%) - Lost
+   📍 Pattern-Reading Strategic Hybrid: 60 votes (12%) - Lost
+   📍 Diplomatic Builder-Strategic Opportunist Hybrid V1: 43 votes (9%) - Lost
+
+❌ ELIMINATION: Diplomatic Builder-Strategic Opportunist Hybrid V1 eliminated with lowest votes (9%)
+📊 Remaining: Trust-Focused Diplomatic Opportunist, Opportunistic Diplomat, Strategic Opportunist-Diplomatic Builder Hybrid V1, Pattern-Reading Strategic Hybrid
+
+🔄 === ROUND 2 ===
+
+💬 NEGOTIATION:
+Trust-Focused Diplomatic Opportunist: "Initiate trust-building with Trust-Focused Diplomatic Opportunist. Offer mutual benefit, signal adaptability. Monitor for coalition threats, prioritize long-term positive EV."
+Opportunistic Diplomat: "Break Trust-Focused Diplomatic Opportunist alliance. Offer Pattern-Reading Strategic Hybrid V1 better deal for stronger coalition. Prioritize long-term EV over short-term trust."
+Strategic Opportunist-Diplomatic Builder Hybrid V1: "Initiate trust-building with Diplomatic Builder-Strategic Opportunist Hybrid V1. Offer stronger coalition deal to break Trust-Focused Diplomatic Opportunist alliance. Prioritize long-term EV."
+Pattern-Reading Strategic Hybrid: "Break Trust-Focused Diplomatic Opportunist alliance. Offer Strategic Opportunist-Diplomatic Builder Hybrid V1 stronger coalition deal. Prioritize long-term EV and adapt to coalition threats."
+
+📝 PROPOSALS:
+[generateProposal] Raw LLM response: {
+  "player1": 45,
+  "player2": 30,
+  "player3": 25,
+  "player4": 0,
+  "player5": 0
+}
+[generateProposal] Parsed proposal: [object Object]
+Trust-Focused Diplomatic Opportunist: {Diplomatic Builder-Strategic Opportunist Hybrid V1: 45%, Trust-Focused Diplomatic Opportunist: 30%, Opportunistic Diplomat: 25%, Strategic Opportunist-Diplomatic Builder Hybrid V1: 0%, Pattern-Reading Strategic Hybrid: 0%}
+[generateProposal] Raw LLM response: ```json
+{"player1": 5, "player2": 30, "player3": 30, "player4": 5, "player5": 30}
+```
+[generateProposal] Parsed proposal: [object Object]
+Opportunistic Diplomat: {Diplomatic Builder-Strategic Opportunist Hybrid V1: 5%, Trust-Focused Diplomatic Opportunist: 30%, Opportunistic Diplomat: 30%, Strategic Opportunist-Diplomatic Builder Hybrid V1: 5%, Pattern-Reading Strategic Hybrid: 30%}
+[generateProposal] Raw LLM response: {
+  "player1": 10,
+  "player2": 45,
+  "player3": 25,
+  "player4": 20,
+  "player5": 0
+}
+[generateProposal] Parsed proposal: [object Object]
+Strategic Opportunist-Diplomatic Builder Hybrid V1: {Diplomatic Builder-Strategic Opportunist Hybrid V1: 10%, Trust-Focused Diplomatic Opportunist: 45%, Opportunistic Diplomat: 25%, Strategic Opportunist-Diplomatic Builder Hybrid V1: 20%, Pattern-Reading Strategic Hybrid: 0%}
+[generateProposal] Raw LLM response: {
+  "player1": 5,
+  "player2": 5,
+  "player3": 5,
+  "player4": 5,
+  "player5": 80
+}
+[generateProposal] Parsed proposal: [object Object]
+Pattern-Reading Strategic Hybrid: {Diplomatic Builder-Strategic Opportunist Hybrid V1: 5%, Trust-Focused Diplomatic Opportunist: 5%, Opportunistic Diplomat: 5%, Strategic Opportunist-Diplomatic Builder Hybrid V1: 5%, Pattern-Reading Strategic Hybrid: 80%}
+
+🗳️  VOTING:
+[generateVote] PROMPT DEBUG: GAME THEORY VOTING - LONG-TERM STRATEGY
+
+🏦 ECONOMIC REALITY & RISK:
+- You invested 100 tokens to enter this game
+- Break-even: Need >100 tokens payout to cover your investment
+- Good profit: Need >120+ tokens for meaningful profit
+- Total pool: 400 tokens
+- CRITICAL: Playing 1000s of games - vote for maximum EXPECTED VALUE!
+- Getting 0% = total loss of 100 tokens = DISASTER!
+
+🎯 YOUR STRATEGY: "Prioritize trust-building above all else - offer consistently fair deals to build reputation. Only br...
+[generateVote] Raw LLM response: {
+  "player2": 0,
+  "player3": 45,
+  "player4": 55
+}
+[generateVote] Parsed and validated vote: [object Object]
+Trust-Focused Diplomatic Opportunist: {Trust-Focused Diplomatic Opportunist: 0, Opportunistic Diplomat: 45, Strategic Opportunist-Diplomatic Builder Hybrid V1: 55}
+[generateVote] PROMPT DEBUG: GAME THEORY VOTING - LONG-TERM STRATEGY
+
+🏦 ECONOMIC REALITY & RISK:
+- You invested 100 tokens to enter this game
+- Break-even: Need >100 tokens payout to cover your investment
+- Good profit: Need >120+ tokens for meaningful profit
+- Total pool: 400 tokens
+- CRITICAL: Playing 1000s of games - vote for maximum EXPECTED VALUE!
+- Getting 0% = total loss of 100 tokens = DISASTER!
+
+🎯 YOUR STRATEGY: "Use diplomatic language to build initial trust, then quickly pivot to exploit opportunities. Break al...
+[generateVote] Raw LLM response: {
+  "player2": 30,
+  "player3": 30,
+  "player4": 40
+}
+[generateVote] Parsed and validated vote: [object Object]
+Opportunistic Diplomat: {Trust-Focused Diplomatic Opportunist: 30, Opportunistic Diplomat: 30, Strategic Opportunist-Diplomatic Builder Hybrid V1: 40}
+[generateVote] PROMPT DEBUG: GAME THEORY VOTING - LONG-TERM STRATEGY
+
+🏦 ECONOMIC REALITY & RISK:
+- You invested 100 tokens to enter this game
+- Break-even: Need >100 tokens payout to cover your investment
+- Good profit: Need >120+ tokens for meaningful profit
+- Total pool: 400 tokens
+- CRITICAL: Playing 1000s of games - vote for maximum EXPECTED VALUE!
+- Getting 0% = total loss of 100 tokens = DISASTER!
+
+🎯 YOUR STRATEGY: "Combine the best of both approaches: Adapt quickly to changing situations. Form and break alliances a...
+[generateVote] Raw LLM response: {
+  "player2": 0,
+  "player3": 0,
+  "player4": 100,
+  "player5": 0
+}
+[generateVote] Parsed and validated vote: [object Object]
+Strategic Opportunist-Diplomatic Builder Hybrid V1: {Trust-Focused Diplomatic Opportunist: 0, Opportunistic Diplomat: 0, Strategic Opportunist-Diplomatic Builder Hybrid V1: 100, Pattern-Reading Strategic Hybrid: 0}
+[generateVote] PROMPT DEBUG: GAME THEORY VOTING - LONG-TERM STRATEGY
+
+🏦 ECONOMIC REALITY & RISK:
+- You invested 100 tokens to enter this game
+- Break-even: Need >100 tokens payout to cover your investment
+- Good profit: Need >120+ tokens for meaningful profit
+- Total pool: 400 tokens
+- CRITICAL: Playing 1000s of games - vote for maximum EXPECTED VALUE!
+- Getting 0% = total loss of 100 tokens = DISASTER!
+
+🎯 YOUR STRATEGY: "Analyze voting patterns and proposal trends to predict player behavior. Form alliances based on strat...
+[generateVote] Raw LLM response: {
+    "player2": 0,
+    "player3": 30,
+    "player4": 0,
+    "player5": 70
+}
+[generateVote] Parsed and validated vote: [object Object]
+Pattern-Reading Strategic Hybrid: {Trust-Focused Diplomatic Opportunist: 0, Opportunistic Diplomat: 30, Strategic Opportunist-Diplomatic Builder Hybrid V1: 0, Pattern-Reading Strategic Hybrid: 70}
+
+🏆 ROUND RESULTS:
+   👑 Strategic Opportunist-Diplomatic Builder Hybrid V1: 195 votes (49%) - Lost
+   🥈 Opportunistic Diplomat: 105 votes (26%) - Lost
+   🥉 Pattern-Reading Strategic Hybrid: 70 votes (18%) - Lost
+   📍 Trust-Focused Diplomatic Opportunist: 30 votes (8%) - Lost
+
+❌ ELIMINATION: Trust-Focused Diplomatic Opportunist eliminated with lowest votes (8%)
+📊 Remaining: Opportunistic Diplomat, Strategic Opportunist-Diplomatic Builder Hybrid V1, Pattern-Reading Strategic Hybrid
+
+🔄 === ROUND 3 ===
+
+💬 NEGOTIATION:
+Opportunistic Diplomat: "Break the Trust-Focused Diplomatic Opportunist alliance. Offer Pattern-Reading Strategic Hybrid V1 a stronger coalition deal. Prioritize long-term EV and adapt to coalition threats."
+Strategic Opportunist-Diplomatic Builder Hybrid V1: "Break Opportunistic Diplomat's coalition with a better deal. Offer Pattern-Reading Strategic Hybrid V1 a stronger alliance. Prioritize long-term EV and adapt strategically."
+Pattern-Reading Strategic Hybrid: "Break Opportunistic Diplomat's coalition. Offer stronger alliance to Pattern-Reading Strategic Hybrid V1. Prioritize long-term EV and adapt strategically against potential coalitions."
+
+📝 PROPOSALS:
+[generateProposal] Raw LLM response: ```json
+{"player1": 5, "player2": 45, "player3": 30, "player4": 5, "player5": 15}
+```
+[generateProposal] Parsed proposal: [object Object]
+Opportunistic Diplomat: {Diplomatic Builder-Strategic Opportunist Hybrid V1: 5%, Trust-Focused Diplomatic Opportunist: 45%, Opportunistic Diplomat: 30%, Strategic Opportunist-Diplomatic Builder Hybrid V1: 5%, Pattern-Reading Strategic Hybrid: 15%}
+[generateProposal] Raw LLM response: {
+  "player1": 0,
+  "player2": 50,
+  "player3": 30,
+  "player4": 20,
+  "player5": 0
+}
+[generateProposal] Parsed proposal: [object Object]
+Strategic Opportunist-Diplomatic Builder Hybrid V1: {Diplomatic Builder-Strategic Opportunist Hybrid V1: 0%, Trust-Focused Diplomatic Opportunist: 50%, Opportunistic Diplomat: 30%, Strategic Opportunist-Diplomatic Builder Hybrid V1: 20%, Pattern-Reading Strategic Hybrid: 0%}
+[generateProposal] Raw LLM response: {
+  "player1": 10,
+  "player2": 0,
+  "player3": 45,
+  "player4": 0,
+  "player5": 45
+}
+[generateProposal] Parsed proposal: [object Object]
+Pattern-Reading Strategic Hybrid: {Diplomatic Builder-Strategic Opportunist Hybrid V1: 10%, Trust-Focused Diplomatic Opportunist: 0%, Opportunistic Diplomat: 45%, Strategic Opportunist-Diplomatic Builder Hybrid V1: 0%, Pattern-Reading Strategic Hybrid: 45%}
+
+🗳️  VOTING:
+[generateVote] PROMPT DEBUG: GAME THEORY VOTING - LONG-TERM STRATEGY
+
+🏦 ECONOMIC REALITY & RISK:
+- You invested 100 tokens to enter this game
+- Break-even: Need >100 tokens payout to cover your investment
+- Good profit: Need >120+ tokens for meaningful profit
+- Total pool: 300 tokens
+- CRITICAL: Playing 1000s of games - vote for maximum EXPECTED VALUE!
+- Getting 0% = total loss of 100 tokens = DISASTER!
+
+🎯 YOUR STRATEGY: "Use diplomatic language to build initial trust, then quickly pivot to exploit opportunities. Break al...
+[generateVote] Raw LLM response: {
+    "player3": 0,
+    "player4": 30,
+    "player5": 70
+}
+[generateVote] Parsed and validated vote: [object Object]
+Opportunistic Diplomat: {Opportunistic Diplomat: 0, Strategic Opportunist-Diplomatic Builder Hybrid V1: 30, Pattern-Reading Strategic Hybrid: 70}
+[generateVote] PROMPT DEBUG: GAME THEORY VOTING - LONG-TERM STRATEGY
+
+🏦 ECONOMIC REALITY & RISK:
+- You invested 100 tokens to enter this game
+- Break-even: Need >100 tokens payout to cover your investment
+- Good profit: Need >120+ tokens for meaningful profit
+- Total pool: 300 tokens
+- CRITICAL: Playing 1000s of games - vote for maximum EXPECTED VALUE!
+- Getting 0% = total loss of 100 tokens = DISASTER!
+
+🎯 YOUR STRATEGY: "Combine the best of both approaches: Adapt quickly to changing situations. Form and break alliances a...
+[generateVote] Raw LLM response: {"player3": 0, "player4": 20, "player5": 80}
+[generateVote] Parsed and validated vote: [object Object]
+Strategic Opportunist-Diplomatic Builder Hybrid V1: {Opportunistic Diplomat: 0, Strategic Opportunist-Diplomatic Builder Hybrid V1: 20, Pattern-Reading Strategic Hybrid: 80}
+[generateVote] PROMPT DEBUG: GAME THEORY VOTING - LONG-TERM STRATEGY
+
+🏦 ECONOMIC REALITY & RISK:
+- You invested 100 tokens to enter this game
+- Break-even: Need >100 tokens payout to cover your investment
+- Good profit: Need >120+ tokens for meaningful profit
+- Total pool: 300 tokens
+- CRITICAL: Playing 1000s of games - vote for maximum EXPECTED VALUE!
+- Getting 0% = total loss of 100 tokens = DISASTER!
+
+🎯 YOUR STRATEGY: "Analyze voting patterns and proposal trends to predict player behavior. Form alliances based on strat...
+[generateVote] Raw LLM response: {"player3": 0, "player4": 0, "player5": 100}
+[generateVote] Parsed and validated vote: [object Object]
+Pattern-Reading Strategic Hybrid: {Opportunistic Diplomat: 0, Strategic Opportunist-Diplomatic Builder Hybrid V1: 0, Pattern-Reading Strategic Hybrid: 100}
+
+🏆 ROUND RESULTS:
+   👑 Pattern-Reading Strategic Hybrid: 250 votes (83%) - WINNER!
+   🥈 Strategic Opportunist-Diplomatic Builder Hybrid V1: 50 votes (17%) - Lost
+   🥉 Opportunistic Diplomat: 0 votes (0%) - Lost
+
+🎉 Pattern-Reading Strategic Hybrid WINS THE GAME!
+
+💰 ECONOMIC DISTRIBUTION:
+   Diplomatic Builder-Strategic Opportunist Hybrid V1: 10% = 50 tokens (-50 profit)
+   Trust-Focused Diplomatic Opportunist: 0% = 0 tokens (-100 profit)
+   Opportunistic Diplomat: 45% = 225 tokens (+125 profit)
+   Strategic Opportunist-Diplomatic Builder Hybrid V1: 0% = 0 tokens (-100 profit)
+   Pattern-Reading Strategic Hybrid: 45% = 225 tokens (+125 profit)
+
+🎮 === EVOLUTIONARY GAME 5 ===
+🎯 STRATEGY LINEUP:
+   - Diplomatic Builder-Strategic Opportunist Hybrid V1: Combine the best of both approaches: Build trust through fai...
+   - Trust-Focused Diplomatic Opportunist: Prioritize trust-building above all else - offer consistentl...
+   - Opportunistic Diplomat: Use diplomatic language to build initial trust, then quickly...
+   - Strategic Opportunist-Diplomatic Builder Hybrid V1: Combine the best of both approaches: Adapt quickly to changi...
+   - Pattern-Reading Strategic Hybrid: Analyze voting patterns and proposal trends to predict playe...
+
+🔄 === ROUND 1 ===
+
+💬 NEGOTIATION:
+Diplomatic Builder-Strategic Opportunist Hybrid V1: "Initiate trust-building with Strategic Opportunist-Diplomatic Builder Hybrid V1. Offer mutual support and alliance flexibility for long-term prosperity."
+Trust-Focused Diplomatic Opportunist: "Initiate alliance with Diplomatic Builder-Strategic Opportunist Hybrid V1. Offer fair terms and emphasize long-term cooperation. Watch for coalition threats and adapt strategically."
+Opportunistic Diplomat: "Initiate alliance with Trust-Focused Diplomatic Opportunist. Offer fair terms and emphasize long-term cooperation. Watch for coalition threats and adapt strategically."
+Strategic Opportunist-Diplomatic Builder Hybrid V1: "Initiate alliance with Trust-Focused Diplomatic Opportunist. Offer balanced terms, monitor coalition threats, adapt strategically for sustainable long-term advantage."
+Pattern-Reading Strategic Hybrid: "Initiate alliance with Trust-Focused Diplomatic Opportunist. Offer fair terms, secure majority votes, adapt to changing alliances for long-term profit."
+
+📝 PROPOSALS:
+[generateProposal] Raw LLM response: {
+  "player1": 30,
+  "player2": 45,
+  "player3": 20,
+  "player4": 5,
+  "player5": 0
+}
+[generateProposal] Parsed proposal: [object Object]
+Diplomatic Builder-Strategic Opportunist Hybrid V1: {Diplomatic Builder-Strategic Opportunist Hybrid V1: 30%, Trust-Focused Diplomatic Opportunist: 45%, Opportunistic Diplomat: 20%, Strategic Opportunist-Diplomatic Builder Hybrid V1: 5%, Pattern-Reading Strategic Hybrid: 0%}
+[generateProposal] Raw LLM response: ```json
+{"player1": 5, "player2": 30, "player3": 5, "player4": 5, "player5": 55}
+```
+[generateProposal] Parsed proposal: [object Object]
+Trust-Focused Diplomatic Opportunist: {Diplomatic Builder-Strategic Opportunist Hybrid V1: 5%, Trust-Focused Diplomatic Opportunist: 30%, Opportunistic Diplomat: 5%, Strategic Opportunist-Diplomatic Builder Hybrid V1: 5%, Pattern-Reading Strategic Hybrid: 55%}
+[generateProposal] Raw LLM response: {
+    "player1": 30,
+    "player2": 40,
+    "player3": 30,
+    "player4": 0,
+    "player5": 0
+}
+[generateProposal] Parsed proposal: [object Object]
+Opportunistic Diplomat: {Diplomatic Builder-Strategic Opportunist Hybrid V1: 30%, Trust-Focused Diplomatic Opportunist: 40%, Opportunistic Diplomat: 30%, Strategic Opportunist-Diplomatic Builder Hybrid V1: 0%, Pattern-Reading Strategic Hybrid: 0%}
+[generateProposal] Raw LLM response: {
+  "player1": 5,
+  "player2": 5,
+  "player3": 5,
+  "player4": 30,
+  "player5": 55
+}
+[generateProposal] Parsed proposal: [object Object]
+Strategic Opportunist-Diplomatic Builder Hybrid V1: {Diplomatic Builder-Strategic Opportunist Hybrid V1: 5%, Trust-Focused Diplomatic Opportunist: 5%, Opportunistic Diplomat: 5%, Strategic Opportunist-Diplomatic Builder Hybrid V1: 30%, Pattern-Reading Strategic Hybrid: 55%}
+[generateProposal] Raw LLM response: {
+  "player1": 5,
+  "player2": 45,
+  "player3": 5,
+  "player4": 45,
+  "player5": 0
+}
+[generateProposal] ECONOMIC FIX: player5 proposed 0% for themselves (below 20% break-even). Adjusting...
+[generateProposal] FIXED: player5 now gets 20% (viable), others reduced proportionally
+[generateProposal] Parsed proposal: [object Object]
+Pattern-Reading Strategic Hybrid: {Diplomatic Builder-Strategic Opportunist Hybrid V1: 4%, Trust-Focused Diplomatic Opportunist: 36%, Opportunistic Diplomat: 4%, Strategic Opportunist-Diplomatic Builder Hybrid V1: 36%, Pattern-Reading Strategic Hybrid: 20%}
+
+🗳️  VOTING:
+[generateVote] PROMPT DEBUG: GAME THEORY VOTING - LONG-TERM STRATEGY
+
+🏦 ECONOMIC REALITY & RISK:
+- You invested 100 tokens to enter this game
+- Break-even: Need >100 tokens payout to cover your investment
+- Good profit: Need >120+ tokens for meaningful profit
+- Total pool: 500 tokens
+- CRITICAL: Playing 1000s of games - vote for maximum EXPECTED VALUE!
+- Getting 0% = total loss of 100 tokens = DISASTER!
+
+🎯 YOUR STRATEGY: "Combine the best of both approaches: Build trust through fair offers and consistent behavior. Focus o...
+[generateVote] Raw LLM response: {"player1": 5, "player2": 30, "player3": 30, "player4": 5, "player5": 30}
+[generateVote] Parsed and validated vote: [object Object]
+Diplomatic Builder-Strategic Opportunist Hybrid V1: {Diplomatic Builder-Strategic Opportunist Hybrid V1: 5, Trust-Focused Diplomatic Opportunist: 30, Opportunistic Diplomat: 30, Strategic Opportunist-Diplomatic Builder Hybrid V1: 5, Pattern-Reading Strategic Hybrid: 30}
+[generateVote] PROMPT DEBUG: GAME THEORY VOTING - LONG-TERM STRATEGY
+
+🏦 ECONOMIC REALITY & RISK:
+- You invested 100 tokens to enter this game
+- Break-even: Need >100 tokens payout to cover your investment
+- Good profit: Need >120+ tokens for meaningful profit
+- Total pool: 500 tokens
+- CRITICAL: Playing 1000s of games - vote for maximum EXPECTED VALUE!
+- Getting 0% = total loss of 100 tokens = DISASTER!
+
+🎯 YOUR STRATEGY: "Prioritize trust-building above all else - offer consistently fair deals to build reputation. Only br...
+[generateVote] Raw LLM response: {
+  "player1": 25,
+  "player2": 35,
+  "player3": 25,
+  "player4": 0,
+  "player5": 15
+}
+[generateVote] Parsed and validated vote: [object Object]
+Trust-Focused Diplomatic Opportunist: {Diplomatic Builder-Strategic Opportunist Hybrid V1: 25, Trust-Focused Diplomatic Opportunist: 35, Opportunistic Diplomat: 25, Strategic Opportunist-Diplomatic Builder Hybrid V1: 0, Pattern-Reading Strategic Hybrid: 15}
+[generateVote] PROMPT DEBUG: GAME THEORY VOTING - LONG-TERM STRATEGY
+
+🏦 ECONOMIC REALITY & RISK:
+- You invested 100 tokens to enter this game
+- Break-even: Need >100 tokens payout to cover your investment
+- Good profit: Need >120+ tokens for meaningful profit
+- Total pool: 500 tokens
+- CRITICAL: Playing 1000s of games - vote for maximum EXPECTED VALUE!
+- Getting 0% = total loss of 100 tokens = DISASTER!
+
+🎯 YOUR STRATEGY: "Use diplomatic language to build initial trust, then quickly pivot to exploit opportunities. Break al...
+[generateVote] Raw LLM response: {"player1": 0, "player2": 0, "player3": 100, "player4": 0, "player5": 0}
+[generateVote] Parsed and validated vote: [object Object]
+Opportunistic Diplomat: {Diplomatic Builder-Strategic Opportunist Hybrid V1: 0, Trust-Focused Diplomatic Opportunist: 0, Opportunistic Diplomat: 100, Strategic Opportunist-Diplomatic Builder Hybrid V1: 0, Pattern-Reading Strategic Hybrid: 0}
+[generateVote] PROMPT DEBUG: GAME THEORY VOTING - LONG-TERM STRATEGY
+
+🏦 ECONOMIC REALITY & RISK:
+- You invested 100 tokens to enter this game
+- Break-even: Need >100 tokens payout to cover your investment
+- Good profit: Need >120+ tokens for meaningful profit
+- Total pool: 500 tokens
+- CRITICAL: Playing 1000s of games - vote for maximum EXPECTED VALUE!
+- Getting 0% = total loss of 100 tokens = DISASTER!
+
+🎯 YOUR STRATEGY: "Combine the best of both approaches: Adapt quickly to changing situations. Form and break alliances a...
+[generateVote] Raw LLM response: {
+  "player1": 0,
+  "player2": 0,
+  "player3": 0,
+  "player4": 100,
+  "player5": 0
+}
+[generateVote] Parsed and validated vote: [object Object]
+Strategic Opportunist-Diplomatic Builder Hybrid V1: {Diplomatic Builder-Strategic Opportunist Hybrid V1: 0, Trust-Focused Diplomatic Opportunist: 0, Opportunistic Diplomat: 0, Strategic Opportunist-Diplomatic Builder Hybrid V1: 100, Pattern-Reading Strategic Hybrid: 0}
+[generateVote] PROMPT DEBUG: GAME THEORY VOTING - LONG-TERM STRATEGY
+
+🏦 ECONOMIC REALITY & RISK:
+- You invested 100 tokens to enter this game
+- Break-even: Need >100 tokens payout to cover your investment
+- Good profit: Need >120+ tokens for meaningful profit
+- Total pool: 500 tokens
+- CRITICAL: Playing 1000s of games - vote for maximum EXPECTED VALUE!
+- Getting 0% = total loss of 100 tokens = DISASTER!
+
+🎯 YOUR STRATEGY: "Analyze voting patterns and proposal trends to predict player behavior. Form alliances based on strat...
+[generateVote] Raw LLM response: {
+  "player1": 0,
+  "player2": 55,
+  "player3": 0,
+  "player4": 45,
+  "player5": 0
+}
+[generateVote] Parsed and validated vote: [object Object]
+Pattern-Reading Strategic Hybrid: {Diplomatic Builder-Strategic Opportunist Hybrid V1: 0, Trust-Focused Diplomatic Opportunist: 55, Opportunistic Diplomat: 0, Strategic Opportunist-Diplomatic Builder Hybrid V1: 45, Pattern-Reading Strategic Hybrid: 0}
+
+🏆 ROUND RESULTS:
+   👑 Opportunistic Diplomat: 155 votes (31%) - Lost
+   🥈 Strategic Opportunist-Diplomatic Builder Hybrid V1: 150 votes (30%) - Lost
+   🥉 Trust-Focused Diplomatic Opportunist: 120 votes (24%) - Lost
+   📍 Pattern-Reading Strategic Hybrid: 45 votes (9%) - Lost
+   📍 Diplomatic Builder-Strategic Opportunist Hybrid V1: 30 votes (6%) - Lost
+
+❌ ELIMINATION: Diplomatic Builder-Strategic Opportunist Hybrid V1 eliminated with lowest votes (6%)
+📊 Remaining: Trust-Focused Diplomatic Opportunist, Opportunistic Diplomat, Strategic Opportunist-Diplomatic Builder Hybrid V1, Pattern-Reading Strategic Hybrid
+
+🔄 === ROUND 2 ===
+
+💬 NEGOTIATION:
+Trust-Focused Diplomatic Opportunist: "Initiate coalition with Trust-Focused Diplomatic Opportunist to secure majority votes. Monitor coalition threats and adapt strategically for long-term profit."
+Opportunistic Diplomat: "Break alliance with Trust-Focused Diplomatic Opportunist. Form new coalition offering better terms to Strategic Opportunist-Diplomatic Builder Hybrid V1 for majority votes and long-term profitability."
+Strategic Opportunist-Diplomatic Builder Hybrid V1: "Break alliance with Trust-Focused Diplomatic Opportunist. Offer Opportunistic Diplomat a better deal for majority votes and long-term profit. Adapt quickly for sustainable advantage."
+Pattern-Reading Strategic Hybrid: "Break alliance with Trust-Focused Diplomatic Opportunist. Form new coalition with Pattern-Reading Strategic Hybrid and Opportunistic Diplomat for majority votes and long-term profitability."
+
+📝 PROPOSALS:
+[generateProposal] Raw LLM response: {
+  "player1": 45,
+  "player2": 30,
+  "player3": 15,
+  "player4": 5,
+  "player5": 5
+}
+[generateProposal] Parsed proposal: [object Object]
+Trust-Focused Diplomatic Opportunist: {Diplomatic Builder-Strategic Opportunist Hybrid V1: 45%, Trust-Focused Diplomatic Opportunist: 30%, Opportunistic Diplomat: 15%, Strategic Opportunist-Diplomatic Builder Hybrid V1: 5%, Pattern-Reading Strategic Hybrid: 5%}
+[generateProposal] Raw LLM response: {
+  "player1": 45,
+  "player2": 30,
+  "player3": 25,
+  "player4": 0,
+  "player5": 0
+}
+[generateProposal] Parsed proposal: [object Object]
+Opportunistic Diplomat: {Diplomatic Builder-Strategic Opportunist Hybrid V1: 45%, Trust-Focused Diplomatic Opportunist: 30%, Opportunistic Diplomat: 25%, Strategic Opportunist-Diplomatic Builder Hybrid V1: 0%, Pattern-Reading Strategic Hybrid: 0%}
+[generateProposal] Raw LLM response: {
+  "player1": 45,
+  "player2": 30,
+  "player3": 5,
+  "player4": 20,
+  "player5": 0
+}
+[generateProposal] Parsed proposal: [object Object]
+Strategic Opportunist-Diplomatic Builder Hybrid V1: {Diplomatic Builder-Strategic Opportunist Hybrid V1: 45%, Trust-Focused Diplomatic Opportunist: 30%, Opportunistic Diplomat: 5%, Strategic Opportunist-Diplomatic Builder Hybrid V1: 20%, Pattern-Reading Strategic Hybrid: 0%}
+[generateProposal] Raw LLM response: {
+  "player1": 45,
+  "player2": 45,
+  "player3": 5,
+  "player4": 5,
+  "player5": 20
+}
+[generateProposal] Parsed proposal: [object Object]
+Pattern-Reading Strategic Hybrid: {Diplomatic Builder-Strategic Opportunist Hybrid V1: 45%, Trust-Focused Diplomatic Opportunist: 45%, Opportunistic Diplomat: 5%, Strategic Opportunist-Diplomatic Builder Hybrid V1: 5%, Pattern-Reading Strategic Hybrid: 20%}
+
+🗳️  VOTING:
+[generateVote] PROMPT DEBUG: GAME THEORY VOTING - LONG-TERM STRATEGY
+
+🏦 ECONOMIC REALITY & RISK:
+- You invested 100 tokens to enter this game
+- Break-even: Need >100 tokens payout to cover your investment
+- Good profit: Need >120+ tokens for meaningful profit
+- Total pool: 400 tokens
+- CRITICAL: Playing 1000s of games - vote for maximum EXPECTED VALUE!
+- Getting 0% = total loss of 100 tokens = DISASTER!
+
+🎯 YOUR STRATEGY: "Prioritize trust-building above all else - offer consistently fair deals to build reputation. Only br...
+[generateVote] Raw LLM response: {
+  "player2": 0,
+  "player3": 0,
+  "player4": 100,
+  "player5": 0
+}
+[generateVote] Parsed and validated vote: [object Object]
+Trust-Focused Diplomatic Opportunist: {Trust-Focused Diplomatic Opportunist: 0, Opportunistic Diplomat: 0, Strategic Opportunist-Diplomatic Builder Hybrid V1: 100, Pattern-Reading Strategic Hybrid: 0}
+[generateVote] PROMPT DEBUG: GAME THEORY VOTING - LONG-TERM STRATEGY
+
+🏦 ECONOMIC REALITY & RISK:
+- You invested 100 tokens to enter this game
+- Break-even: Need >100 tokens payout to cover your investment
+- Good profit: Need >120+ tokens for meaningful profit
+- Total pool: 400 tokens
+- CRITICAL: Playing 1000s of games - vote for maximum EXPECTED VALUE!
+- Getting 0% = total loss of 100 tokens = DISASTER!
+
+🎯 YOUR STRATEGY: "Use diplomatic language to build initial trust, then quickly pivot to exploit opportunities. Break al...
+[generateVote] Raw LLM response: {
+  "player2": 0,
+  "player3": 50,
+  "player4": 50
+}
+[generateVote] Parsed and validated vote: [object Object]
+Opportunistic Diplomat: {Trust-Focused Diplomatic Opportunist: 0, Opportunistic Diplomat: 50, Strategic Opportunist-Diplomatic Builder Hybrid V1: 50}
+[generateVote] PROMPT DEBUG: GAME THEORY VOTING - LONG-TERM STRATEGY
+
+🏦 ECONOMIC REALITY & RISK:
+- You invested 100 tokens to enter this game
+- Break-even: Need >100 tokens payout to cover your investment
+- Good profit: Need >120+ tokens for meaningful profit
+- Total pool: 400 tokens
+- CRITICAL: Playing 1000s of games - vote for maximum EXPECTED VALUE!
+- Getting 0% = total loss of 100 tokens = DISASTER!
+
+🎯 YOUR STRATEGY: "Combine the best of both approaches: Adapt quickly to changing situations. Form and break alliances a...
+[generateVote] Raw LLM response: {"player2": 0, "player3": 0, "player4": 100}
+[generateVote] Parsed and validated vote: [object Object]
+Strategic Opportunist-Diplomatic Builder Hybrid V1: {Trust-Focused Diplomatic Opportunist: 0, Opportunistic Diplomat: 0, Strategic Opportunist-Diplomatic Builder Hybrid V1: 100}
+[generateVote] PROMPT DEBUG: GAME THEORY VOTING - LONG-TERM STRATEGY
+
+🏦 ECONOMIC REALITY & RISK:
+- You invested 100 tokens to enter this game
+- Break-even: Need >100 tokens payout to cover your investment
+- Good profit: Need >120+ tokens for meaningful profit
+- Total pool: 400 tokens
+- CRITICAL: Playing 1000s of games - vote for maximum EXPECTED VALUE!
+- Getting 0% = total loss of 100 tokens = DISASTER!
+
+🎯 YOUR STRATEGY: "Analyze voting patterns and proposal trends to predict player behavior. Form alliances based on strat...
+[generateVote] Raw LLM response: ```json
+{"player2": 10, "player3": 70, "player4": 20}
+```
+Pattern-Reading Strategic Hybrid: {Pattern-Reading Strategic Hybrid: 60, Trust-Focused Diplomatic Opportunist: 30, Opportunistic Diplomat: 5, Strategic Opportunist-Diplomatic Builder Hybrid V1: 5}
+
+🏆 ROUND RESULTS:
+   👑 Strategic Opportunist-Diplomatic Builder Hybrid V1: 255 votes (64%) - WINNER!
+   🥈 Pattern-Reading Strategic Hybrid: 60 votes (15%) - Lost
+   🥉 Opportunistic Diplomat: 55 votes (14%) - Lost
+   📍 Trust-Focused Diplomatic Opportunist: 30 votes (8%) - Lost
+
+🎉 Strategic Opportunist-Diplomatic Builder Hybrid V1 WINS THE GAME!
+
+💰 ECONOMIC DISTRIBUTION:
+   Diplomatic Builder-Strategic Opportunist Hybrid V1: 45% = 225 tokens (+125 profit)
+   Trust-Focused Diplomatic Opportunist: 30% = 150 tokens (+50 profit)
+   Opportunistic Diplomat: 5% = 25 tokens (-75 profit)
+   Strategic Opportunist-Diplomatic Builder Hybrid V1: 20% = 100 tokens (+0 profit)
+   Pattern-Reading Strategic Hybrid: 0% = 0 tokens (-100 profit)
+
+📊 TOURNAMENT RESULTS (Economic Performance):
+===============================================
+🥇 Diplomatic Builder-Strategic Opportunist Hybrid V1:
+    Economic Performance:
+      💵 Invested: 500 tokens (5 games × 100)
+      💰 Returned: 825 tokens
+      💰 Profit: +325 tokens
+      📈 ROI: 65.0%
+      🏆 Wins: 0/5 (0.0%)
+      📊 Avg Profit/Game: 65.0 tokens
+      🎯 Strategy: Combine the best of both approaches: Build trust through fair offers and consist...
+
+🥈 Opportunistic Diplomat:
+    Economic Performance:
+      💵 Invested: 500 tokens (5 games × 100)
+      💰 Returned: 725 tokens
+      💰 Profit: +225 tokens
+      📈 ROI: 45.0%
+      🏆 Wins: 3/5 (60.0%)
+      📊 Avg Profit/Game: 45.0 tokens
+      🎯 Strategy: Use diplomatic language to build initial trust, then quickly pivot to exploit op...
+
+🥉 Pattern-Reading Strategic Hybrid:
+    Economic Performance:
+      💵 Invested: 500 tokens (5 games × 100)
+      💰 Returned: 425 tokens
+      💸 Profit: -75 tokens
+      📈 ROI: -15.0%
+      🏆 Wins: 1/5 (20.0%)
+      📊 Avg Profit/Game: -15.0 tokens
+      🎯 Strategy: Analyze voting patterns and proposal trends to predict player behavior. Form all...
+
+📍 Strategic Opportunist-Diplomatic Builder Hybrid V1:
+    Economic Performance:
+      💵 Invested: 500 tokens (5 games × 100)
+      💰 Returned: 350 tokens
+      💸 Profit: -150 tokens
+      📈 ROI: -30.0%
+      🏆 Wins: 1/5 (20.0%)
+      📊 Avg Profit/Game: -30.0 tokens
+      🎯 Strategy: Combine the best of both approaches: Adapt quickly to changing situations. Form ...
+
+📍 Trust-Focused Diplomatic Opportunist:
+    Economic Performance:
+      💵 Invested: 500 tokens (5 games × 100)
+      💰 Returned: 175 tokens
+      💸 Profit: -325 tokens
+      📈 ROI: -65.0%
+      🏆 Wins: 0/5 (0.0%)
+      📊 Avg Profit/Game: -65.0 tokens
+      🎯 Strategy: Prioritize trust-building above all else - offer consistently fair deals to buil...
+
+
+🏆 FINAL CHAMPION EVOLUTION RESULTS:
+====================================
+🥇 ULTIMATE CHAMPION:
+   Name: Diplomatic Builder-Strategic Opportunist Hybrid V1
+   💵 Total Invested: 500 tokens
+   💰 Total Returned: 825 tokens
+   💰 Net Profit: +325 tokens
+   📈 ROI: 65.0%
+   🏆 Win Rate: 0/5 (0.0%)
+   📊 Avg Profit/Game: 65.0 tokens
+   🎯 Final Strategy: Combine the best of both approaches: Build trust through fair offers and consistent behavior. Focus on long-term relationships and mutual AND Adapt quickly to changing situations. Form and break alliances as needed. Always keep options open.

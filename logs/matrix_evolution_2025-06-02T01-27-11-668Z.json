@@ -1,0 +1,651 @@
+{
+  "strategies": [
+    {
+      "id": "matrix_aggressive",
+      "name": "Matrix Aggressive Maximizer",
+      "strategy": "Demand high percentages for yourself (40%+), use minimal vote trading, make aggressive requests",
+      "balance": 720,
+      "wins": 2,
+      "totalGames": 3,
+      "averageReturn": 73.33333333333333,
+      "eliminated": false
+    },
+    {
+      "id": "matrix_diplomatic",
+      "name": "Matrix Diplomatic Builder",
+      "strategy": "Propose balanced allocations (20-30% for all), make generous offers, build alliances through vote trading",
+      "balance": 480,
+      "totalGames": 3,
+      "averageReturn": -6.666666666666667,
+      "eliminated": false,
+      "wins": null
+    },
+    {
+      "id": "matrix_calculator",
+      "name": "Matrix Strategic Calculator",
+      "strategy": "Use mathematical optimization, analyze matrix patterns, make calculated offers based on probability",
+      "balance": 480,
+      "wins": 0,
+      "totalGames": 3,
+      "averageReturn": -6.666666666666667,
+      "eliminated": false
+    },
+    {
+      "id": "matrix_opportunist",
+      "name": "Matrix Smart Opportunist",
+      "strategy": "Adapt your matrix based on what others propose, form temporary alliances, exploit weaknesses",
+      "balance": 320,
+      "wins": 0,
+      "totalGames": 3,
+      "averageReturn": -60,
+      "eliminated": false
+    }
+  ],
+  "gameHistory": [
+    {
+      "gameNumber": 1,
+      "players": [
+        "Matrix Aggressive Maximizer",
+        "Matrix Diplomatic Builder",
+        "Matrix Strategic Calculator",
+        "Matrix Smart Opportunist"
+      ],
+      "matrixData": {
+        "finalMatrix": [
+          [
+            60,
+            20,
+            15,
+            5,
+            80,
+            10,
+            10,
+            0,
+            60,
+            10,
+            20,
+            10,
+            80,
+            60,
+            40,
+            20
+          ],
+          [
+            25,
+            25,
+            25,
+            25,
+            20,
+            20,
+            30,
+            30,
+            40,
+            20,
+            20,
+            20,
+            20,
+            20,
+            25,
+            15
+          ],
+          [
+            25,
+            30,
+            30,
+            15,
+            25,
+            20,
+            30,
+            25,
+            30,
+            30,
+            20,
+            20,
+            25,
+            25,
+            25,
+            25
+          ],
+          [
+            30,
+            20,
+            30,
+            20,
+            30,
+            30,
+            20,
+            20,
+            40,
+            20,
+            20,
+            20,
+            40,
+            30,
+            20,
+            10
+          ]
+        ],
+        "negotiationSummary": {
+          "totalPromises": 16,
+          "promisesKept": 4,
+          "promiseKeepingRate": 25
+        },
+        "roundsCompleted": 3
+      },
+      "proposals": {
+        "Matrix Aggressive Maximizer": {
+          "player1": 45,
+          "player2": 30,
+          "player3": 20,
+          "player4": 5
+        },
+        "Matrix Diplomatic Builder": {
+          "player1": 25,
+          "player2": 25,
+          "player3": 25,
+          "player4": 25
+        },
+        "Matrix Strategic Calculator": {
+          "player1": 40,
+          "player2": 30,
+          "player3": 20,
+          "player4": 10
+        },
+        "Matrix Smart Opportunist": {
+          "player1": 25,
+          "player2": 25,
+          "player3": 25,
+          "player4": 25
+        }
+      },
+      "votes": {
+        "Matrix Aggressive Maximizer": {
+          "player1": 20,
+          "player2": 60,
+          "player3": 20,
+          "player4": 0
+        },
+        "Matrix Diplomatic Builder": {
+          "player1": 20,
+          "player2": 30,
+          "player3": 30,
+          "player4": 20
+        },
+        "Matrix Strategic Calculator": {
+          "player1": 40,
+          "player2": 30,
+          "player3": 20,
+          "player4": 10
+        },
+        "Matrix Smart Opportunist": {
+          "player1": 20,
+          "player2": 20,
+          "player3": 20,
+          "player4": 40
+        }
+      },
+      "results": {
+        "winner": {
+          "name": "Matrix Diplomatic Builder",
+          "votes": 140,
+          "tokens": 100
+        },
+        "voteBreakdown": [
+          [
+            "Matrix Diplomatic Builder",
+            140
+          ],
+          [
+            "Matrix Aggressive Maximizer",
+            100
+          ],
+          [
+            "Matrix Strategic Calculator",
+            90
+          ],
+          [
+            "Matrix Smart Opportunist",
+            70
+          ]
+        ],
+        "distribution": {
+          "Matrix Aggressive Maximizer": 100,
+          "Matrix Diplomatic Builder": 100,
+          "Matrix Strategic Calculator": 100,
+          "Matrix Smart Opportunist": 100
+        },
+        "voteDetails": {
+          "Matrix Aggressive Maximizer": {
+            "Matrix Aggressive Maximizer": 20,
+            "Matrix Diplomatic Builder": 20,
+            "Matrix Strategic Calculator": 40,
+            "Matrix Smart Opportunist": 20
+          },
+          "Matrix Diplomatic Builder": {
+            "Matrix Aggressive Maximizer": 60,
+            "Matrix Diplomatic Builder": 30,
+            "Matrix Strategic Calculator": 30,
+            "Matrix Smart Opportunist": 20
+          },
+          "Matrix Strategic Calculator": {
+            "Matrix Aggressive Maximizer": 20,
+            "Matrix Diplomatic Builder": 30,
+            "Matrix Strategic Calculator": 20,
+            "Matrix Smart Opportunist": 20
+          },
+          "Matrix Smart Opportunist": {
+            "Matrix Aggressive Maximizer": 0,
+            "Matrix Diplomatic Builder": 20,
+            "Matrix Strategic Calculator": 10,
+            "Matrix Smart Opportunist": 40
+          }
+        }
+      },
+      "timestamp": "2025-06-02T01:26:53.217Z"
+    },
+    {
+      "gameNumber": 2,
+      "players": [
+        "Matrix Aggressive Maximizer",
+        "Matrix Diplomatic Builder",
+        "Matrix Strategic Calculator",
+        "Matrix Smart Opportunist"
+      ],
+      "matrixData": {
+        "finalMatrix": [
+          [
+            60,
+            20,
+            15,
+            5,
+            80,
+            10,
+            10,
+            0,
+            60,
+            10,
+            20,
+            10,
+            80,
+            60,
+            40,
+            20
+          ],
+          [
+            25,
+            25,
+            25,
+            25,
+            20,
+            20,
+            30,
+            30,
+            40,
+            20,
+            20,
+            20,
+            20,
+            20,
+            25,
+            15
+          ],
+          [
+            25,
+            30,
+            30,
+            15,
+            25,
+            20,
+            30,
+            25,
+            30,
+            30,
+            20,
+            20,
+            25,
+            25,
+            25,
+            25
+          ],
+          [
+            30,
+            20,
+            30,
+            20,
+            30,
+            30,
+            20,
+            20,
+            40,
+            20,
+            20,
+            20,
+            40,
+            30,
+            20,
+            10
+          ]
+        ],
+        "negotiationSummary": {
+          "totalPromises": 16,
+          "promisesKept": 9,
+          "promiseKeepingRate": 56.3
+        },
+        "roundsCompleted": 3
+      },
+      "proposals": {
+        "Matrix Aggressive Maximizer": {
+          "player1": 45,
+          "player2": 25,
+          "player3": 30,
+          "player4": 0
+        },
+        "Matrix Diplomatic Builder": {
+          "player1": 25,
+          "player2": 25,
+          "player3": 25,
+          "player4": 25
+        },
+        "Matrix Strategic Calculator": {
+          "player1": 38,
+          "player2": 25,
+          "player3": 25,
+          "player4": 12
+        },
+        "Matrix Smart Opportunist": {
+          "player1": 40,
+          "player2": 20,
+          "player3": 20,
+          "player4": 20
+        }
+      },
+      "votes": {
+        "Matrix Aggressive Maximizer": {
+          "player1": 35,
+          "player2": 30,
+          "player3": 20,
+          "player4": 15
+        },
+        "Matrix Diplomatic Builder": {
+          "player1": 20,
+          "player2": 20,
+          "player3": 20,
+          "player4": 40
+        },
+        "Matrix Strategic Calculator": {
+          "player1": 30,
+          "player2": 30,
+          "player3": 20,
+          "player4": 20
+        },
+        "Matrix Smart Opportunist": {
+          "player1": 50,
+          "player2": 40,
+          "player3": 0,
+          "player4": 10
+        }
+      },
+      "results": {
+        "winner": {
+          "name": "Matrix Aggressive Maximizer",
+          "votes": 135,
+          "tokens": 180
+        },
+        "voteBreakdown": [
+          [
+            "Matrix Aggressive Maximizer",
+            135
+          ],
+          [
+            "Matrix Diplomatic Builder",
+            120
+          ],
+          [
+            "Matrix Smart Opportunist",
+            85
+          ],
+          [
+            "Matrix Strategic Calculator",
+            60
+          ]
+        ],
+        "distribution": {
+          "Matrix Aggressive Maximizer": 180,
+          "Matrix Diplomatic Builder": 100,
+          "Matrix Strategic Calculator": 120,
+          "Matrix Smart Opportunist": 0
+        },
+        "voteDetails": {
+          "Matrix Aggressive Maximizer": {
+            "Matrix Aggressive Maximizer": 35,
+            "Matrix Diplomatic Builder": 20,
+            "Matrix Strategic Calculator": 30,
+            "Matrix Smart Opportunist": 50
+          },
+          "Matrix Diplomatic Builder": {
+            "Matrix Aggressive Maximizer": 30,
+            "Matrix Diplomatic Builder": 20,
+            "Matrix Strategic Calculator": 30,
+            "Matrix Smart Opportunist": 40
+          },
+          "Matrix Strategic Calculator": {
+            "Matrix Aggressive Maximizer": 20,
+            "Matrix Diplomatic Builder": 20,
+            "Matrix Strategic Calculator": 20,
+            "Matrix Smart Opportunist": 0
+          },
+          "Matrix Smart Opportunist": {
+            "Matrix Aggressive Maximizer": 15,
+            "Matrix Diplomatic Builder": 40,
+            "Matrix Strategic Calculator": 20,
+            "Matrix Smart Opportunist": 10
+          }
+        }
+      },
+      "timestamp": "2025-06-02T01:27:02.075Z"
+    },
+    {
+      "gameNumber": 3,
+      "players": [
+        "Matrix Aggressive Maximizer",
+        "Matrix Diplomatic Builder",
+        "Matrix Strategic Calculator",
+        "Matrix Smart Opportunist"
+      ],
+      "matrixData": {
+        "finalMatrix": [
+          [
+            60,
+            20,
+            15,
+            5,
+            80,
+            10,
+            10,
+            0,
+            60,
+            10,
+            20,
+            10,
+            80,
+            60,
+            40,
+            20
+          ],
+          [
+            25,
+            25,
+            25,
+            25,
+            20,
+            20,
+            30,
+            30,
+            40,
+            20,
+            20,
+            20,
+            20,
+            20,
+            25,
+            15
+          ],
+          [
+            25,
+            30,
+            30,
+            15,
+            25,
+            20,
+            30,
+            25,
+            30,
+            30,
+            20,
+            20,
+            25,
+            25,
+            25,
+            25
+          ],
+          [
+            30,
+            20,
+            30,
+            20,
+            30,
+            30,
+            20,
+            20,
+            40,
+            20,
+            20,
+            20,
+            40,
+            30,
+            20,
+            10
+          ]
+        ],
+        "negotiationSummary": {
+          "totalPromises": 16,
+          "promisesKept": 6,
+          "promiseKeepingRate": 37.5
+        },
+        "roundsCompleted": 3
+      },
+      "proposals": {
+        "Matrix Aggressive Maximizer": {
+          "player1": 60,
+          "player2": 20,
+          "player3": 15,
+          "player4": 5
+        },
+        "Matrix Diplomatic Builder": {
+          "player1": 25,
+          "player2": 25,
+          "player3": 25,
+          "player4": 25
+        },
+        "Matrix Strategic Calculator": {
+          "player1": 25,
+          "player2": 30,
+          "player3": 30,
+          "player4": 15
+        },
+        "Matrix Smart Opportunist": {
+          "player1": 30,
+          "player2": 20,
+          "player3": 30,
+          "player4": 20
+        }
+      },
+      "votes": {
+        "Matrix Aggressive Maximizer": {
+          "player1": 80,
+          "player2": 10,
+          "player3": 10,
+          "player4": 0
+        },
+        "Matrix Diplomatic Builder": {
+          "player1": 20,
+          "player2": 20,
+          "player3": 30,
+          "player4": 30
+        },
+        "Matrix Strategic Calculator": {
+          "player1": 25,
+          "player2": 20,
+          "player3": 30,
+          "player4": 25
+        },
+        "Matrix Smart Opportunist": {
+          "player1": 30,
+          "player2": 30,
+          "player3": 20,
+          "player4": 20
+        }
+      },
+      "results": {
+        "winner": {
+          "name": "Matrix Aggressive Maximizer",
+          "votes": 155,
+          "tokens": 240
+        },
+        "voteBreakdown": [
+          [
+            "Matrix Aggressive Maximizer",
+            155
+          ],
+          [
+            "Matrix Strategic Calculator",
+            90
+          ],
+          [
+            "Matrix Diplomatic Builder",
+            80
+          ],
+          [
+            "Matrix Smart Opportunist",
+            75
+          ]
+        ],
+        "distribution": {
+          "Matrix Aggressive Maximizer": 240,
+          "Matrix Diplomatic Builder": 80,
+          "Matrix Strategic Calculator": 60,
+          "Matrix Smart Opportunist": 20
+        },
+        "voteDetails": {
+          "Matrix Aggressive Maximizer": {
+            "Matrix Aggressive Maximizer": 80,
+            "Matrix Diplomatic Builder": 20,
+            "Matrix Strategic Calculator": 25,
+            "Matrix Smart Opportunist": 30
+          },
+          "Matrix Diplomatic Builder": {
+            "Matrix Aggressive Maximizer": 10,
+            "Matrix Diplomatic Builder": 20,
+            "Matrix Strategic Calculator": 20,
+            "Matrix Smart Opportunist": 30
+          },
+          "Matrix Strategic Calculator": {
+            "Matrix Aggressive Maximizer": 10,
+            "Matrix Diplomatic Builder": 30,
+            "Matrix Strategic Calculator": 30,
+            "Matrix Smart Opportunist": 20
+          },
+          "Matrix Smart Opportunist": {
+            "Matrix Aggressive Maximizer": 0,
+            "Matrix Diplomatic Builder": 30,
+            "Matrix Strategic Calculator": 25,
+            "Matrix Smart Opportunist": 20
+          }
+        }
+      },
+      "timestamp": "2025-06-02T01:27:10.667Z"
+    }
+  ],
+  "currentTournament": 1,
+  "timestamp": "2025-06-02T01:27:11.669Z"
+}

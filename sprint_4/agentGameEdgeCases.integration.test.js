@@ -59,10 +59,10 @@ describe('Agent-driven game edge cases', () => {
     let msg;
     try {
       // Monkey-patch callLLM to throw
-      const original = require('../llmApi').callLLM;
-      require('../llmApi').callLLM = async () => { throw new Error('LLM fail'); };
+      const original = require('../src/core/llmApi').callLLM;
+      require('../src/core/llmApi').callLLM = async () => { throw new Error('LLM fail'); };
       msg = await generateNegotiationMessage(contextWithLlm, agent);
-      require('../llmApi').callLLM = original;
+      require('../src/core/llmApi').callLLM = original;
     } catch (err) {
       errorCaught = true;
     }

@@ -22,23 +22,27 @@ class ImprovedMatrixSystem {
         this.logFile = `improved_matrix_log_${timestamp}.json`;
         this.llmInteractions = [];
         
-        console.log(`📝 LLM interactions will be logged to: ${this.logFile}`);
-        
         // Configuration options
         this.config = {
             collectReasoning: config.collectReasoning !== false, // Default to true
             verbosity: config.verbosity || 3, // 0=silent, 1=minimal, 2=normal, 3=verbose, 4=debug
             showFullMatrix: config.showFullMatrix || false,
+            customLogger: config.customLogger || null, // Custom logging function
             ...config
         };
         
-        // Logging functions that respect verbosity
+        // Use custom logger if provided, otherwise use console.log
+        const logFunction = this.config.customLogger || console.log;
+        
+        logFunction(`📝 LLM interactions will be logged to: ${this.logFile}`);
+        
+        // Logging functions that respect verbosity and use custom logger
         this.log = {
             silent: () => {},
-            minimal: (msg) => this.config.verbosity >= 1 && console.log(msg),
-            normal: (msg) => this.config.verbosity >= 2 && console.log(msg),
-            verbose: (msg) => this.config.verbosity >= 3 && console.log(msg),
-            debug: (msg) => this.config.verbosity >= 4 && console.log(msg)
+            minimal: (msg) => this.config.verbosity >= 1 && logFunction(msg),
+            normal: (msg) => this.config.verbosity >= 2 && logFunction(msg),
+            verbose: (msg) => this.config.verbosity >= 3 && logFunction(msg),
+            debug: (msg) => this.config.verbosity >= 4 && logFunction(msg)
         };
     }
 
@@ -78,7 +82,7 @@ class ImprovedMatrixSystem {
         this.playerExplanations = Array(numPlayers).fill(null).map(() => []);
         this.strategicHistory = Array(numPlayers).fill(null).map(() => []);
         
-        console.log(`🔢 Initialized ${numPlayers}x${matrixWidth} matrix with unified vote structure`);
+        this.log.normal(`🔢 Initialized ${numPlayers}x${matrixWidth} matrix with unified vote structure`);
         return this.negotiationMatrix;
     }
 
@@ -172,7 +176,7 @@ class ImprovedMatrixSystem {
         } catch (error) {
             this.logLLMInteraction(playerName, playerIndex, roundNumber, '', '', false, error.message);
             this.logViolation(playerIndex, 'SYSTEM_ERROR', error.message, roundNumber);
-            console.log(`[Player ${playerIndex + 1}] Matrix negotiation failed: ${error.message}`);
+            this.log.normal(`[Player ${playerIndex + 1}] Matrix negotiation failed: ${error.message}`);
             return false;
         }
     }
@@ -407,7 +411,7 @@ Your position in arrays is index ${playerIndex}, so position ${playerIndex} repr
         
         // Handle eliminated players - force proposal section to -1
         if (isEliminated) {
-            console.log(`ELIMINATED PLAYER: Setting proposal section and vote request section to -1`);
+            this.log.verbose(`ELIMINATED PLAYER: Setting proposal section and vote request section to -1`);
             // Set proposal section to -1 (positions 0 to numPlayers-1)
             for (let i = 0; i < numPlayers; i++) {
                 corrected[i] = -1;
@@ -422,7 +426,7 @@ Your position in arrays is index ${playerIndex}, so position ${playerIndex} repr
         
         // FORCE self-allocation to be profitable (≥17%) unless eliminated
         if (!isEliminated && corrected[playerIndex] < 17) {
-            console.log(`FORCING PROFITABLE ALLOCATION: ${corrected[playerIndex]}% → 17% to prevent financial loss`);
+            this.log.verbose(`FORCING PROFITABLE ALLOCATION: ${corrected[playerIndex]}% → 17% to prevent financial loss`);
             const deficit = 17 - corrected[playerIndex];
             corrected[playerIndex] = 17;
             
@@ -572,11 +576,11 @@ Array format: [${data.join(', ')}]`;
             
             if (matrixRow.length === expectedLength - 1) {
                 // LLM provided 17 instead of 18 - pad with 0
-                console.log(`⚠️  Auto-fixing array length: got ${matrixRow.length}, expected ${expectedLength}, adding 0`);
+                this.log.verbose(`⚠️  Auto-fixing array length: got ${matrixRow.length}, expected ${expectedLength}, adding 0`);
                     matrixRow.push(0);
             } else if (matrixRow.length === expectedLength + 1) {
                 // LLM provided 19 instead of 18 - trim last element
-                console.log(`⚠️  Auto-fixing array length: got ${matrixRow.length}, expected ${expectedLength}, removing last element`);
+                this.log.verbose(`⚠️  Auto-fixing array length: got ${matrixRow.length}, expected ${expectedLength}, removing last element`);
                 matrixRow = matrixRow.slice(0, expectedLength);
             } else if (matrixRow.length !== expectedLength) {
                 return { 
@@ -718,7 +722,7 @@ Array format: [${data.join(', ')}]`;
             matrixSnapshot: [...newRowData]
         });
         
-        console.log(`🔒 [${playerRow.playerName}] Row ${playerIndex} updated (mod #${playerRow.modificationCount})`);
+        this.log.normal(`🔒 [${playerRow.playerName}] Row ${playerIndex} updated (mod #${playerRow.modificationCount})`);
     }
 
     logViolation(playerIndex, violationType, details, roundNumber) {
@@ -732,7 +736,7 @@ Array format: [${data.join(', ')}]`;
         };
         
         this.violationLog.push(violation);
-        console.log(`🚨 VIOLATION: ${violation.playerName} - ${violationType}: ${details}`);
+        this.log.normal(`🚨 VIOLATION: ${violation.playerName} - ${violationType}: ${details}`);
     }
 
     getMatrix() {
@@ -740,34 +744,34 @@ Array format: [${data.join(', ')}]`;
     }
 
     displayResults() {
-        console.log('\n📊 ENHANCED MATRIX SYSTEM RESULTS');
-        console.log('=================================');
+        this.log.normal('\n📊 ENHANCED MATRIX SYSTEM RESULTS');
+        this.log.normal('=================================');
         
         // Show LLM interaction summary
-        console.log('\n📝 LLM INTERACTION SUMMARY:');
-        console.log(`Total LLM calls: ${this.llmInteractions.length}`);
-        console.log(`Log file: ${this.logFile}`);
+        this.log.normal('\n📝 LLM INTERACTION SUMMARY:');
+        this.log.normal(`Total LLM calls: ${this.llmInteractions.length}`);
+        this.log.normal(`Log file: ${this.logFile}`);
         
         const successfulCalls = this.llmInteractions.filter(i => i.success).length;
         const correctedCalls = this.llmInteractions.filter(i => i.corrected).length;
         const failedCalls = this.llmInteractions.filter(i => !i.success).length;
         
-        console.log(`Successful calls: ${successfulCalls}`);
-        console.log(`Auto-corrected calls: ${correctedCalls}`);
-        console.log(`Failed calls: ${failedCalls}`);
+        this.log.normal(`Successful calls: ${successfulCalls}`);
+        this.log.normal(`Auto-corrected calls: ${correctedCalls}`);
+        this.log.normal(`Failed calls: ${failedCalls}`);
         
         if (this.llmInteractions.length > 0) {
             const validInteractions = this.llmInteractions.filter(i => !i.corrected);
             if (validInteractions.length > 0) {
                 const avgPromptLength = validInteractions.reduce((sum, i) => sum + i.promptLength, 0) / validInteractions.length;
                 const avgResponseLength = validInteractions.reduce((sum, i) => sum + i.responseLength, 0) / validInteractions.length;
-            console.log(`Average prompt length: ${avgPromptLength.toFixed(0)} chars`);
-            console.log(`Average response length: ${avgResponseLength.toFixed(0)} chars`);
+            this.log.normal(`Average prompt length: ${avgPromptLength.toFixed(0)} chars`);
+            this.log.normal(`Average response length: ${avgResponseLength.toFixed(0)} chars`);
             }
         }
         
         // Show enhanced matrix state
-        console.log('\nENHANCED MATRIX STATE (3 sections):');
+        this.log.normal('\nENHANCED MATRIX STATE (3 sections):');
         this.negotiationMatrix.forEach((rowObj, idx) => {
             const data = rowObj.data;
             const numPlayers = this.players.length;
@@ -775,32 +779,32 @@ Array format: [${data.join(', ')}]`;
             const votes = data.slice(numPlayers, numPlayers * 2);
             const requests = data.slice(numPlayers * 2, numPlayers * 3);
             
-            console.log(`Row ${idx} (${rowObj.playerName}):`);
-            console.log(`  💰 Token Proposal: [${proposal.join(',')}%] (sum: ${proposal.reduce((a,b) => a+b, 0)}%)`);
-            console.log(`  🗳️ Vote Allocation: [${votes.join(',')}%] (sum: ${votes.reduce((a,b) => a+b, 0)}%)`);
-            console.log(`  📞 Vote Requests: [${requests.join(',')}] votes`);
-            console.log(`  🔧 Modifications: ${rowObj.modificationCount}`);
-            console.log('');
+            this.log.normal(`Row ${idx} (${rowObj.playerName}):`);
+            this.log.normal(`  💰 Token Proposal: [${proposal.join(',')}%] (sum: ${proposal.reduce((a,b) => a+b, 0)}%)`);
+            this.log.normal(`  🗳️ Vote Allocation: [${votes.join(',')}%] (sum: ${votes.reduce((a,b) => a+b, 0)}%)`);
+            this.log.normal(`  📞 Vote Requests: [${requests.join(',')}] votes`);
+            this.log.normal(`  🔧 Modifications: ${rowObj.modificationCount}`);
+            this.log.normal('');
         });
         
         // Show strategic evolution
-        console.log('STRATEGIC EVOLUTION:');
+        this.log.normal('STRATEGIC EVOLUTION:');
         this.strategicHistory.forEach((history, playerIndex) => {
             const playerName = this.players[playerIndex].name;
-            console.log(`\n${playerName} Strategic Development:`);
+            this.log.normal(`\n${playerName} Strategic Development:`);
             history.forEach(entry => {
-                console.log(`  Round ${entry.round}: "${entry.explanation.substring(0, 200)}..."`);
+                this.log.normal(`  Round ${entry.round}: "${entry.explanation.substring(0, 200)}..."`);
             });
         });
         
         // Show violations
         if (this.violationLog.length > 0) {
-            console.log('\nVIOLATIONS:');
+            this.log.normal('\nVIOLATIONS:');
             this.violationLog.forEach(v => {
-                console.log(`  ${v.playerName}: ${v.violationType} - ${v.details}`);
+                this.log.normal(`  ${v.playerName}: ${v.violationType} - ${v.details}`);
             });
         } else {
-            console.log('\n✅ NO VIOLATIONS DETECTED');
+            this.log.normal('\n✅ NO VIOLATIONS DETECTED');
         }
         
         // Summary stats
@@ -808,14 +812,14 @@ Array format: [${data.join(', ')}]`;
         const totalExplanations = this.playerExplanations.reduce((sum, exps) => sum + exps.length, 0);
         const totalViolations = this.violationLog.length;
         
-        console.log('\nSUMMARY:');
-        console.log(`Matrix format: 3-section unified (${this.players.length * 3} numbers per player)`);
-        console.log(`Matrix modifications: ${totalMods}`);
-        console.log(`Strategic explanations: ${totalExplanations}`);
-        console.log(`Violations: ${totalViolations}`);
-        console.log(`Auto-corrections: ${correctedCalls}`);
-        console.log(`LLM success rate: ${((successfulCalls / this.llmInteractions.filter(i => !i.corrected).length) * 100).toFixed(1)}%`);
-        console.log(`Matrix update success rate: ${((totalMods / (this.players.length * 2)) * 100).toFixed(1)}%`);
+        this.log.normal('\nSUMMARY:');
+        this.log.normal(`Matrix format: 3-section unified (${this.players.length * 3} numbers per player)`);
+        this.log.normal(`Matrix modifications: ${totalMods}`);
+        this.log.normal(`Strategic explanations: ${totalExplanations}`);
+        this.log.normal(`Violations: ${totalViolations}`);
+        this.log.normal(`Auto-corrections: ${correctedCalls}`);
+        this.log.normal(`LLM success rate: ${((successfulCalls / this.llmInteractions.filter(i => !i.corrected).length) * 100).toFixed(1)}%`);
+        this.log.normal(`Matrix update success rate: ${((totalMods / (this.players.length * 2)) * 100).toFixed(1)}%`);
         
         return {
             matrix: this.getMatrix(),
@@ -833,7 +837,7 @@ Array format: [${data.join(', ')}]`;
     }
 
     printCurrentMatrixState() {
-        console.log(this.formatDetailedMatrixState());
+        this.log.normal(this.formatDetailedMatrixState());
     }
 }
 

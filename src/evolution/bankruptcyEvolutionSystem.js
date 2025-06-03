@@ -287,7 +287,8 @@ class BankruptcyEvolutionSystem {
     const matrixSystem = new ImprovedMatrixSystem({
       collectReasoning: this.fullLogging,
       verbosity: this.fullLogging ? 3 : 1,
-      showFullMatrix: false
+      showFullMatrix: false,
+      customLogger: (message) => this.log('debug', 'MatrixSystem', message)
     });
 
     const gameResult = await this.simulateGameWithMatrix(matrixSystem, gameData);

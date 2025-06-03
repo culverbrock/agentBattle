@@ -166,9 +166,10 @@ class ImprovedMatrixSystem {
             
             // Show full matrix only if requested
             if (this.config.showFullMatrix && this.config.verbosity >= 2) {
-                this.log.normal(`\n=== MATRIX STATE AFTER PLAYER ${playerIndex + 1} UPDATE ===`);
-                this.log.normal(this.formatDetailedMatrixState());
-                this.log.normal('=== END MATRIX STATE ===\n');
+                const logFunction = this.config.customLogger || console.log;
+                logFunction(`\n=== MATRIX STATE AFTER PLAYER ${playerIndex + 1} UPDATE ===`);
+                logFunction(this.formatDetailedMatrixState());
+                logFunction('=== END MATRIX STATE ===\n');
             }
             
             return true;

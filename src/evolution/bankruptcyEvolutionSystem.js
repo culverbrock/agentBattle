@@ -287,7 +287,7 @@ class BankruptcyEvolutionSystem {
     const matrixSystem = new ImprovedMatrixSystem({
       collectReasoning: this.fullLogging,
       verbosity: this.fullLogging ? 3 : 1,
-      showFullMatrix: false,
+      showFullMatrix: true,
       customLogger: (message) => this.log('debug', 'MatrixSystem', message)
     });
 

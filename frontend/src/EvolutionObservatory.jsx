@@ -423,31 +423,22 @@ function DashboardView({ strategies, currentGame, currentTournament, currentRoun
 
         <div className="live-activity-panel">
           <h3>⚡ Live Logs</h3>
-          <div className="live-logs-container">
+          <div className="live-logs-console">
             {isWaitingForNextGame ? (
-              <div className="activity-feed">
-                <div className="log-entry delay">
-                  <span className="log-time">{countdown.formattedTime}</span>
-                  <span className="log-source">RateLimit</span>
-                  <span className="log-message">Waiting for rate limit delay</span>
-                </div>
+              <div className="console-line">
+                {countdown.formattedTime} - RateLimit: Waiting for rate limit delay
               </div>
             ) : detailedLogs.length > 0 ? (
-              <div className="activity-feed">
+              <div>
                 {detailedLogs.slice(-15).map((log, idx) => (
-                  <div key={idx} className={`log-entry log-${log.level || 'info'}`}>
-                    <span className="log-time">{new Date(log.timestamp).toLocaleTimeString()}</span>
-                    <span className="log-source">{log.source || 'System'}</span>
-                    <span className="log-message">{log.message}</span>
+                  <div key={idx} className="console-line">
+                    {log.message}
                   </div>
                 ))}
               </div>
             ) : (
-              <div className="activity-feed">
-                <div className="log-entry">
-                  <span className="log-source">System</span>
-                  <span className="log-message">Waiting for simulation to start...</span>
-                </div>
+              <div className="console-line">
+                System: Waiting for simulation to start...
               </div>
             )}
           </div>
@@ -539,15 +530,13 @@ function LogsView({ logs, isRunning }) {
   return (
     <div className="logs-view">
       <h3>📝 Live Evolution Logs</h3>
-      <div className="logs-container">
+      <div className="logs-console">
         {logs.length === 0 ? (
-          <p>No logs yet. {isRunning ? 'Simulation starting...' : 'Start the simulation to see logs!'}</p>
+          <div className="console-line">No logs yet. {isRunning ? 'Simulation starting...' : 'Start the simulation to see logs!'}</div>
         ) : (
           logs.map((log, idx) => (
-            <div key={idx} className={`log-entry log-${log.level || 'info'}`}>
-              <span className="log-time">{new Date(log.timestamp).toLocaleTimeString()}</span>
-              <span className="log-source">{log.source || 'System'}</span>
-              <span className="log-message">{log.message}</span>
+            <div key={idx} className="console-line">
+              {log.message}
             </div>
           ))
         )}

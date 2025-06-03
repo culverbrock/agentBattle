@@ -408,16 +408,13 @@ Respond with JSON:
       verbosity: this.fullLogging ? 3 : 1,
       showFullMatrix: true,
       customLogger: (message) => {
-        // Log to both debug level and broadcast directly for dashboard
-        this.log('debug', 'MatrixSystem', message);
-        
-        // Also send as individual log for live dashboard display
+        // Send the raw console message directly - no formatting, just like terminal output
         if (this.broadcaster) {
           this.broadcaster.broadcast({
             type: 'log',
             data: {
-              level: 'debug',
-              source: 'MatrixSystem',
+              level: 'console',
+              source: 'Matrix',
               message: message,
               timestamp: Date.now()
             }

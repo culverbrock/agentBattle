@@ -728,138 +728,78 @@ Respond with JSON:
   }
 
   async simulateGameWithMatrix(matrixSystem, gameData) {
-    const players = gameData.players.map((strategy, index) => ({
+    // Setup players for matrix system
+    const allPlayers = gameData.players.map((strategy, index) => ({
       id: strategy.id,
       name: strategy.name,
       strategy: strategy.strategy,
       agent: { strategyId: strategy.id }
     }));
-
-    let activePlayers = [...players]; // Players who can make proposals
-    let allPlayers = [...players]; // All players (including eliminated ones)
+    
+    // Initialize matrix system with players
+    matrixSystem.initializeMatrix(allPlayers);
+    
+    let activePlayers = [...allPlayers]; // Players who can make proposals
     let roundNumber = 1;
     let finalWinner = null;
     let finalProposal = null;
-    let negotiationHistory = [];
+    let proposals = []; // Declare proposals outside the loop to maintain scope
+    let allVotes = {}; // Declare allVotes outside the loop to maintain scope
     
-    // Initialize matrix system ONCE for the entire game
-    let matrixInitialized = false;
+    this.log('info', 'MatrixGame', `Starting matrix game with ${allPlayers.length} total players, ${activePlayers.length} active`);
 
-    // Game loop - continue until someone gets 61%+ votes or only one player remains
-    while (!finalWinner && roundNumber <= 5 && activePlayers.length >= 2) {
+    const context = {
+      gameType: 'bankruptcyEvolution',
+      matrixSystem: matrixSystem,
+      allPlayers: allPlayers,
+      activePlayers: activePlayers,
+      gameNumber: gameData.number,
+      phase: 'matrix_negotiation'
+    };
+
+    // Game loop - negotiate until winner emerges
+    while (finalWinner === null && activePlayers.length > 0 && roundNumber <= this.maxRounds) {
       this.log('info', 'MatrixGame', `=== ROUND ${roundNumber} ===`);
-      
-      const context = {
-        phase: 'negotiation',
-        round: roundNumber,
-        maxRounds: 5,
-        players: allPlayers,
-        negotiationHistory: negotiationHistory
-      };
+      this.log('debug', 'MatrixGame', `Matrix negotiations starting (${this.maxNegotiationRounds} rounds)`);
 
-      // Matrix Negotiation phase
-      this.log('debug', 'MatrixGame', 'Matrix negotiations starting (3 rounds)');
-      const roundNegotiations = [];
+      // Negotiation phase via matrix
+      const matrixResultsPromise = matrixSystem.runNegotiation({
+        players: allPlayers,
+        eliminated: allPlayers.filter(p => !activePlayers.includes(p)),
+        rounds: this.maxNegotiationRounds,
+        gameContext: gameData
+      });
+
+      const matrixResults = await matrixResultsPromise;
       
-      try {
-        // Only initialize matrix ONCE in Round 1 - preserve elimination state in subsequent rounds
-        if (!matrixInitialized) {
-          matrixSystem.initializeMatrix(allPlayers);
-          matrixInitialized = true;
+      // Extract reasoning data after matrix
+      const reasoning = this.extractReasoningData(matrixSystem);
+      
+      // Update context with matrix results
+      context.finalMatrix = matrixResults.finalMatrix;
+      context.matrixSystem = matrixSystem;
+      context.reasoning = reasoning;
+
+      // Capture logs
+      const logs = context.logs || [];
+
+      // Broadcast round data
+      this.onUpdate({
+        type: 'round_complete',
+        data: {
+          number: roundNumber,
+          gameNumber: gameData.number,
+          phase: 'matrix_complete',
+          matrix: this.extractMatrixData(matrixSystem),
+          reasoning: reasoning,
+          activePlayers: activePlayers.length,
+          logs: logs
         }
-        
-        // Run 3 rounds of matrix negotiations
-        const matrixRounds = 3;
-        for (let matrixRound = 1; matrixRound <= matrixRounds; matrixRound++) {
-          
-          // Each player updates their matrix row (including eliminated players!)
-          for (let playerIndex = 0; playerIndex < allPlayers.length; playerIndex++) {
-            const player = allPlayers[playerIndex];
-            const isActive = activePlayers.find(p => p.id === player.id);
-            
-            // Find the strategy for this player
-            const strategy = gameData.players.find(s => s.id === player.id);
-            const strategyText = strategy ? strategy.strategy : 'Maximize my position strategically';
-            
-            // Create active players array for matrix system
-            const activePlayersInfo = allPlayers.map((p, idx) => ({
-              playerIndex: idx,
-              isActive: !!activePlayers.find(ap => ap.id === p.id)
-            }));
-            
-            try {
-              // Even eliminated players can update matrix (offers, votes, etc.)
-              const success = await matrixSystem.performNegotiationRound(
-                playerIndex,
-                strategyText,
-                roundNumber,
-                !isActive, // Pass elimination status to matrix system
-                activePlayersInfo
-              );
-              
-              if (success) {
-                const matrixNegotiation = {
-                  playerId: player.id,
-                  playerName: player.name,
-                  strategyId: player.agent.strategyId,
-                  message: isActive 
-                    ? `Matrix update completed: strategic positioning optimized`
-                    : `Matrix update completed: offering votes and influence despite elimination`,
-                  round: roundNumber,
-                  negotiationRound: matrixRound,
-                  isMatrixBased: true,
-                  isEliminated: !isActive
-                };
-                negotiationHistory.push(matrixNegotiation);
-                roundNegotiations.push(matrixNegotiation);
-                
-                const statusTag = isActive ? '' : ' [ELIMINATED - OFFERING VOTES]';
-                this.log('debug', 'MatrixGame', `${player.name}${statusTag}: Matrix updated successfully`);
-              } else {
-                const statusTag = isActive ? '' : ' [ELIMINATED]';
-                this.log('warning', 'MatrixGame', `${player.name}${statusTag}: Matrix update failed`);
-              }
-            } catch (error) {
-              const statusTag = isActive ? '' : ' [ELIMINATED]';
-              this.log('warning', 'MatrixGame', `${player.name}${statusTag}: Matrix error - ${error.message}`);
-            }
-            
-            // Small delay to prevent overwhelming the API
-            await this.sleep(this.interactionDelaySeconds * 1000);
-          }
-          
-          // Show matrix state after this matrix round
-          this.log('info', 'MatrixGame', `\n📊 Matrix State After Round ${matrixRound}/${matrixRounds}:`);
-          matrixSystem.displayResults();
-        }
-        
-        // Store matrix results in context
-        context.matrixSystem = matrixSystem;
-        context.finalMatrix = matrixSystem.getMatrix();
-        
-      } catch (error) {
-        this.log('error', 'MatrixGame', `Matrix negotiation system failed: ${error.message}`);
-        
-        // Fallback: Create simple negotiation entries
-        allPlayers.forEach(player => {
-          const fallbackNegotiation = {
-            playerId: player.id,
-            playerName: player.name,
-            strategyId: player.agent.strategyId,
-            message: `Strategic positioning evaluated (matrix fallback)`,
-            round: roundNumber,
-            negotiationRound: 1,
-            wasFailure: true,
-            isMatrixBased: true
-          };
-          negotiationHistory.push(fallbackNegotiation);
-          roundNegotiations.push(fallbackNegotiation);
-        });
-      }
+      });
 
       // Proposal phase - ONLY ACTIVE PLAYERS can make proposals
       this.log('debug', 'MatrixGame', 'Proposal phase starting');
-      const proposals = [];
+      proposals = []; // Reset proposals for this round
       
       // Run all proposals in parallel
       const proposalPromises = activePlayers.map(async (player) => {
@@ -928,7 +868,7 @@ Respond with JSON:
       context.proposals = proposals;
       
       this.log('debug', 'MatrixGame', 'Voting phase starting');
-      const allVotes = {};
+      allVotes = {}; // Reset allVotes for this round (don't redeclare)
       
       // Run all votes in parallel
       const votingPromises = allPlayers.map(async (player) => {
@@ -1142,7 +1082,17 @@ Respond with JSON:
     this.log('warning', 'MatrixGame', 'Game ended without clear winner - using fallback');
     const remainingPlayers = activePlayers.length > 0 ? activePlayers : allPlayers;
     const fallbackWinner = remainingPlayers[0];
-    const fallbackProposal = new Array(allPlayers.length).fill(Math.floor(100 / allPlayers.length));
+    
+    // Create proper equal distribution that totals exactly 100%
+    const baseShare = Math.floor(100 / allPlayers.length);
+    const remainder = 100 - (baseShare * allPlayers.length);
+    const fallbackProposal = new Array(allPlayers.length).fill(baseShare);
+    
+    // Distribute remainder to first players to ensure exactly 100%
+    for (let i = 0; i < remainder; i++) {
+      fallbackProposal[i] += 1;
+    }
+    
     const fallbackDistribution = fallbackProposal.map(percentage => 
       Math.round((percentage / 100) * (allPlayers.length * this.entryFee))
     );

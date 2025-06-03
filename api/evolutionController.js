@@ -6,16 +6,17 @@
 const { ContinuousEvolutionSystem } = require('../src/evolution/bankruptcyEvolutionSystem');
 const { EvolutionWebSocketBroadcaster } = require('../src/evolution/evolutionWebSocketBroadcaster');
 
+// Singleton evolution system that auto-starts
+let globalEvolutionSystem = null;
+
 class EvolutionController {
   constructor() {
-    this.isRunning = false;
-    this.currentSimulation = null;
     this.broadcaster = new EvolutionWebSocketBroadcaster();
     this.simulationData = {
       totalGames: 0,
       totalEliminations: 0,
       evolutionEvents: 0,
-      startTime: null,
+      startTime: Date.now(),
       currentTournament: null,
       currentGame: null,
       strategies: [],
@@ -23,9 +24,45 @@ class EvolutionController {
       evolutionTree: [],
       detailedLogs: []
     };
+    
+    // Initialize the global evolution system on startup
+    this.initializeGlobalSystem();
+  }
+
+  async initializeGlobalSystem() {
+    if (!globalEvolutionSystem) {
+      console.log('🧬 Initializing global evolution system...');
+      
+      globalEvolutionSystem = new ContinuousEvolutionSystem({
+        mode: 'continuous_evolution',
+        realTimeUpdates: true,
+        fullLogging: true,
+        autoStart: true, // Auto-start enabled for production
+        onUpdate: (data) => this.handleSimulationUpdate(data),
+        onLog: (log) => this.handleLog(log),
+        broadcaster: this.broadcaster
+      });
+      
+      console.log('🧬 Global evolution system initialized and auto-starting...');
+    }
+  }
+
+  get isRunning() {
+    return globalEvolutionSystem ? globalEvolutionSystem.isRunning : false;
+  }
+
+  get currentSimulation() {
+    return globalEvolutionSystem;
   }
 
   async startEvolution(req, res) {
+    if (!globalEvolutionSystem) {
+      return res.status(500).json({ 
+        error: 'Evolution system not initialized',
+        status: 'error'
+      });
+    }
+
     if (this.isRunning) {
       return res.status(400).json({ 
         error: 'Evolution simulation is already running',
@@ -34,70 +71,49 @@ class EvolutionController {
     }
 
     try {
-      const { mode = 'bankruptcy_elimination', realTime = true, fullLogging = true } = req.body;
+      console.log('🧬 Resuming evolution system...');
       
-      console.log('🧬 Starting Evolution Observatory simulation...');
+      // Just start the existing system
+      globalEvolutionSystem.start();
       
-      // Reset simulation data
-      this.simulationData = {
-        totalGames: 0,
-        totalEliminations: 0,
-        evolutionEvents: 0,
-        startTime: Date.now(),
-        currentTournament: null,
-        currentGame: null,
-        strategies: [],
-        eliminatedStrategies: [],
-        evolutionTree: [],
-        detailedLogs: []
-      };
-
-      // Create the bankruptcy evolution system
-      this.currentSimulation = new ContinuousEvolutionSystem({
-        mode: mode,
-        realTimeUpdates: realTime,
-        fullLogging: fullLogging,
-        onUpdate: (data) => this.handleSimulationUpdate(data),
-        onLog: (log) => this.handleLog(log),
-        broadcaster: this.broadcaster
+      // Restart the evolution loop if needed
+      globalEvolutionSystem.runContinuousEvolution().catch(error => {
+        console.error('Evolution loop error:', error);
       });
-
-      // Start the evolution system
-      this.currentSimulation.start();
-
-      // Start the simulation in the background
-      this.isRunning = true;
-      this.runSimulationLoop();
       
-      // Broadcast simulation started
+      // Broadcast simulation resumed
       this.broadcaster.broadcast({
-        type: 'simulation_started',
+        type: 'simulation_resumed',
         data: {
-          mode: mode,
-          realTime: realTime,
-          fullLogging: fullLogging,
-          startTime: this.simulationData.startTime
+          resumeTime: Date.now(),
+          message: 'Evolution system resumed from pause'
         }
       });
 
       res.json({ 
         success: true, 
-        message: 'Evolution simulation started',
-        mode: mode,
-        startTime: this.simulationData.startTime
+        message: 'Evolution simulation resumed',
+        action: 'resumed',
+        timestamp: Date.now()
       });
 
     } catch (error) {
-      console.error('Failed to start evolution simulation:', error);
-      this.isRunning = false;
+      console.error('Failed to resume evolution simulation:', error);
       res.status(500).json({ 
-        error: 'Failed to start evolution simulation',
+        error: 'Failed to resume evolution simulation',
         details: error.message 
       });
     }
   }
 
   async stopEvolution(req, res) {
+    if (!globalEvolutionSystem) {
+      return res.status(500).json({ 
+        error: 'Evolution system not initialized',
+        status: 'error'
+      });
+    }
+
     if (!this.isRunning) {
       return res.status(400).json({ 
         error: 'No evolution simulation is currently running',
@@ -106,95 +122,69 @@ class EvolutionController {
     }
 
     try {
-      console.log('🧬 Stopping Evolution Observatory simulation...');
+      console.log('🧬 Pausing evolution system...');
       
-      this.isRunning = false;
-      
-      if (this.currentSimulation) {
-        await this.currentSimulation.stop();
-        this.currentSimulation = null;
-      }
+      // Just stop the existing system (don't destroy it)
+      await globalEvolutionSystem.stop();
 
-      // Broadcast simulation stopped
+      // Broadcast simulation paused
       this.broadcaster.broadcast({
-        type: 'simulation_stopped',
+        type: 'simulation_paused',
         data: {
-          endTime: Date.now(),
-          totalRunTime: Date.now() - this.simulationData.startTime,
-          finalStats: {
-            totalGames: this.simulationData.totalGames,
-            totalEliminations: this.simulationData.totalEliminations,
-            evolutionEvents: this.simulationData.evolutionEvents
-          }
+          pauseTime: Date.now(),
+          message: 'Evolution system paused (state preserved)'
         }
       });
 
       res.json({ 
         success: true, 
-        message: 'Evolution simulation stopped',
-        runTime: Date.now() - this.simulationData.startTime,
-        finalStats: {
-          totalGames: this.simulationData.totalGames,
-          totalEliminations: this.simulationData.totalEliminations,
-          evolutionEvents: this.simulationData.evolutionEvents
-        }
+        message: 'Evolution simulation paused',
+        action: 'paused',
+        timestamp: Date.now()
       });
 
     } catch (error) {
-      console.error('Failed to stop evolution simulation:', error);
+      console.error('Failed to pause evolution simulation:', error);
       res.status(500).json({ 
-        error: 'Failed to stop evolution simulation',
+        error: 'Failed to pause evolution simulation',
         details: error.message 
       });
     }
   }
 
   getStatus(req, res) {
+    const system = globalEvolutionSystem;
+    
     res.json({
       isRunning: this.isRunning,
       startTime: this.simulationData.startTime,
       runTime: this.isRunning ? Date.now() - this.simulationData.startTime : 0,
       stats: {
-        totalGames: this.simulationData.totalGames,
+        totalGames: system ? system.totalGamesPlayed : 0,
         totalEliminations: this.simulationData.totalEliminations,
-        evolutionEvents: this.simulationData.evolutionEvents
+        evolutionEvents: system ? system.totalEvolutions : 0
       },
-      currentTournament: this.simulationData.currentTournament,
+      currentTournament: null, // Not applicable for continuous evolution
       currentGame: this.simulationData.currentGame,
       activeStrategies: this.simulationData.strategies.length,
-      eliminatedStrategies: this.simulationData.eliminatedStrategies.length
+      eliminatedStrategies: this.simulationData.eliminatedStrategies.length,
+      systemType: 'continuous_evolution',
+      autoStarted: true
     });
   }
 
   getCurrentData(req, res) {
+    const system = globalEvolutionSystem;
+    
     res.json({
       ...this.simulationData,
       isRunning: this.isRunning,
-      runTime: this.isRunning ? Date.now() - this.simulationData.startTime : 0
+      runTime: this.isRunning ? Date.now() - this.simulationData.startTime : 0,
+      totalGames: system ? system.totalGamesPlayed : 0,
+      totalEvolutions: system ? system.totalEvolutions : 0,
+      systemType: 'continuous_evolution',
+      autoStarted: true
     });
-  }
-
-  async runSimulationLoop() {
-    console.log('🧬 Continuous evolution simulation started');
-    
-    try {
-      // The continuous evolution system runs its own loop
-      await this.currentSimulation.runContinuousEvolution();
-    } catch (error) {
-      console.error('🧬 Continuous evolution simulation error:', error);
-      this.isRunning = false;
-      
-      // Broadcast error
-      this.broadcaster.broadcast({
-        type: 'simulation_error',
-        data: {
-          error: error.message,
-          timestamp: Date.now()
-        }
-      });
-    }
-    
-    console.log('🧬 Continuous evolution simulation ended');
   }
 
   handleSimulationUpdate(data) {

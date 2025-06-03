@@ -41,30 +41,43 @@ class ContinuousEvolutionSystem {
     this.totalGamesPlayed = 0;
     this.totalEvolutions = 0;
     
-    // State persistence
-    this.saveProgressEveryGames = 5; // Save state every 5 games
+    // State persistence - save after EVERY game for better debugging
+    this.saveProgressEveryGames = 1; // Save state after every game
     this.lastProgressFile = null;
     
+    // Initialize but don't auto-start - let the API control startup
+    this.initializeSystem(options);
+  }
+
+  async initializeSystem(options) {
     // Try to resume from previous state if available
     const shouldResume = options.resume !== false; // Resume by default
     if (shouldResume) {
       this.log('info', 'System', 'Attempting to resume from previous state...');
-      this.tryResumeFromPreviousState().catch(error => {
+      try {
+        await this.tryResumeFromPreviousState();
+      } catch (error) {
         this.log('error', 'Resume', `Resume failed: ${error.message}, starting fresh`);
-        this.initializeInitialPopulation();
-      });
+        await this.initializeInitialPopulation();
+      }
     } else {
       this.log('info', 'System', 'Starting fresh (resume disabled)');
-      this.initializeInitialPopulation();
+      await this.initializeInitialPopulation();
     }
     
-    // Auto-start the simulation for continuous evolution
-    setTimeout(() => {
-      this.start();
-      this.runContinuousEvolution().catch(error => {
-        this.log('error', 'AutoStart', `Auto-start failed: ${error.message}`);
-      });
-    }, 2000); // 2 second delay to allow initialization
+    // Only auto-start if explicitly enabled
+    if (options.autoStart !== false) {
+      // Small delay to allow initialization
+      setTimeout(() => {
+        if (!this.isRunning) {
+          this.log('info', 'System', 'Auto-starting continuous evolution...');
+          this.start();
+          this.runContinuousEvolution().catch(error => {
+            this.log('error', 'AutoStart', `Auto-start failed: ${error.message}`);
+          });
+        }
+      }, 3000); // 3 second delay
+    }
   }
 
   async initializeInitialPopulation() {
@@ -156,7 +169,10 @@ class ContinuousEvolutionSystem {
   }
 
   async runContinuousEvolution() {
-    if (!this.isRunning) return;
+    if (!this.isRunning) {
+      this.log('warning', 'System', 'Cannot start evolution - system not running');
+      return;
+    }
 
     this.log('info', 'System', 'Starting continuous evolution - no tournaments, just endless games with evolution on bankruptcy');
 
@@ -166,14 +182,18 @@ class ContinuousEvolutionSystem {
       strategies: this.strategies
     });
 
-    let gameNumber = 0;
+    let gameNumber = this.totalGamesPlayed; // Start from where we left off
 
     while (this.isRunning) {
       gameNumber++;
       this.totalGamesPlayed = gameNumber;
       
+      this.log('info', 'GameLoop', `=== Starting Game ${gameNumber} ===`);
+      
       // Filter out bankrupt strategies first
       const viableStrategies = this.strategies.filter(s => s.coinBalance >= this.entryFee);
+      
+      this.log('debug', 'GameLoop', `Viable strategies: ${viableStrategies.length}/${this.strategies.length}`);
       
       if (viableStrategies.length < 2) {
         this.log('warning', 'Evolution', 'Less than 2 viable strategies remaining - restarting with fresh population');
@@ -183,24 +203,42 @@ class ContinuousEvolutionSystem {
 
       // Wait for rate limit delay between games (except first game)
       if (gameNumber > 1) {
+        this.log('info', 'RateLimit', `About to wait ${this.gameDelayMinutes} minutes before game ${gameNumber}...`);
         await this.waitForNextGame();
-        if (!this.isRunning) break; // Check if stopped during wait
+        if (!this.isRunning) {
+          this.log('warning', 'GameLoop', 'System stopped during wait period');
+          break; // Check if stopped during wait
+        }
+        this.log('info', 'RateLimit', `Wait period completed, continuing with game ${gameNumber}`);
       }
 
       // Run a single game
+      this.log('info', 'GameLoop', `Running game ${gameNumber} with ${viableStrategies.length} players`);
       const gameResult = await this.runSingleGame(gameNumber, viableStrategies);
+      this.log('info', 'GameLoop', `Game ${gameNumber} completed - Winner: ${gameResult.winner?.name || 'None'}`);
       
       // Handle bankruptcies and evolution (combined)
+      this.log('debug', 'GameLoop', 'Checking for bankruptcies and evolution...');
       await this.handleBankruptciesWithEvolution();
       
-      // Save progress periodically and after evolutions
-      if (gameNumber % this.saveProgressEveryGames === 0 || this.totalEvolutions > 0) {
-        await this.saveProgressState();
+      // Save progress after EVERY game for debugging and persistence
+      this.log('debug', 'GameLoop', `Saving progress after game ${gameNumber}...`);
+      try {
+        const saveResult = await this.saveProgressState();
+        this.log('info', 'Persistence', `Game ${gameNumber} progress saved: ${saveResult || 'failed'}`);
+      } catch (error) {
+        this.log('error', 'Persistence', `Failed to save progress after game ${gameNumber}: ${error.message}`);
       }
       
       // Brief pause before next iteration
+      this.log('debug', 'GameLoop', 'Brief pause before next game...');
       await this.sleep(2000);
+      
+      // Log current system state
+      this.log('info', 'GameLoop', `System state: isRunning=${this.isRunning}, totalGamesPlayed=${this.totalGamesPlayed}, totalEvolutions=${this.totalEvolutions}`);
     }
+    
+    this.log('info', 'System', 'Continuous evolution loop ended');
   }
 
   async handleBankruptciesWithEvolution() {
@@ -1453,23 +1491,29 @@ Allocate 100 points among proposals (can be 0 for any proposal):
 
   async tryResumeFromPreviousState() {
     try {
+      this.log('info', 'Resume', 'Searching for previous state in database...');
       const latestProgress = await this.findLatestProgressFromDB();
       if (latestProgress) {
-        this.log('info', 'Resume', `Found previous state: evolution_state_${latestProgress.id}`);
+        this.log('info', 'Resume', `Found previous state: evolution_state_${latestProgress.id} from ${latestProgress.created_at}`);
         const resumed = this.resumeFromProgressData(latestProgress);
         if (resumed) {
           this.log('info', 'Resume', `Successfully resumed from state ${latestProgress.id}`);
           this.log('info', 'Resume', `Continuing from game ${this.totalGamesPlayed + 1} with ${this.strategies.length} strategies`);
-          return;
+          return true;
+        } else {
+          this.log('warning', 'Resume', 'Failed to resume from progress data, will start fresh');
         }
+      } else {
+        this.log('info', 'Resume', 'No previous state found in database, will start fresh');
       }
     } catch (error) {
-      this.log('warning', 'Resume', `Resume failed: ${error.message}, starting fresh`);
+      this.log('error', 'Resume', `Resume failed: ${error.message}, will start fresh`);
     }
     
     // Fallback to fresh start
-    this.log('info', 'Resume', 'No previous state found, starting with fresh population');
+    this.log('info', 'Resume', 'Starting with fresh population');
     await this.initializeInitialPopulation();
+    return false;
   }
 
   async findLatestProgressFromDB() {

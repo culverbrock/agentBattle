@@ -628,6 +628,26 @@ Respond with JSON:
       strategy.preGameBalance = strategy.coinBalance;
     });
 
+    // Update frontend with pre-game balances
+    this.onUpdate({
+      type: 'strategies_updated',
+      strategies: this.strategies.map(s => ({
+        ...s,
+        balanceInfo: {
+          current: s.coinBalance,
+          initial: s.initialBalance,
+          preGame: s.preGameBalance,
+          totalChange: s.coinBalance - s.initialBalance,
+          gameChange: s.coinBalance - s.preGameBalance,
+          gamesPlayed: s.gamesPlayed,
+          avgProfit: s.avgProfit || 0,
+          totalProfit: s.totalProfit || 0,
+          generationInfo: `Gen ${s.generationNumber}${s.birthGame > 0 ? ` (Born Game ${s.birthGame})` : ' (Original)'}`,
+          recentBalanceHistory: (s.balanceHistory || []).slice(-5) // Last 5 balance changes
+        }
+      }))
+    });
+
     this.onUpdate({
       type: 'game_started',
       game: gameData
@@ -645,6 +665,26 @@ Respond with JSON:
       this.addBalanceHistoryEntry(player, gameNumber, player.coinBalance, -this.entryFee, 'Entry fee deducted');
       
       this.log('debug', 'Balance', `${player.name}: ${previousBalance} → ${player.coinBalance} (-${this.entryFee} entry fee)`);
+    });
+
+    // Update frontend immediately after entry fee deduction
+    this.onUpdate({
+      type: 'strategies_updated',
+      strategies: this.strategies.map(s => ({
+        ...s,
+        balanceInfo: {
+          current: s.coinBalance,
+          initial: s.initialBalance,
+          preGame: s.preGameBalance,
+          totalChange: s.coinBalance - s.initialBalance,
+          gameChange: s.coinBalance - s.preGameBalance,
+          gamesPlayed: s.gamesPlayed,
+          avgProfit: s.avgProfit || 0,
+          totalProfit: s.totalProfit || 0,
+          generationInfo: `Gen ${s.generationNumber}${s.birthGame > 0 ? ` (Born Game ${s.birthGame})` : ' (Original)'}`,
+          recentBalanceHistory: (s.balanceHistory || []).slice(-5) // Last 5 balance changes
+        }
+      }))
     });
 
     // Run the game using the matrix system
@@ -733,6 +773,26 @@ Respond with JSON:
         endTime: gameData.endTime,
         duration: gameData.endTime - gameData.startTime
       }
+    });
+
+    // CRITICAL: Update Strategy Financial Health panels with latest balance info
+    this.onUpdate({
+      type: 'strategies_updated',
+      strategies: this.strategies.map(s => ({
+        ...s,
+        balanceInfo: {
+          current: s.coinBalance,
+          initial: s.initialBalance,
+          preGame: s.preGameBalance,
+          totalChange: s.coinBalance - s.initialBalance,
+          gameChange: s.coinBalance - s.preGameBalance,
+          gamesPlayed: s.gamesPlayed,
+          avgProfit: s.avgProfit || 0,
+          totalProfit: s.totalProfit || 0,
+          generationInfo: `Gen ${s.generationNumber}${s.birthGame > 0 ? ` (Born Game ${s.birthGame})` : ' (Original)'}`,
+          recentBalanceHistory: (s.balanceHistory || []).slice(-5) // Last 5 balance changes
+        }
+      }))
     });
 
     return gameData;

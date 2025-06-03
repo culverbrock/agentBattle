@@ -142,7 +142,7 @@ function EvolutionObservatory() {
       case 'round_update':
         setCurrentRound(message.data);
         if (message.data.logs) {
-          setDetailedLogs(prev => [...prev.slice(-200), ...message.data.logs]); // Keep last 200 logs
+          setDetailedLogs(prev => [...prev.slice(-10000), ...message.data.logs]); // Keep last 10,000 logs
         }
         if (message.data.reasoning) {
           setAiReasoning(prev => [...prev.slice(-10), ...Object.entries(message.data.reasoning).map(([strategyId, reasoning]) => ({
@@ -175,7 +175,7 @@ function EvolutionObservatory() {
           ...message.data,
           timestamp: message.data.timestamp || Date.now()
         };
-        setDetailedLogs(prev => [...prev.slice(-200), logEntry]); // Keep last 200 logs
+        setDetailedLogs(prev => [...prev.slice(-10000), logEntry]); // Keep last 10,000 logs
         break;
         
       default:
@@ -430,7 +430,7 @@ function DashboardView({ strategies, currentGame, currentTournament, currentRoun
               </div>
             ) : detailedLogs.length > 0 ? (
               <div>
-                {detailedLogs.slice(-15).map((log, idx) => (
+                {detailedLogs.slice(-150).map((log, idx) => (
                   <div key={idx} className="console-line">
                     {log.message}
                   </div>
@@ -529,7 +529,7 @@ function LogsView({ logs, isRunning }) {
 
   return (
     <div className="logs-view">
-      <h3>📝 Live Evolution Logs</h3>
+      <h3>📝 Live Evolution Logs ({logs.length} total)</h3>
       <div className="logs-console">
         {logs.length === 0 ? (
           <div className="console-line">No logs yet. {isRunning ? 'Simulation starting...' : 'Start the simulation to see logs!'}</div>

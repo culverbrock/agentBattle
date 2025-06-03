@@ -1245,4 +1245,206 @@
   .observatory-header h1 {
     font-size: 2em;
   }
+}
+
+/* Enhanced Balance Section Styles */
+.balance-section {
+  margin-bottom: 12px;
+}
+
+.primary-balance {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.balance-label {
+  font-size: 0.9em;
+  color: #ccc;
+  font-weight: 500;
+}
+
+.balance-value {
+  font-size: 1.2em;
+  color: #4CAF50;
+  font-weight: bold;
+}
+
+.balance-details {
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 6px;
+  padding: 8px;
+  margin-bottom: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.balance-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 4px;
+}
+
+.balance-row:last-child {
+  margin-bottom: 0;
+}
+
+.detail-label {
+  font-size: 0.8em;
+  color: #aaa;
+}
+
+.detail-value {
+  font-size: 0.8em;
+  font-weight: 500;
+}
+
+.detail-value.positive {
+  color: #4CAF50;
+}
+
+.detail-value.negative {
+  color: #f44336;
+}
+
+.performance-metrics {
+  background: rgba(76, 175, 80, 0.05);
+  border-radius: 6px;
+  padding: 8px;
+  margin-bottom: 8px;
+  border-left: 3px solid #4CAF50;
+}
+
+.metric-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 4px;
+}
+
+.metric-row:last-child {
+  margin-bottom: 0;
+}
+
+.metric-label {
+  font-size: 0.8em;
+  color: #bbb;
+  font-weight: 500;
+}
+
+.metric-value {
+  font-size: 0.8em;
+  font-weight: bold;
+}
+
+.metric-value.positive {
+  color: #4CAF50;
+}
+
+.metric-value.negative {
+  color: #f44336;
+}
+
+.generation-info {
+  background: rgba(33, 150, 243, 0.05);
+  border-radius: 6px;
+  padding: 6px 8px;
+  margin-bottom: 8px;
+  border-left: 3px solid #2196F3;
+  text-align: center;
+}
+
+.generation-label {
+  font-size: 0.75em;
+  color: #64B5F6;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.balance-history {
+  background: rgba(255, 255, 255, 0.02);
+  border-radius: 6px;
+  padding: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.history-title {
+  font-size: 0.75em;
+  color: #999;
+  font-weight: 500;
+  margin-bottom: 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.history-list {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.history-entry {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.75em;
+  line-height: 1.2;
+}
+
+.history-game {
+  color: #888;
+  font-weight: 500;
+  min-width: 25px;
+}
+
+.history-change {
+  font-weight: bold;
+  min-width: 35px;
+  text-align: right;
+}
+
+.history-change.positive {
+  color: #4CAF50;
+}
+
+.history-change.negative {
+  color: #f44336;
+}
+
+.history-reason {
+  color: #aaa;
+  flex: 1;
+  font-size: 0.7em;
+  opacity: 0.8;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Responsive adjustments for balance section */
+@media (max-width: 768px) {
+  .balance-details, .performance-metrics, .balance-history {
+    padding: 6px;
+  }
+  
+  .balance-row, .metric-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 2px;
+  }
+  
+  .history-entry {
+    flex-wrap: wrap;
+    gap: 4px;
+  }
+  
+  .primary-balance {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+  }
 } 

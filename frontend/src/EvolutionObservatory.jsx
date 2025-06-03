@@ -477,15 +477,84 @@ function DashboardView({ strategies, currentGame, currentTournament, currentRoun
                   onClick={() => onSelectStrategy(strategy)}
                 >
                   <div className="strategy-name">{strategy.name}</div>
-                  <div className="strategy-balance">
-                    {strategy.coinBalance} coins
+                  
+                  {/* Enhanced Balance Display */}
+                  <div className="balance-section">
+                    <div className="primary-balance">
+                      <span className="balance-label">Current:</span>
+                      <span className="balance-value">{strategy.coinBalance || strategy.balanceInfo?.current || 0} coins</span>
+                    </div>
+                    
+                    {strategy.balanceInfo && (
+                      <>
+                        <div className="balance-details">
+                          <div className="balance-row">
+                            <span className="detail-label">Initial:</span>
+                            <span className="detail-value">{strategy.balanceInfo.initial} coins</span>
+                          </div>
+                          <div className="balance-row">
+                            <span className="detail-label">Pre-Game:</span>
+                            <span className="detail-value">{strategy.balanceInfo.preGame} coins</span>
+                          </div>
+                          <div className="balance-row">
+                            <span className="detail-label">Total Change:</span>
+                            <span className={`detail-value ${strategy.balanceInfo.totalChange >= 0 ? 'positive' : 'negative'}`}>
+                              {strategy.balanceInfo.totalChange >= 0 ? '+' : ''}{strategy.balanceInfo.totalChange}
+                            </span>
+                          </div>
+                          <div className="balance-row">
+                            <span className="detail-label">Game Change:</span>
+                            <span className={`detail-value ${strategy.balanceInfo.gameChange >= 0 ? 'positive' : 'negative'}`}>
+                              {strategy.balanceInfo.gameChange >= 0 ? '+' : ''}{strategy.balanceInfo.gameChange}
+                            </span>
+                          </div>
+                        </div>
+                        
+                        <div className="performance-metrics">
+                          <div className="metric-row">
+                            <span className="metric-label">Avg Profit:</span>
+                            <span className={`metric-value ${strategy.balanceInfo.avgProfit >= 0 ? 'positive' : 'negative'}`}>
+                              {strategy.balanceInfo.avgProfit >= 0 ? '+' : ''}{strategy.balanceInfo.avgProfit?.toFixed(1) || '0.0'}
+                            </span>
+                          </div>
+                          <div className="metric-row">
+                            <span className="metric-label">Total Profit:</span>
+                            <span className={`metric-value ${strategy.balanceInfo.totalProfit >= 0 ? 'positive' : 'negative'}`}>
+                              {strategy.balanceInfo.totalProfit >= 0 ? '+' : ''}{strategy.balanceInfo.totalProfit?.toFixed(1) || '0.0'}
+                            </span>
+                          </div>
+                        </div>
+                        
+                        <div className="generation-info">
+                          <span className="generation-label">{strategy.balanceInfo.generationInfo}</span>
+                        </div>
+                        
+                        {strategy.balanceInfo.recentBalanceHistory && strategy.balanceInfo.recentBalanceHistory.length > 0 && (
+                          <div className="balance-history">
+                            <div className="history-title">Recent History:</div>
+                            <div className="history-list">
+                              {strategy.balanceInfo.recentBalanceHistory.slice(-3).map((entry, idx) => (
+                                <div key={idx} className="history-entry">
+                                  <span className="history-game">G{entry.game}:</span>
+                                  <span className={`history-change ${entry.change >= 0 ? 'positive' : 'negative'}`}>
+                                    {entry.change >= 0 ? '+' : ''}{entry.change}
+                                  </span>
+                                  <span className="history-reason">{entry.reason}</span>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+                      </>
+                    )}
                   </div>
+                  
                   <div className={`strategy-status ${strategy.coinBalance < 100 ? 'danger' : strategy.coinBalance < 300 ? 'warning' : 'healthy'}`}>
                     {strategy.coinBalance < 100 ? '💀 Near Bankruptcy' : 
                      strategy.coinBalance < 300 ? '⚠️ At Risk' : '✅ Healthy'}
                   </div>
                   <div className="strategy-games">
-                    Games: {strategy.gamesPlayed || 0}
+                    Games: {strategy.gamesPlayed || strategy.balanceInfo?.gamesPlayed || 0}
                   </div>
                   <div className="strategy-description">
                     {strategy.strategy}

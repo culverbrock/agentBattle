@@ -486,9 +486,24 @@ Your position in arrays is index ${playerIndex}, so position ${playerIndex} repr
             corrected[0] += (100 - newSum);
         }
         
-        // MUCH more aggressive vote correction
+        // CRITICAL FIX: Handle vote allocation - correct BOTH zero-sum and non-100 cases
         const voteSum = corrected.slice(numPlayers, numPlayers * 2).reduce((sum, val) => sum + val, 0);
-        if (voteSum > 0 && Math.abs(voteSum - 100) > 1) {
+        
+        if (voteSum === 0) {
+            // SPECIAL CASE: All-zero vote allocation - distribute evenly
+            this.log.verbose(`FIXING ALL-ZERO VOTE ALLOCATION: Distributing 100% evenly across ${numPlayers} players`);
+            const evenAllocation = 100 / numPlayers;
+            for (let i = numPlayers; i < numPlayers * 2; i++) {
+                corrected[i] = evenAllocation;
+            }
+            // Fix rounding errors
+            const newVoteSum = corrected.slice(numPlayers, numPlayers * 2).reduce((sum, val) => sum + val, 0);
+            const diff = 100 - newVoteSum;
+            if (Math.abs(diff) > 0.1) {
+                corrected[numPlayers] += diff; // Add difference to first vote
+            }
+        } else if (Math.abs(voteSum - 100) > 1) {
+            // NORMAL CASE: Non-zero votes that don't sum to 100
             const factor = 100 / voteSum;
             for (let i = numPlayers; i < numPlayers * 2; i++) {
                 corrected[i] = Math.round(corrected[i] * factor);
@@ -517,6 +532,70 @@ Your position in arrays is index ${playerIndex}, so position ${playerIndex} repr
         }
         
         return corrected;
+    }
+
+    // Generate a simple fallback row when LLM fails completely
+    generateFallbackRow(numPlayers, playerIndex, isEliminated = false) {
+        const row = new Array(numPlayers * 3).fill(0);
+        
+        if (isEliminated) {
+            // For eliminated players
+            // Proposal section: all -1
+            for (let i = 0; i < numPlayers; i++) {
+                row[i] = -1;
+            }
+            
+            // Vote section: distribute evenly among other players (not self)
+            const votePerPlayer = 100 / (numPlayers - 1);
+            for (let i = numPlayers; i < numPlayers * 2; i++) {
+                if (i - numPlayers === playerIndex) {
+                    row[i] = 0; // No votes to self
+                } else {
+                    row[i] = votePerPlayer;
+                }
+            }
+            
+            // Request section: all -1
+            for (let i = numPlayers * 2; i < numPlayers * 3; i++) {
+                row[i] = -1;
+            }
+        } else {
+            // For active players
+            // Proposal section: equal distribution with slight self-favor
+            const baseAllocation = 100 / numPlayers;
+            const selfBonus = Math.min(5, (100 - (baseAllocation * numPlayers))); // Small self-bonus
+            
+            for (let i = 0; i < numPlayers; i++) {
+                if (i === playerIndex) {
+                    row[i] = Math.max(17, baseAllocation + selfBonus); // Ensure profitable
+                } else {
+                    row[i] = Math.max(0, baseAllocation - (selfBonus / (numPlayers - 1)));
+                }
+            }
+            
+            // Normalize to 100%
+            const proposalSum = row.slice(0, numPlayers).reduce((a, b) => a + b, 0);
+            if (Math.abs(proposalSum - 100) > 0.1) {
+                const factor = 100 / proposalSum;
+                for (let i = 0; i < numPlayers; i++) {
+                    row[i] *= factor;
+                }
+            }
+            
+            // Vote section: equal distribution
+            const votePerPlayer = 100 / numPlayers;
+            for (let i = numPlayers; i < numPlayers * 2; i++) {
+                row[i] = votePerPlayer;
+            }
+            
+            // Request section: modest vote requests
+            const requestPerPlayer = 10; // Request 10 votes from each player
+            for (let i = numPlayers * 2; i < numPlayers * 3; i++) {
+                row[i] = requestPerPlayer;
+            }
+        }
+        
+        return row;
     }
 
     formatDetailedMatrixState() {

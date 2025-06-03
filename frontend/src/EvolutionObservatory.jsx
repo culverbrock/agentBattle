@@ -139,6 +139,12 @@ function EvolutionObservatory() {
         setCurrentRound(message.data);
         if (message.data.logs) {
           setDetailedLogs(prev => [...prev.slice(-200), ...message.data.logs]); // Keep last 200 logs
+          // Also add these logs to live logs for dashboard display
+          const newLiveLogs = message.data.logs.map(log => ({
+            ...log,
+            timestamp: log.timestamp || Date.now()
+          }));
+          setLiveLogs(prev => [...prev.slice(-100), ...newLiveLogs]);
         }
         if (message.data.reasoning) {
           setAiReasoning(prev => [...prev.slice(-10), ...Object.entries(message.data.reasoning).map(([strategyId, reasoning]) => ({
@@ -170,7 +176,7 @@ function EvolutionObservatory() {
           ...message.data,
           timestamp: message.data.timestamp || Date.now()
         };
-        setLiveLogs(prev => [...prev.slice(-50), logEntry]); // Keep last 50 logs
+        setLiveLogs(prev => [...prev.slice(-100), logEntry]); // Keep last 100 logs (increased from 50)
         break;
         
       default:
@@ -426,7 +432,7 @@ function DashboardView({ strategies, currentGame, currentTournament, currentRoun
               </div>
             ) : liveLogs.length > 0 ? (
               <div className="activity-feed">
-                {liveLogs.slice(-8).map((log, idx) => (
+                {liveLogs.slice(-15).map((log, idx) => (
                   <div key={idx} className={`log-entry log-${log.level || 'info'}`}>
                     <span className="log-time">{new Date(log.timestamp).toLocaleTimeString()}</span>
                     <span className="log-source">{log.source || 'System'}</span>

@@ -1,14 +1,15 @@
 /**
- * Bankruptcy Evolution System - Runs continuous tournaments until strategies go bankrupt
- * Replaces the fixed tournament approach with natural selection based on financial survival
+ * Continuous Evolution System - Runs continuous games with evolution on bankruptcy
+ * No tournaments - just endless games where bankrupt strategies get replaced by evolved ones
+ * Evolution is based on weighted combinations of profitable strategies
  */
 
 const { ImprovedMatrixSystem } = require('../matrix/improvedMatrixSystem');
 const { callLLM } = require('../core/llmApi');
 
-class BankruptcyEvolutionSystem {
+class ContinuousEvolutionSystem {
   constructor(options = {}) {
-    this.mode = options.mode || 'bankruptcy_elimination';
+    this.mode = options.mode || 'continuous_evolution';
     this.realTimeUpdates = options.realTimeUpdates !== false;
     this.fullLogging = options.fullLogging !== false;
     this.onUpdate = options.onUpdate || (() => {});
@@ -16,7 +17,6 @@ class BankruptcyEvolutionSystem {
     this.broadcaster = options.broadcaster;
     
     this.isRunning = false;
-    this.currentTournament = null;
     this.strategies = [];
     this.eliminatedStrategies = [];
     this.evolutionHistory = [];
@@ -25,10 +25,8 @@ class BankruptcyEvolutionSystem {
     this.entryFee = 100;
     this.startingBalance = 500; // Each strategy starts with 5 games worth of entry fees
     
-    // Evolution parameters
-    this.minPopulation = 6;
-    this.maxPopulation = 12;
-    this.evolutionPressure = 0.3; // Increased from 0.1 to 0.3 (30% chance to evolve when winning)
+    // Population parameters
+    this.populationSize = 6; // Always maintain exactly 6 strategies
     
     // Rate limiting and timing
     this.gameDelayMinutes = 5; // 5 minute delay between games
@@ -38,11 +36,15 @@ class BankruptcyEvolutionSystem {
     this.nextGameTime = null;
     this.countdownTimer = null;
     
+    // Game tracking
+    this.totalGamesPlayed = 0;
+    this.totalEvolutions = 0;
+    
     this.initializeInitialPopulation();
   }
 
   async initializeInitialPopulation() {
-    console.log('🧬 Initializing starting population for bankruptcy evolution...');
+    console.log('🧬 Initializing starting population for continuous evolution...');
     
     const initialStrategies = [
       {
@@ -54,8 +56,9 @@ class BankruptcyEvolutionSystem {
         gamesPlayed: 0,
         wins: 0,
         avgProfit: 0,
+        totalProfit: 0,
         generationNumber: 1,
-        parentId: null
+        parentIds: null
       },
       {
         id: 'aggressive-1',
@@ -66,8 +69,9 @@ class BankruptcyEvolutionSystem {
         gamesPlayed: 0,
         wins: 0,
         avgProfit: 0,
+        totalProfit: 0,
         generationNumber: 1,
-        parentId: null
+        parentIds: null
       },
       {
         id: 'strategic-1',
@@ -78,8 +82,9 @@ class BankruptcyEvolutionSystem {
         gamesPlayed: 0,
         wins: 0,
         avgProfit: 0,
+        totalProfit: 0,
         generationNumber: 1,
-        parentId: null
+        parentIds: null
       },
       {
         id: 'analyzer-1',
@@ -90,8 +95,9 @@ class BankruptcyEvolutionSystem {
         gamesPlayed: 0,
         wins: 0,
         avgProfit: 0,
+        totalProfit: 0,
         generationNumber: 1,
-        parentId: null
+        parentIds: null
       },
       {
         id: 'coalition-1',
@@ -102,8 +108,9 @@ class BankruptcyEvolutionSystem {
         gamesPlayed: 0,
         wins: 0,
         avgProfit: 0,
+        totalProfit: 0,
         generationNumber: 1,
-        parentId: null
+        parentIds: null
       },
       {
         id: 'conservative-1',
@@ -114,51 +121,34 @@ class BankruptcyEvolutionSystem {
         gamesPlayed: 0,
         wins: 0,
         avgProfit: 0,
+        totalProfit: 0,
         generationNumber: 1,
-        parentId: null
+        parentIds: null
       }
     ];
 
     this.strategies = initialStrategies;
-    this.log('info', 'BankruptcyEvolution', `Initialized population with ${this.strategies.length} strategies`);
+    this.log('info', 'ContinuousEvolution', `Initialized population with ${this.strategies.length} strategies`);
   }
 
-  async runTournament() {
-    if (!this.isRunning) return { allEliminated: false };
+  async runContinuousEvolution() {
+    if (!this.isRunning) return;
 
-    this.currentTournament = {
-      number: (this.currentTournament?.number || 0) + 1,
-      startTime: Date.now(),
-      participatingStrategies: this.strategies.filter(s => s.coinBalance >= this.entryFee)
-    };
+    this.log('info', 'System', 'Starting continuous evolution - no tournaments, just endless games with evolution on bankruptcy');
 
-    this.onUpdate({
-      type: 'tournament_started',
-      tournament: this.currentTournament,
-      strategies: this.strategies
-    });
-
-    this.log('info', 'Tournament', `Starting tournament ${this.currentTournament.number} with ${this.currentTournament.participatingStrategies.length} viable strategies`);
-
-    // Check if we have enough strategies to play
-    if (this.currentTournament.participatingStrategies.length < 2) {
-      this.log('warning', 'Tournament', 'Not enough viable strategies to continue tournament');
-      return { allEliminated: true };
-    }
-
-    // Run games until one strategy is clearly dominant or several go bankrupt
     let gameNumber = 0;
-    const maxGamesPerTournament = 20;
 
-    while (gameNumber < maxGamesPerTournament && this.isRunning) {
+    while (this.isRunning) {
       gameNumber++;
+      this.totalGamesPlayed = gameNumber;
       
-      // Filter out bankrupt strategies
+      // Filter out bankrupt strategies first
       const viableStrategies = this.strategies.filter(s => s.coinBalance >= this.entryFee);
       
       if (viableStrategies.length < 2) {
-        this.log('warning', 'Tournament', 'Insufficient viable strategies remaining');
-        break;
+        this.log('warning', 'Evolution', 'Less than 2 viable strategies remaining - restarting with fresh population');
+        await this.restartWithFreshPopulation();
+        continue;
       }
 
       // Wait for rate limit delay between games (except first game)
@@ -170,102 +160,225 @@ class BankruptcyEvolutionSystem {
       // Run a single game
       const gameResult = await this.runSingleGame(gameNumber, viableStrategies);
       
-      // Handle bankruptcies
-      await this.handleBankruptcies();
-      
-      // Check for evolution opportunities
-      await this.checkForEvolution();
+      // Handle bankruptcies and evolution (combined)
+      await this.handleBankruptciesWithEvolution();
       
       // Brief pause before next iteration
       await this.sleep(2000);
     }
-
-    this.currentTournament.endTime = Date.now();
-    this.currentTournament.duration = this.currentTournament.endTime - this.currentTournament.startTime;
-
-    this.log('info', 'Tournament', `Tournament ${this.currentTournament.number} completed in ${this.currentTournament.duration}ms`);
-
-    return { 
-      allEliminated: this.strategies.filter(s => s.coinBalance >= this.entryFee).length === 0,
-      tournament: this.currentTournament
-    };
   }
 
-  async waitForNextGame() {
-    this.isWaitingForNextGame = true;
-    this.nextGameTime = Date.now() + (this.gameDelayMinutes * 60 * 1000);
+  async handleBankruptciesWithEvolution() {
+    const bankruptStrategies = this.strategies.filter(s => s.coinBalance < this.entryFee);
     
-    this.log('info', 'RateLimit', `Waiting ${this.gameDelayMinutes} minutes before next game to respect OpenAI rate limits...`);
-    
-    this.onUpdate({
-      type: 'game_delay_started',
-      data: {
-        delayMinutes: this.gameDelayMinutes,
-        nextGameTime: this.nextGameTime,
-        reason: 'OpenAI rate limit management'
-      }
-    });
+    if (bankruptStrategies.length === 0) {
+      // No bankruptcies, continue
+      return;
+    }
 
-    // Start countdown timer
-    this.startCountdownTimer();
+    this.log('info', 'Evolution', `${bankruptStrategies.length} strategies bankrupt - triggering evolution`);
     
-    // Wait for the delay period
-    await this.sleep(this.gameDelayMinutes * 60 * 1000);
-    
-    this.isWaitingForNextGame = false;
-    this.nextGameTime = null;
-    this.stopCountdownTimer();
-    
-    this.onUpdate({
-      type: 'game_delay_ended',
-      data: {
-        timestamp: Date.now()
-      }
-    });
-  }
+    for (const bankruptStrategy of bankruptStrategies) {
+      this.log('warning', 'Bankruptcy', `${bankruptStrategy.name} eliminated due to bankruptcy (${bankruptStrategy.coinBalance} coins)`);
+      
+      // Track elimination
+      this.eliminatedStrategies.push({
+        ...bankruptStrategy,
+        eliminationReason: 'bankruptcy',
+        eliminationTime: Date.now(),
+        finalBalance: bankruptStrategy.coinBalance
+      });
 
-  startCountdownTimer() {
-    this.stopCountdownTimer(); // Clear any existing timer
-    
-    this.countdownTimer = setInterval(() => {
-      if (!this.nextGameTime || !this.isRunning) {
-        this.stopCountdownTimer();
-        return;
-      }
-      
-      const timeRemaining = this.nextGameTime - Date.now();
-      
-      if (timeRemaining <= 0) {
-        this.stopCountdownTimer();
-        return;
-      }
-      
-      const minutes = Math.floor(timeRemaining / 60000);
-      const seconds = Math.floor((timeRemaining % 60000) / 1000);
-      
       this.onUpdate({
-        type: 'countdown_update',
-        data: {
-          timeRemaining: timeRemaining,
-          minutes: minutes,
-          seconds: seconds,
-          formattedTime: `${minutes}:${seconds.toString().padStart(2, '0')}`
+        type: 'strategy_eliminated',
+        elimination: {
+          strategyId: bankruptStrategy.id,
+          strategyName: bankruptStrategy.name,
+          reason: 'Bankruptcy - insufficient funds for entry fee',
+          finalBalance: bankruptStrategy.coinBalance,
+          gamesPlayed: bankruptStrategy.gamesPlayed,
+          timestamp: Date.now()
         }
       });
-    }, 1000);
+
+      // Remove bankrupt strategy
+      this.strategies = this.strategies.filter(s => s.id !== bankruptStrategy.id);
+      
+      // Create evolved replacement based on profitable strategies
+      const evolvedReplacement = await this.createWeightedEvolvedStrategy(bankruptStrategy);
+      
+      if (evolvedReplacement) {
+        this.strategies.push(evolvedReplacement);
+        this.totalEvolutions++;
+        
+        this.log('info', 'Evolution', `${bankruptStrategy.name} → ${evolvedReplacement.name} (evolved replacement)`);
+        
+        this.onUpdate({
+          type: 'strategy_evolved',
+          evolution: {
+            eliminatedStrategy: bankruptStrategy,
+            newStrategy: evolvedReplacement,
+            reason: 'Bankruptcy replacement',
+            parentStrategies: evolvedReplacement.parentIds,
+            timestamp: Date.now()
+          }
+        });
+      }
+    }
+
+    // Ensure we still have exactly the right population size
+    if (this.strategies.length !== this.populationSize) {
+      this.log('warning', 'Evolution', `Population size mismatch: ${this.strategies.length} instead of ${this.populationSize}`);
+    }
+
+    // Broadcast updated strategies list
+    this.onUpdate({
+      type: 'strategies_updated',
+      strategies: this.strategies
+    });
   }
 
-  stopCountdownTimer() {
-    if (this.countdownTimer) {
-      clearInterval(this.countdownTimer);
-      this.countdownTimer = null;
+  async createWeightedEvolvedStrategy(eliminatedStrategy) {
+    // Find profitable strategies (positive avgProfit or totalProfit)
+    const profitableStrategies = this.strategies.filter(s => 
+      s.avgProfit > 0 || s.totalProfit > 0
+    );
+    
+    if (profitableStrategies.length === 0) {
+      this.log('warning', 'Evolution', 'No profitable strategies found - creating fresh strategy');
+      return await this.createFreshStrategy();
     }
+
+    // Calculate weights based on profit
+    const totalProfit = profitableStrategies.reduce((sum, s) => 
+      sum + Math.max(s.totalProfit, s.avgProfit * s.gamesPlayed, 0), 0
+    );
+    
+    let weights = [];
+    if (totalProfit > 0) {
+      weights = profitableStrategies.map(s => {
+        const profit = Math.max(s.totalProfit, s.avgProfit * s.gamesPlayed, 0);
+        const weight = profit / totalProfit;
+        return { strategy: s, weight, profit };
+      });
+    } else {
+      // If no profits, equal weighting
+      weights = profitableStrategies.map(s => ({ 
+        strategy: s, 
+        weight: 1 / profitableStrategies.length,
+        profit: 0 
+      }));
+    }
+
+    // Sort by weight (highest first)
+    weights.sort((a, b) => b.weight - a.weight);
+
+    this.log('debug', 'Evolution', `Profitable strategies for evolution:`);
+    weights.forEach(w => {
+      this.log('debug', 'Evolution', `  ${w.strategy.name}: ${(w.weight * 100).toFixed(1)}% (${w.profit.toFixed(1)} profit)`);
+    });
+
+    // Generate weighted blend prompt
+    const blendPrompt = `Create a new strategy by combining these successful strategies based on their profitability:
+
+PROFITABLE STRATEGIES TO BLEND:
+${weights.map(w => 
+  `${Math.round(w.weight * 100)}% - ${w.strategy.name}: "${w.strategy.strategy}" (${w.profit.toFixed(1)} total profit)`
+).join('\n')}
+
+ELIMINATED STRATEGY TO AVOID:
+${eliminatedStrategy.name}: "${eliminatedStrategy.strategy}" (${eliminatedStrategy.totalProfit || 0} total profit)
+
+TASK: Create a hybrid strategy that combines the most successful elements from each profitable strategy, 
+weighted by their profitability. Focus on what made each strategy profitable and avoid the patterns 
+that led to the eliminated strategy's bankruptcy.
+
+REQUIREMENTS:
+1. Combine strategies based on the specified profit weightings
+2. Make it SIGNIFICANTLY DIFFERENT from the eliminated strategy
+3. Keep strategy description under 200 characters
+4. Focus on profitable behaviors and successful tactics
+
+Respond with JSON:
+{
+  "name": "Hybrid strategy name reflecting the blend",
+  "archetype": "Most appropriate category", 
+  "strategy": "Detailed strategy combining the best profitable elements (under 200 chars)",
+  "parentStrategies": [${weights.map(w => `"${w.strategy.name}"`).join(', ')}],
+  "blendWeights": [${weights.map(w => w.weight.toFixed(2)).join(', ')}],
+  "evolutionReasoning": "Why this combination should be more successful"
+}`;
+
+    try {
+      const response = await callLLM(blendPrompt, {
+        temperature: 0.7,
+        max_tokens: 600,
+        system: 'You are an expert in strategic evolution and game theory. Create beneficial hybrid strategies that combine successful elements. Return only valid JSON.'
+      });
+
+      const evolutionData = JSON.parse(response.match(/\{[\s\S]*\}/)?.[0] || '{}');
+      
+      if (evolutionData.name && evolutionData.strategy) {
+        const maxGeneration = Math.max(...weights.map(w => w.strategy.generationNumber || 1));
+        
+        return {
+          id: `evolved-${Date.now()}-${Math.random().toString(36).substr(2, 5)}`,
+          name: evolutionData.name,
+          archetype: evolutionData.archetype || 'Hybrid',
+          strategy: evolutionData.strategy,
+          coinBalance: this.startingBalance, // Fresh start
+          gamesPlayed: 0,
+          wins: 0,
+          avgProfit: 0,
+          totalProfit: 0,
+          generationNumber: maxGeneration + 1,
+          parentIds: weights.map(w => w.strategy.id),
+          parentNames: weights.map(w => w.strategy.name),
+          blendWeights: evolutionData.blendWeights || weights.map(w => w.weight),
+          evolutionReasoning: evolutionData.evolutionReasoning || 'Profit-weighted hybrid strategy'
+        };
+      } else {
+        throw new Error('Invalid evolution data generated');
+      }
+    } catch (error) {
+      this.log('warning', 'Evolution', `LLM-based evolution failed: ${error.message}, using fallback`);
+      
+      // Fallback to simpler weighted evolution
+      return this.createFallbackWeightedStrategy(weights, eliminatedStrategy);
+    }
+  }
+
+  createFallbackWeightedStrategy(weights, eliminatedStrategy) {
+    // Simple fallback when LLM fails
+    const topStrategy = weights[0].strategy;
+    const secondStrategy = weights[1]?.strategy || weights[0].strategy;
+    
+    const hybridName = `${topStrategy.name.split(' ')[0]} ${secondStrategy.name.split(' ')[1] || 'Hybrid'}`;
+    const hybridStrategy = `${topStrategy.strategy.substring(0, 100)}. Enhanced with ${secondStrategy.strategy.substring(0, 80)}.`;
+    
+    const maxGeneration = Math.max(...weights.map(w => w.strategy.generationNumber || 1));
+    
+    return {
+      id: `fallback-${Date.now()}-${Math.random().toString(36).substr(2, 5)}`,
+      name: hybridName,
+      archetype: topStrategy.archetype,
+      strategy: hybridStrategy.substring(0, 200),
+      coinBalance: this.startingBalance,
+      gamesPlayed: 0,
+      wins: 0,
+      avgProfit: 0,
+      totalProfit: 0,
+      generationNumber: maxGeneration + 1,
+      parentIds: weights.map(w => w.strategy.id),
+      parentNames: weights.map(w => w.strategy.name),
+      blendWeights: weights.map(w => w.weight),
+      evolutionReasoning: `Fallback hybrid of ${topStrategy.name} (${(weights[0].weight * 100).toFixed(1)}%) and ${secondStrategy.name} (${((weights[1]?.weight || 0) * 100).toFixed(1)}%)`
+    };
   }
 
   async runSingleGame(gameNumber, participatingStrategies) {
     const gameData = {
       number: gameNumber,
-      tournamentNumber: this.currentTournament.number,
       players: participatingStrategies.slice(0, 6), // Limit to 6 players per game
       startTime: Date.now()
     };
@@ -288,7 +401,23 @@ class BankruptcyEvolutionSystem {
       collectReasoning: this.fullLogging,
       verbosity: this.fullLogging ? 3 : 1,
       showFullMatrix: true,
-      customLogger: (message) => this.log('debug', 'MatrixSystem', message)
+      customLogger: (message) => {
+        // Log to both debug level and broadcast directly for dashboard
+        this.log('debug', 'MatrixSystem', message);
+        
+        // Also send as individual log for live dashboard display
+        if (this.broadcaster) {
+          this.broadcaster.broadcast({
+            type: 'log',
+            data: {
+              level: 'debug',
+              source: 'MatrixSystem',
+              message: message,
+              timestamp: Date.now()
+            }
+          });
+        }
+      }
     });
 
     const gameResult = await this.simulateGameWithMatrix(matrixSystem, gameData);
@@ -298,18 +427,18 @@ class BankruptcyEvolutionSystem {
     gameData.finalProposal = gameResult.winningProposal;
     gameData.coinDistribution = gameResult.coinDistribution;
 
-    // Distribute winnings
+    // Distribute winnings and update statistics
     if (gameResult.coinDistribution) {
       gameData.players.forEach((player, index) => {
         const winnings = gameResult.coinDistribution[index] || 0;
         player.coinBalance += winnings;
         
-        // Update statistics
+        // Update profit statistics
         const profit = winnings - this.entryFee;
-        if (player.avgProfit === 0) {
-          player.avgProfit = profit;
-        } else {
-          player.avgProfit = (player.avgProfit * (player.gamesPlayed - 1) + profit) / player.gamesPlayed;
+        player.totalProfit = (player.totalProfit || 0) + profit;
+        
+        if (player.gamesPlayed > 0) {
+          player.avgProfit = player.totalProfit / player.gamesPlayed;
         }
         
         if (winnings > this.entryFee) {
@@ -361,12 +490,18 @@ class BankruptcyEvolutionSystem {
       if (this.realTimeUpdates) {
         this.onUpdate({
           type: 'round_update',
-          round: {
+          data: {
             number: round,
             gameNumber: gameData.number,
             phase: 'negotiation',
             matrix: this.extractMatrixData(matrixSystem),
-            reasoning: this.extractReasoningData(matrixSystem)
+            reasoning: this.extractReasoningData(matrixSystem),
+            logs: [{
+              level: 'info',
+              source: 'MatrixGame',
+              message: `Round ${round} completed`,
+              timestamp: Date.now()
+            }]
           }
         });
       }
@@ -453,217 +588,75 @@ class BankruptcyEvolutionSystem {
     return null; // No winner - rare case
   }
 
-  async handleBankruptcies() {
-    const bankruptStrategies = this.strategies.filter(s => s.coinBalance < this.entryFee);
+  async waitForNextGame() {
+    this.isWaitingForNextGame = true;
+    this.nextGameTime = Date.now() + (this.gameDelayMinutes * 60 * 1000);
     
-    for (const strategy of bankruptStrategies) {
-      this.log('warning', 'Bankruptcy', `Strategy ${strategy.name} eliminated due to bankruptcy (${strategy.coinBalance} coins)`);
-      
-      this.eliminatedStrategies.push({
-        ...strategy,
-        eliminationReason: 'bankruptcy',
-        eliminationTime: Date.now(),
-        finalBalance: strategy.coinBalance
-      });
+    this.log('info', 'RateLimit', `Waiting ${this.gameDelayMinutes} minutes before next game to respect OpenAI rate limits...`);
+    
+    this.onUpdate({
+      type: 'game_delay_started',
+      data: {
+        delayMinutes: this.gameDelayMinutes,
+        nextGameTime: this.nextGameTime,
+        reason: 'OpenAI rate limit management'
+      }
+    });
 
+    // Start countdown timer
+    this.startCountdownTimer();
+    
+    // Wait for the delay period
+    await this.sleep(this.gameDelayMinutes * 60 * 1000);
+    
+    this.isWaitingForNextGame = false;
+    this.nextGameTime = null;
+    this.stopCountdownTimer();
+    
+    this.onUpdate({
+      type: 'game_delay_ended',
+      data: {
+        timestamp: Date.now()
+      }
+    });
+  }
+
+  startCountdownTimer() {
+    this.stopCountdownTimer(); // Clear any existing timer
+    
+    this.countdownTimer = setInterval(() => {
+      if (!this.nextGameTime || !this.isRunning) {
+        this.stopCountdownTimer();
+        return;
+      }
+      
+      const timeRemaining = this.nextGameTime - Date.now();
+      
+      if (timeRemaining <= 0) {
+        this.stopCountdownTimer();
+        return;
+      }
+      
+      const minutes = Math.floor(timeRemaining / 60000);
+      const seconds = Math.floor((timeRemaining % 60000) / 1000);
+      
       this.onUpdate({
-        type: 'strategy_eliminated',
-        elimination: {
-          strategyId: strategy.id,
-          strategyName: strategy.name,
-          reason: 'Bankruptcy - insufficient funds for entry fee',
-          finalBalance: strategy.coinBalance,
-          gamesPlayed: strategy.gamesPlayed,
-          timestamp: Date.now()
+        type: 'countdown_update',
+        data: {
+          timeRemaining: timeRemaining,
+          minutes: minutes,
+          seconds: seconds,
+          formattedTime: `${minutes}:${seconds.toString().padStart(2, '0')}`
         }
       });
-    }
-
-    // Remove bankrupt strategies
-    this.strategies = this.strategies.filter(s => s.coinBalance >= this.entryFee);
-    
-    // Spawn new agents to replace eliminated ones
-    const eliminatedCount = bankruptStrategies.length;
-    if (eliminatedCount > 0) {
-      this.log('info', 'Evolution', `Spawning ${eliminatedCount} new agents to replace eliminated strategies`);
-      
-      for (let i = 0; i < eliminatedCount; i++) {
-        // Create a new strategy to replace the eliminated one
-        const newStrategy = await this.createFreshStrategy();
-        if (newStrategy) {
-          this.strategies.push(newStrategy);
-          this.log('info', 'Evolution', `New strategy spawned: ${newStrategy.name}`);
-          
-          // Broadcast the new strategy
-          this.onUpdate({
-            type: 'strategy_spawned',
-            strategy: {
-              id: newStrategy.id,
-              name: newStrategy.name,
-              archetype: newStrategy.archetype,
-              coinBalance: newStrategy.coinBalance,
-              reason: 'Replacement for bankruptcy elimination'
-            }
-          });
-        }
-      }
-      
-      // Broadcast updated strategies list
-      this.onUpdate({
-        type: 'strategies_updated',
-        strategies: this.strategies
-      });
-    }
+    }, 1000);
   }
 
-  async checkForEvolution() {
-    // Identify successful strategies (above average performance OR simply profitable)
-    const avgBalance = this.strategies.reduce((sum, s) => sum + s.coinBalance, 0) / this.strategies.length;
-    const successfulStrategies = this.strategies.filter(s => 
-      (s.coinBalance > avgBalance || s.avgProfit > 0) && // Above average OR profitable
-      s.gamesPlayed >= 2 && // Reduced from 3 to 2 games minimum
-      Math.random() < this.evolutionPressure
-    );
-
-    this.log('debug', 'Evolution', `Checking evolution: ${successfulStrategies.length} potential parents found`);
-
-    for (const parentStrategy of successfulStrategies) {
-      if (this.strategies.length < this.maxPopulation) {
-        const childStrategy = await this.evolveStrategy(parentStrategy);
-        if (childStrategy) {
-          this.strategies.push(childStrategy);
-          
-          this.onUpdate({
-            type: 'strategy_evolved',
-            evolution: {
-              parentStrategy: parentStrategy,
-              childStrategy: childStrategy,
-              parentFitness: parentStrategy.avgProfit,
-              mutationType: childStrategy.mutationType,
-              reasoning: childStrategy.evolutionReasoning,
-              timestamp: Date.now()
-            }
-          });
-
-          this.log('info', 'Evolution', `${parentStrategy.name} evolved into ${childStrategy.name}`);
-        }
-      }
+  stopCountdownTimer() {
+    if (this.countdownTimer) {
+      clearInterval(this.countdownTimer);
+      this.countdownTimer = null;
     }
-  }
-
-  async evolveStrategy(parentStrategy) {
-    try {
-      // Try LLM-based evolution first
-      const evolutionPrompt = `You are an AI strategy evolution system. A successful strategy needs to evolve and adapt.
-
-PARENT STRATEGY:
-Name: ${parentStrategy.name}
-Archetype: ${parentStrategy.archetype}
-Current Strategy: ${parentStrategy.strategy}
-Performance: ${parentStrategy.coinBalance} coins, ${parentStrategy.wins} wins in ${parentStrategy.gamesPlayed} games
-Average Profit: ${parentStrategy.avgProfit.toFixed(2)} coins per game
-
-EVOLUTION TASK:
-Create an evolved version of this strategy that builds upon its success while introducing beneficial mutations.
-
-EVOLUTION TYPES:
-1. ENHANCEMENT - Improve existing strengths
-2. ADAPTATION - Add new capabilities based on environment
-3. SPECIALIZATION - Focus on specific successful tactics
-4. HYBRIDIZATION - Combine with traits from other successful archetypes
-
-Respond with JSON:
-{
-  "name": "New evolved strategy name",
-  "archetype": "Strategy category (keep similar or evolve)",
-  "strategy": "Detailed strategy description (build upon parent)",
-  "mutationType": "Type of evolution applied",
-  "evolutionReasoning": "Why this evolution should be successful"
-}`;
-
-      const response = await callLLM(evolutionPrompt, {
-        temperature: 0.7,
-        max_tokens: 500,
-        system: 'You are an expert in strategic evolution and game theory. Create beneficial mutations that improve upon successful strategies.'
-      });
-
-      const evolutionData = JSON.parse(response.match(/\{[\s\S]*\}/)?.[0] || '{}');
-      
-      if (evolutionData.name && evolutionData.strategy) {
-        return {
-          id: `evolved-${Date.now()}-${Math.random().toString(36).substr(2, 5)}`,
-          name: evolutionData.name,
-          archetype: evolutionData.archetype || parentStrategy.archetype,
-          strategy: evolutionData.strategy,
-          coinBalance: this.startingBalance,
-          gamesPlayed: 0,
-          wins: 0,
-          avgProfit: 0,
-          generationNumber: (parentStrategy.generationNumber || 1) + 1,
-          parentId: parentStrategy.id,
-          mutationType: evolutionData.mutationType,
-          evolutionReasoning: evolutionData.evolutionReasoning
-        };
-      } else {
-        throw new Error('Invalid evolution data generated');
-      }
-    } catch (error) {
-      this.log('warning', 'Evolution', `LLM-based evolution failed for ${parentStrategy.name}: ${error.message}, using fallback`);
-      
-      // Fallback to simpler evolution if LLM fails
-      return this.createSimpleEvolution(parentStrategy);
-    }
-  }
-
-  createSimpleEvolution(parentStrategy) {
-    // Simplified evolution as fallback when LLM fails
-    const evolutionTypes = [
-      'ENHANCEMENT', 'ADAPTATION', 'SPECIALIZATION', 'HYBRIDIZATION'
-    ];
-    
-    const mutationType = evolutionTypes[Math.floor(Math.random() * evolutionTypes.length)];
-    
-    // Generate evolved name
-    const evolutionSuffixes = [
-      'Enhanced', 'Advanced', 'Evolved', 'Refined', 'Optimized', 'Prime', 'Elite', 'Modified'
-    ];
-    const suffix = evolutionSuffixes[Math.floor(Math.random() * evolutionSuffixes.length)];
-    const newName = `${parentStrategy.name} ${suffix}`;
-    
-    // Generate evolved strategy based on parent
-    let evolvedStrategy = parentStrategy.strategy;
-    
-    switch (mutationType) {
-      case 'ENHANCEMENT':
-        evolvedStrategy += ' Enhanced with improved mathematical precision and risk assessment.';
-        break;
-      case 'ADAPTATION':
-        evolvedStrategy += ' Adapted with dynamic response patterns and environmental awareness.';
-        break;
-      case 'SPECIALIZATION':
-        evolvedStrategy += ' Specialized for optimal coalition formation and vote trading efficiency.';
-        break;
-      case 'HYBRIDIZATION':
-        evolvedStrategy += ' Hybridized with cross-archetype techniques for maximum flexibility.';
-        break;
-    }
-    
-    const evolutionReasoning = `${mutationType} evolution of successful ${parentStrategy.archetype} strategy. Parent had ${parentStrategy.avgProfit.toFixed(2)} average profit over ${parentStrategy.gamesPlayed} games.`;
-    
-    return {
-      id: `evolved-${Date.now()}-${Math.random().toString(36).substr(2, 5)}`,
-      name: newName,
-      archetype: parentStrategy.archetype, // Keep same archetype but evolved
-      strategy: evolvedStrategy,
-      coinBalance: this.startingBalance,
-      gamesPlayed: 0,
-      wins: 0,
-      avgProfit: 0,
-      generationNumber: (parentStrategy.generationNumber || 1) + 1,
-      parentId: parentStrategy.id,
-      mutationType: mutationType,
-      evolutionReasoning: evolutionReasoning
-    };
   }
 
   async restartWithFreshPopulation() {
@@ -716,9 +709,9 @@ Respond with JSON:
         gamesPlayed: 0,
         wins: 0,
         avgProfit: 0,
-        creationTime: Date.now(),
-        parentId: null, // Fresh strategy, not evolved from another
-        mutationCount: 0
+        totalProfit: 0,
+        generationNumber: 1,
+        parentIds: null
       };
     } catch (error) {
       this.log('error', 'Evolution', `Failed to create fresh strategy: ${error.message}`);
@@ -773,9 +766,9 @@ Respond with JSON:
       gamesPlayed: 0,
       wins: 0,
       avgProfit: 0,
-      creationTime: Date.now(),
-      parentId: null,
-      mutationCount: 0
+      totalProfit: 0,
+      generationNumber: 1,
+      parentIds: null
     };
   }
 
@@ -837,4 +830,4 @@ Respond with JSON:
   }
 }
 
-module.exports = { BankruptcyEvolutionSystem }; 
+module.exports = { ContinuousEvolutionSystem }; 

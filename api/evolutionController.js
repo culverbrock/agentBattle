@@ -3,7 +3,7 @@
  * Handles starting/stopping continuous evolution simulations with bankruptcy elimination
  */
 
-const { BankruptcyEvolutionSystem } = require('../src/evolution/bankruptcyEvolutionSystem');
+const { ContinuousEvolutionSystem } = require('../src/evolution/bankruptcyEvolutionSystem');
 const { EvolutionWebSocketBroadcaster } = require('../src/evolution/evolutionWebSocketBroadcaster');
 
 class EvolutionController {
@@ -53,7 +53,7 @@ class EvolutionController {
       };
 
       // Create the bankruptcy evolution system
-      this.currentSimulation = new BankruptcyEvolutionSystem({
+      this.currentSimulation = new ContinuousEvolutionSystem({
         mode: mode,
         realTimeUpdates: realTime,
         fullLogging: fullLogging,
@@ -175,23 +175,13 @@ class EvolutionController {
   }
 
   async runSimulationLoop() {
-    console.log('🧬 Evolution simulation loop started');
+    console.log('🧬 Continuous evolution simulation started');
     
     try {
-      while (this.isRunning && this.currentSimulation) {
-        // Run a single tournament cycle
-        const tournamentResult = await this.currentSimulation.runTournament();
-        
-        if (tournamentResult.allEliminated) {
-          console.log('🧬 All strategies eliminated - restarting with fresh population');
-          await this.currentSimulation.restartWithFreshPopulation();
-        }
-
-        // Small delay to prevent overwhelming the system
-        await new Promise(resolve => setTimeout(resolve, 1000));
-      }
+      // The continuous evolution system runs its own loop
+      await this.currentSimulation.runContinuousEvolution();
     } catch (error) {
-      console.error('🧬 Evolution simulation loop error:', error);
+      console.error('🧬 Continuous evolution simulation error:', error);
       this.isRunning = false;
       
       // Broadcast error
@@ -204,7 +194,7 @@ class EvolutionController {
       });
     }
     
-    console.log('🧬 Evolution simulation loop ended');
+    console.log('🧬 Continuous evolution simulation ended');
   }
 
   handleSimulationUpdate(data) {

@@ -395,6 +395,108 @@
   margin: 0;
 }
 
+/* Player Balance Changes in Game History */
+.game-balance-changes {
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 8px;
+  padding: 12px;
+  margin: 10px 0;
+  border-left: 3px solid #FF9800;
+}
+
+.game-balance-changes > strong {
+  color: #FF9800;
+  display: block;
+  margin-bottom: 10px;
+  font-size: 0.9em;
+}
+
+.balance-changes-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 8px;
+}
+
+.player-balance-change {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 6px;
+  padding: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.player-balance-name {
+  font-weight: bold;
+  color: #fff;
+  font-size: 0.85em;
+  margin-bottom: 4px;
+  text-align: center;
+}
+
+.player-balance-details {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  font-family: 'Courier New', monospace;
+  font-size: 0.8em;
+  margin-bottom: 4px;
+}
+
+.balance-before {
+  color: #888;
+  font-weight: 500;
+}
+
+.balance-arrow {
+  color: #666;
+  font-weight: bold;
+}
+
+.balance-after {
+  color: #fff;
+  font-weight: bold;
+}
+
+.balance-change {
+  font-weight: bold;
+  font-size: 0.75em;
+}
+
+.balance-change.positive {
+  color: #4CAF50;
+}
+
+.balance-change.negative {
+  color: #f44336;
+}
+
+.player-profit-info {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  font-size: 0.7em;
+  line-height: 1.2;
+}
+
+.profit-label, .avg-label {
+  color: #999;
+  font-weight: 500;
+}
+
+.profit-value, .avg-value {
+  font-weight: bold;
+  font-family: 'Courier New', monospace;
+}
+
+.profit-value.positive, .avg-value.positive {
+  color: #4CAF50;
+}
+
+.profit-value.negative, .avg-value.negative {
+  color: #f44336;
+}
+
 /* Panel Headers */
 .game-strategy-panel h3, 
 .elimination-panel h3, 

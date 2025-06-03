@@ -132,7 +132,7 @@ function EvolutionObservatory() {
       case 'game_completed':
         // Store completed game results with final matrix and proposals
         const completedGame = {
-          ...message.data,
+          ...message.game,
           completedAt: Date.now()
         };
         setCompletedGames(prev => [...prev.slice(-20), completedGame]); // Keep last 20 games
@@ -649,6 +649,44 @@ function DashboardView({ strategies, currentGame, currentTournament, currentRoun
                         </div>
                       )}
                     </div>
+
+                    {/* Player Balance Changes Section */}
+                    {game.players && game.players.length > 0 && (
+                      <div className="game-balance-changes">
+                        <strong>💰 Player Balance Changes:</strong>
+                        <div className="balance-changes-grid">
+                          {game.players.map((player, pIdx) => (
+                            <div key={pIdx} className="player-balance-change">
+                              <div className="player-balance-name">{player.name}</div>
+                              <div className="player-balance-details">
+                                <span className="balance-before">{player.preGameBalance}</span>
+                                <span className="balance-arrow">→</span>
+                                <span className="balance-after">{player.currentBalance}</span>
+                                <span className={`balance-change ${player.balanceChange >= 0 ? 'positive' : 'negative'}`}>
+                                  ({player.balanceChange >= 0 ? '+' : ''}{player.balanceChange})
+                                </span>
+                              </div>
+                              {player.totalProfit !== undefined && (
+                                <div className="player-profit-info">
+                                  <span className="profit-label">Total Profit:</span>
+                                  <span className={`profit-value ${player.totalProfit >= 0 ? 'positive' : 'negative'}`}>
+                                    {player.totalProfit >= 0 ? '+' : ''}{player.totalProfit}
+                                  </span>
+                                  {player.avgProfit !== undefined && (
+                                    <>
+                                      <span className="avg-label">| Avg:</span>
+                                      <span className={`avg-value ${player.avgProfit >= 0 ? 'positive' : 'negative'}`}>
+                                        {player.avgProfit >= 0 ? '+' : ''}{player.avgProfit.toFixed(1)}
+                                      </span>
+                                    </>
+                                  )}
+                                </div>
+                              )}
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
 
                     {game.finalMatrix && (
                       <div className="final-matrix-display">

@@ -207,6 +207,13 @@ class EvolutionController {
         });
         break;
 
+      case 'game_completed':
+        this.broadcaster.broadcast({
+          type: 'game_completed',
+          game: data.game
+        });
+        break;
+
       case 'game_delay_started':
         this.broadcaster.broadcast({
           type: 'game_delay_started',

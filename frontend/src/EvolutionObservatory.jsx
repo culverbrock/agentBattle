@@ -26,6 +26,7 @@ function EvolutionObservatory() {
   const [countdown, setCountdown] = useState({ minutes: 0, seconds: 0, formattedTime: '0:00', timeRemaining: 0 });
   const [aiReasoning, setAiReasoning] = useState([]);
   const [detailedLogs, setDetailedLogs] = useState([]);
+  const [completedGames, setCompletedGames] = useState([]);
   
   const wsRef = useRef(null);
   const startTimeRef = useRef(null);
@@ -125,6 +126,15 @@ function EvolutionObservatory() {
         setCurrentGame(message.data);
         setSimulationStats(prev => ({ ...prev, totalGames: prev.totalGames + 1 }));
         setIsWaitingForNextGame(false);
+        break;
+        
+      case 'game_completed':
+        // Store completed game results with final matrix and proposals
+        const completedGame = {
+          ...message.data,
+          completedAt: Date.now()
+        };
+        setCompletedGames(prev => [...prev.slice(-20), completedGame]); // Keep last 20 games
         break;
         
       case 'game_delay_started':
@@ -327,6 +337,7 @@ function EvolutionObservatory() {
             countdown={countdown}
             detailedLogs={detailedLogs}
             aiReasoning={aiReasoning}
+            completedGames={completedGames}
           />
         )}
         
@@ -353,76 +364,56 @@ function EvolutionObservatory() {
 }
 
 // Dashboard View Component
-function DashboardView({ strategies, currentGame, currentTournament, currentRound, eliminatedStrategies, onSelectStrategy, isWaitingForNextGame, countdown, detailedLogs, aiReasoning }) {
+function DashboardView({ strategies, currentGame, currentTournament, currentRound, eliminatedStrategies, onSelectStrategy, isWaitingForNextGame, countdown, detailedLogs, aiReasoning, completedGames }) {
+  
+  const downloadLogs = () => {
+    const logData = {
+      exportTimestamp: new Date().toISOString(),
+      totalLogs: detailedLogs.length,
+      logs: detailedLogs,
+      metadata: {
+        gameInfo: {
+          currentTournament: currentTournament?.number || 'N/A',
+          currentGame: currentGame?.number || 'N/A',
+          currentRound: currentRound?.number || 'N/A'
+        },
+        strategiesSnapshot: strategies.map(s => ({
+          id: s.id,
+          name: s.name,
+          balance: s.coinBalance,
+          gamesPlayed: s.gamesPlayed
+        })),
+        eliminatedCount: eliminatedStrategies.length,
+        completedGames: completedGames.length
+      }
+    };
+
+    const blob = new Blob([JSON.stringify(logData, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `evolution-logs-${new Date().toISOString().replace(/[:.]/g, '-')}.json`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  };
+
   return (
     <div className="dashboard-view">
       <div className="dashboard-grid">
-        <div className="game-status-panel">
-          <h3>🎮 Current Game Status</h3>
-          {isWaitingForNextGame ? (
-            <div className="waiting-status">
-              <p><strong>Status:</strong> Waiting for rate limit delay</p>
-              <p><strong>Next Game:</strong> {countdown.formattedTime}</p>
-              <p><strong>Reason:</strong> OpenAI API rate limiting</p>
-            </div>
-          ) : currentGame ? (
-            <div>
-              <p><strong>Tournament:</strong> {currentTournament?.number || 'N/A'}</p>
-              <p><strong>Game:</strong> {currentGame.number || 'N/A'}</p>
-              <p><strong>Round:</strong> {currentRound?.number || 'N/A'}</p>
-              <p><strong>Phase:</strong> {currentRound?.phase || 'Waiting'}</p>
-              {currentRound?.winner && (
-                <p><strong>Winner:</strong> {currentRound.winner}</p>
-              )}
-            </div>
-          ) : (
-            <p>No active game</p>
-          )}
-        </div>
-
-        <div className="strategy-health-panel">
-          <h3>💰 Strategy Financial Health</h3>
-          <div className="strategy-grid">
-            {strategies.map(strategy => (
-              <div 
-                key={strategy.id} 
-                className="strategy-card"
-                onClick={() => onSelectStrategy(strategy)}
-              >
-                <div className="strategy-name">{strategy.name}</div>
-                <div className="strategy-balance">
-                  {strategy.coinBalance} coins
-                </div>
-                <div className={`strategy-status ${strategy.coinBalance < 100 ? 'danger' : strategy.coinBalance < 300 ? 'warning' : 'healthy'}`}>
-                  {strategy.coinBalance < 100 ? '💀 Near Bankruptcy' : 
-                   strategy.coinBalance < 300 ? '⚠️ At Risk' : '✅ Healthy'}
-                </div>
-                <div className="strategy-games">
-                  Games: {strategy.gamesPlayed || 0}
-                </div>
-                <div className="strategy-description">
-                  {strategy.strategy}
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        <div className="elimination-panel">
-          <h3>☠️ Recently Eliminated</h3>
-          <div className="eliminated-list">
-            {eliminatedStrategies.slice(-5).map((elimination, idx) => (
-              <div key={idx} className="elimination-entry">
-                <span className="eliminated-name">{elimination.strategyName}</span>
-                <span className="elimination-reason">{elimination.reason}</span>
-                <span className="elimination-time">{new Date(elimination.timestamp).toLocaleTimeString()}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-
+        {/* Live Logs - Most Important, Goes First */}
         <div className="live-activity-panel">
-          <h3>⚡ Live Logs</h3>
+          <div className="panel-header-with-download">
+            <h3>⚡ Live Matrix System Logs</h3>
+            <button 
+              className="download-logs-btn" 
+              onClick={downloadLogs}
+              title="Download complete log history as JSON file"
+            >
+              📥 Download Full Logs ({detailedLogs.length})
+            </button>
+          </div>
           <div className="live-logs-console">
             {isWaitingForNextGame ? (
               <div className="console-line">
@@ -444,6 +435,79 @@ function DashboardView({ strategies, currentGame, currentTournament, currentRoun
           </div>
         </div>
 
+        {/* Combined Game Status + Strategy Health */}
+        <div className="game-strategy-panel">
+          <h3>🎮 Game Status & Financial Health</h3>
+          
+          {/* Game Status Section */}
+          <div className="game-status-section">
+            <h4>Current Game</h4>
+            {isWaitingForNextGame ? (
+              <div className="waiting-status">
+                <p><strong>Status:</strong> Waiting for rate limit delay</p>
+                <p><strong>Next Game:</strong> {countdown.formattedTime}</p>
+                <p><strong>Reason:</strong> OpenAI API rate limiting</p>
+              </div>
+            ) : currentGame ? (
+              <div>
+                <p><strong>Tournament:</strong> {currentTournament?.number || 'N/A'}</p>
+                <p><strong>Game:</strong> {currentGame.number || 'N/A'}</p>
+                <p><strong>Round:</strong> {currentRound?.number || 'N/A'}</p>
+                <p><strong>Phase:</strong> {currentRound?.phase || 'Waiting'}</p>
+                {currentRound?.winner && (
+                  <p><strong>Winner:</strong> {currentRound.winner}</p>
+                )}
+              </div>
+            ) : (
+              <p>No active game</p>
+            )}
+          </div>
+
+          {/* Strategy Health Section */}
+          <div className="strategy-health-section">
+            <h4>Strategy Financial Health</h4>
+            <div className="strategy-grid">
+              {strategies.map(strategy => (
+                <div 
+                  key={strategy.id} 
+                  className="strategy-card"
+                  onClick={() => onSelectStrategy(strategy)}
+                >
+                  <div className="strategy-name">{strategy.name}</div>
+                  <div className="strategy-balance">
+                    {strategy.coinBalance} coins
+                  </div>
+                  <div className={`strategy-status ${strategy.coinBalance < 100 ? 'danger' : strategy.coinBalance < 300 ? 'warning' : 'healthy'}`}>
+                    {strategy.coinBalance < 100 ? '💀 Near Bankruptcy' : 
+                     strategy.coinBalance < 300 ? '⚠️ At Risk' : '✅ Healthy'}
+                  </div>
+                  <div className="strategy-games">
+                    Games: {strategy.gamesPlayed || 0}
+                  </div>
+                  <div className="strategy-description">
+                    {strategy.strategy}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* Recently Eliminated */}
+        <div className="elimination-panel">
+          <h3>☠️ Recently Eliminated</h3>
+          <div className="eliminated-list">
+            {eliminatedStrategies.slice(-5).map((elimination, idx) => (
+              <div key={idx} className="elimination-entry">
+                <span className="eliminated-name">{elimination.strategyName}</span>
+                <span className="elimination-reason">{elimination.reason}</span>
+                <span className="elimination-time">{new Date(elimination.timestamp).toLocaleTimeString()}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* AI Reasoning */}
         <div className="ai-reasoning-panel">
           <h3>🧠 Latest AI Reasoning</h3>
           <div className="reasoning-container">
@@ -470,6 +534,82 @@ function DashboardView({ strategies, currentGame, currentTournament, currentRoun
                 <div className="reasoning-entry">
                   <div className="reasoning-text">No AI reasoning available yet. Start simulation to see strategic thinking!</div>
                 </div>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Game History Panel */}
+        <div className="game-history-panel">
+          <h3>🏆 Game History & Results</h3>
+          <div className="game-history-container">
+            {completedGames.length > 0 ? (
+              <div className="game-history-list">
+                {completedGames.slice(-10).reverse().map((game, idx) => (
+                  <div key={idx} className="game-history-entry">
+                    <div className="game-history-header">
+                      <span className="game-number">Game #{game.number}</span>
+                      <span className="game-duration">
+                        {Math.round((game.endTime - game.startTime) / 1000)}s
+                      </span>
+                      <span className="game-timestamp">
+                        {new Date(game.endTime).toLocaleTimeString()}
+                      </span>
+                    </div>
+                    
+                    <div className="game-result-summary">
+                      <div className="winner-section">
+                        <strong>🏆 Winner:</strong> {game.winner?.name || 'No Winner'}
+                        {game.winner && (
+                          <span className="winner-votes"> ({game.winner.voteTotal || 0} votes)</span>
+                        )}
+                      </div>
+                      
+                      {game.finalProposal && (
+                        <div className="winning-proposal">
+                          <strong>💰 Winning Split:</strong> [{game.finalProposal.join(', ')}]
+                        </div>
+                      )}
+                      
+                      {game.coinDistribution && (
+                        <div className="coin-distribution">
+                          <strong>🪙 Coin Distribution:</strong> [{game.coinDistribution.join(', ')}]
+                        </div>
+                      )}
+                    </div>
+
+                    {game.finalMatrix && (
+                      <div className="final-matrix-display">
+                        <strong>📊 Final Game Matrix:</strong>
+                        <div className="matrix-grid">
+                          {Object.entries(game.finalMatrix).map(([strategyId, matrixData]) => {
+                            const playerName = game.players?.find(p => p.id === strategyId)?.name || 'Unknown';
+                            return (
+                              <div key={strategyId} className="matrix-player-row">
+                                <div className="player-name">{playerName}:</div>
+                                <div className="matrix-data">
+                                  <span className="matrix-section">
+                                    Proposal: [{matrixData.proposal?.join(', ') || 'N/A'}]
+                                  </span>
+                                  <span className="matrix-section">
+                                    Votes: [{matrixData.votes?.join(', ') || 'N/A'}]
+                                  </span>
+                                  <span className="matrix-section">
+                                    Requests: [{matrixData.requests?.join(', ') || 'N/A'}]
+                                  </span>
+                                </div>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="no-game-history">
+                <p>No completed games yet. Start the simulation to see game results!</p>
               </div>
             )}
           </div>

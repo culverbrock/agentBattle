@@ -452,6 +452,22 @@ Respond with JSON:
 
     this.log('info', 'Game', `Game ${gameNumber} completed. Winner: ${gameResult.winner?.name || 'None'}`);
 
+    // Broadcast game completion with full results
+    this.onUpdate({
+      type: 'game_completed',
+      game: {
+        number: gameNumber,
+        players: gameData.players.map(p => ({ id: p.id, name: p.name })),
+        winner: gameResult.winner,
+        finalProposal: gameResult.winningProposal,
+        coinDistribution: gameResult.coinDistribution,
+        finalMatrix: this.extractMatrixData(matrixSystem),
+        finalReasoning: this.extractReasoningData(matrixSystem),
+        endTime: gameData.endTime,
+        duration: gameData.endTime - gameData.startTime
+      }
+    });
+
     return gameData;
   }
 

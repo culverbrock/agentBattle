@@ -161,7 +161,7 @@ class EvolutionController {
       runTime: this.isRunning ? Date.now() - this.simulationData.startTime : 0,
       stats: {
         totalGames: system ? system.totalGamesPlayed : 0,
-        totalEliminations: this.simulationData.totalEliminations,
+        totalEliminations: system ? (system.eliminatedStrategies?.length || 0) : this.simulationData.totalEliminations,
         evolutionEvents: system ? system.totalEvolutions : 0
       },
       currentTournament: null, // Not applicable for continuous evolution
@@ -293,12 +293,25 @@ class EvolutionController {
   addWebSocketClient(ws) {
     this.broadcaster.addClient(ws);
     
+    // Get current stats from the actual system if it exists
+    const system = globalEvolutionSystem;
+    const actualStats = system ? {
+      totalGames: system.totalGamesPlayed,
+      totalEliminations: system.eliminatedStrategies?.length || 0,
+      evolutionEvents: system.totalEvolutions
+    } : {
+      totalGames: this.simulationData.totalGames || 0,
+      totalEliminations: this.simulationData.totalEliminations || 0,
+      evolutionEvents: this.simulationData.evolutionEvents || 0
+    };
+    
     // Send current state to new client
     ws.send(JSON.stringify({
       type: 'initial_state',
       data: {
         isRunning: this.isRunning,
         ...this.simulationData,
+        ...actualStats,  // Override with actual system stats
         runTime: this.isRunning ? Date.now() - this.simulationData.startTime : 0
       }
     }));

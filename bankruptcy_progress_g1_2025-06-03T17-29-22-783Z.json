@@ -1,0 +1,93 @@
+{
+  "timestamp": "2025-06-03T17:29:22.783Z",
+  "totalGamesPlayed": 1,
+  "totalEvolutions": 0,
+  "strategies": [
+    {
+      "id": "cooperative-1",
+      "name": "Cooperative Negotiator",
+      "archetype": "Cooperative",
+      "strategy": "Focuses on fair distribution and building coalitions for mutual benefit",
+      "coinBalance": 300,
+      "gamesPlayed": 2,
+      "wins": 0,
+      "avgProfit": 0,
+      "totalProfit": 0,
+      "generationNumber": 1,
+      "parentIds": null
+    },
+    {
+      "id": "aggressive-1",
+      "name": "Aggressive Maximizer",
+      "archetype": "Aggressive",
+      "strategy": "Seeks to maximize personal gain, often at the expense of others",
+      "coinBalance": 300,
+      "gamesPlayed": 2,
+      "wins": 0,
+      "avgProfit": 0,
+      "totalProfit": 0,
+      "generationNumber": 1,
+      "parentIds": null
+    },
+    {
+      "id": "strategic-1",
+      "name": "Strategic Opportunist",
+      "archetype": "Strategic",
+      "strategy": "Adapts strategy based on game state and other players' behavior",
+      "coinBalance": 300,
+      "gamesPlayed": 2,
+      "wins": 0,
+      "avgProfit": 0,
+      "totalProfit": 0,
+      "generationNumber": 1,
+      "parentIds": null
+    },
+    {
+      "id": "analyzer-1",
+      "name": "Pattern Analyzer",
+      "archetype": "Analytical",
+      "strategy": "Studies opponent patterns and exploits predictable behaviors",
+      "coinBalance": 300,
+      "gamesPlayed": 2,
+      "wins": 0,
+      "avgProfit": 0,
+      "totalProfit": 0,
+      "generationNumber": 1,
+      "parentIds": null
+    },
+    {
+      "id": "coalition-1",
+      "name": "Coalition Builder",
+      "archetype": "Coalition",
+      "strategy": "Forms and breaks alliances strategically to control game outcomes",
+      "coinBalance": 300,
+      "gamesPlayed": 2,
+      "wins": 0,
+      "avgProfit": 0,
+      "totalProfit": 0,
+      "generationNumber": 1,
+      "parentIds": null
+    },
+    {
+      "id": "conservative-1",
+      "name": "Risk Manager",
+      "archetype": "Conservative",
+      "strategy": "Prioritizes survival and consistent small gains over risky big wins",
+      "coinBalance": 300,
+      "gamesPlayed": 2,
+      "wins": 0,
+      "avgProfit": 0,
+      "totalProfit": 0,
+      "generationNumber": 1,
+      "parentIds": null
+    }
+  ],
+  "eliminatedStrategies": [],
+  "evolutionHistory": [],
+  "systemParams": {
+    "entryFee": 100,
+    "startingBalance": 500,
+    "populationSize": 6,
+    "gameDelayMinutes": 5
+  }
+}

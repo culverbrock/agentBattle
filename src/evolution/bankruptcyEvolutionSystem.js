@@ -40,7 +40,19 @@ class ContinuousEvolutionSystem {
     this.totalGamesPlayed = 0;
     this.totalEvolutions = 0;
     
-    this.initializeInitialPopulation();
+    // State persistence
+    this.saveProgressEveryGames = 5; // Save state every 5 games
+    this.lastProgressFile = null;
+    
+    // Try to resume from previous state if available
+    const shouldResume = options.resume !== false; // Resume by default
+    if (shouldResume) {
+      this.log('info', 'System', 'Attempting to resume from previous state...');
+      this.tryResumeFromPreviousState();
+    } else {
+      this.log('info', 'System', 'Starting fresh (resume disabled)');
+      this.initializeInitialPopulation();
+    }
     
     // Auto-start the simulation for continuous evolution
     setTimeout(() => {
@@ -177,6 +189,11 @@ class ContinuousEvolutionSystem {
       // Handle bankruptcies and evolution (combined)
       await this.handleBankruptciesWithEvolution();
       
+      // Save progress periodically and after evolutions
+      if (gameNumber % this.saveProgressEveryGames === 0 || this.totalEvolutions > 0) {
+        this.saveProgressState();
+      }
+      
       // Brief pause before next iteration
       await this.sleep(2000);
     }
@@ -192,6 +209,8 @@ class ContinuousEvolutionSystem {
 
     this.log('info', 'Evolution', `${bankruptStrategies.length} strategies bankrupt - triggering evolution`);
     
+    let evolutionsThisRound = 0; // Track evolutions in this round
+    
     for (const bankruptStrategy of bankruptStrategies) {
       this.log('warning', 'Bankruptcy', `${bankruptStrategy.name} eliminated due to bankruptcy (${bankruptStrategy.coinBalance} coins)`);
       
@@ -200,7 +219,8 @@ class ContinuousEvolutionSystem {
         ...bankruptStrategy,
         eliminationReason: 'bankruptcy',
         eliminationTime: Date.now(),
-        finalBalance: bankruptStrategy.coinBalance
+        finalBalance: bankruptStrategy.coinBalance,
+        gameNumber: this.totalGamesPlayed
       });
 
       this.onUpdate({
@@ -211,6 +231,7 @@ class ContinuousEvolutionSystem {
           reason: 'Bankruptcy - insufficient funds for entry fee',
           finalBalance: bankruptStrategy.coinBalance,
           gamesPlayed: bankruptStrategy.gamesPlayed,
+          gameNumber: this.totalGamesPlayed,
           timestamp: Date.now()
         }
       });
@@ -223,9 +244,18 @@ class ContinuousEvolutionSystem {
       
       if (evolvedReplacement) {
         this.strategies.push(evolvedReplacement);
-        this.totalEvolutions++;
+        evolutionsThisRound++;
         
         this.log('info', 'Evolution', `${bankruptStrategy.name} → ${evolvedReplacement.name} (evolved replacement)`);
+        
+        // Track evolution in history
+        this.evolutionHistory.push({
+          gameNumber: this.totalGamesPlayed,
+          eliminatedStrategy: bankruptStrategy,
+          newStrategy: evolvedReplacement,
+          reason: 'Bankruptcy replacement',
+          timestamp: Date.now()
+        });
         
         this.onUpdate({
           type: 'strategy_evolved',
@@ -234,11 +264,15 @@ class ContinuousEvolutionSystem {
             newStrategy: evolvedReplacement,
             reason: 'Bankruptcy replacement',
             parentStrategies: evolvedReplacement.parentIds,
+            gameNumber: this.totalGamesPlayed,
             timestamp: Date.now()
           }
         });
       }
     }
+
+    // Update total evolution counter
+    this.totalEvolutions += evolutionsThisRound;
 
     // Ensure we still have exactly the right population size
     if (this.strategies.length !== this.populationSize) {
@@ -250,6 +284,11 @@ class ContinuousEvolutionSystem {
       type: 'strategies_updated',
       strategies: this.strategies
     });
+    
+    // Save progress after evolution events
+    if (evolutionsThisRound > 0) {
+      this.saveProgressState();
+    }
   }
 
   async createWeightedEvolvedStrategy(eliminatedStrategy) {
@@ -1081,6 +1120,13 @@ Respond with JSON:
   async stop() {
     this.isRunning = false;
     this.stopCountdownTimer();
+    
+    // Save final progress state
+    const savedFile = this.saveProgressState();
+    if (savedFile) {
+      this.log('info', 'System', `Final progress saved to: ${savedFile}`);
+    }
+    
     this.log('info', 'System', 'Bankruptcy evolution system stopped');
   }
 
@@ -1400,6 +1446,139 @@ Allocate 100 points among proposals (can be 0 for any proposal):
       throw error; // Let the calling function handle fallback
     }
   }
+
+  tryResumeFromPreviousState() {
+    try {
+      const latestProgressFile = this.findLatestProgressFile();
+      if (latestProgressFile) {
+        this.log('info', 'Resume', `Found previous state: ${latestProgressFile}`);
+        const resumed = this.resumeFromProgressFile(latestProgressFile);
+        if (resumed) {
+          this.log('info', 'Resume', `Successfully resumed from ${latestProgressFile}`);
+          this.log('info', 'Resume', `Continuing from game ${this.totalGamesPlayed + 1} with ${this.strategies.length} strategies`);
+          return;
+        }
+      }
+    } catch (error) {
+      this.log('warning', 'Resume', `Resume failed: ${error.message}, starting fresh`);
+    }
+    
+    // Fallback to fresh start
+    this.log('info', 'Resume', 'No previous state found, starting with fresh population');
+    this.initializeInitialPopulation();
+  }
+
+  findLatestProgressFile() {
+    const fs = require('fs');
+    const path = require('path');
+    
+    try {
+      const files = fs.readdirSync('.')
+        .filter(file => file.startsWith('bankruptcy_progress_') && file.endsWith('.json'))
+        .map(file => ({
+          name: file,
+          time: fs.statSync(file).mtime.getTime()
+        }))
+        .sort((a, b) => b.time - a.time);
+      
+      return files.length > 0 ? files[0].name : null;
+    } catch (error) {
+      return null;
+    }
+  }
+
+  resumeFromProgressFile(filename) {
+    const fs = require('fs');
+    
+    try {
+      const rawData = fs.readFileSync(filename, 'utf8');
+      const progressData = JSON.parse(rawData);
+      
+      // Validate the progress data
+      if (!progressData.strategies || !Array.isArray(progressData.strategies) || progressData.strategies.length !== 6) {
+        throw new Error(`Invalid progress data: expected 6 strategies, found ${progressData.strategies?.length || 0}`);
+      }
+      
+      // Restore state
+      this.strategies = progressData.strategies.map(s => ({
+        ...s,
+        gamesPlayed: s.gamesPlayed || 0,
+        wins: s.wins || 0,
+        avgProfit: s.avgProfit || 0,
+        totalProfit: s.totalProfit || 0,
+        generationNumber: s.generationNumber || 1,
+        parentIds: s.parentIds || null
+      }));
+      
+      this.totalGamesPlayed = progressData.totalGamesPlayed || 0;
+      this.totalEvolutions = progressData.totalEvolutions || 0;
+      this.eliminatedStrategies = progressData.eliminatedStrategies || [];
+      this.evolutionHistory = progressData.evolutionHistory || [];
+      this.lastProgressFile = filename;
+      
+      this.log('info', 'Resume', `Restored state: ${this.strategies.length} strategies, ${this.totalGamesPlayed} games played, ${this.totalEvolutions} evolutions`);
+      
+      // Show current strategy standings
+      this.log('info', 'Resume', 'Current strategy standings:');
+      this.strategies.forEach((s, i) => {
+        const rank = ['🥇', '🥈', '🥉', '📍', '🏅', '⭐'][i];
+        const generation = s.generationNumber > 1 ? ` (Gen ${s.generationNumber})` : ' (Original)';
+        this.log('info', 'Resume', `${rank} ${s.name}: ${s.coinBalance} coins${generation}`);
+      });
+      
+      return true;
+    } catch (error) {
+      this.log('error', 'Resume', `Failed to resume from ${filename}: ${error.message}`);
+      return false;
+    }
+  }
+
+  saveProgressState() {
+    try {
+      const fs = require('fs');
+      const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+      
+      const progressData = {
+        timestamp: new Date().toISOString(),
+        totalGamesPlayed: this.totalGamesPlayed,
+        totalEvolutions: this.totalEvolutions,
+        strategies: this.strategies.map(s => ({
+          id: s.id,
+          name: s.name,
+          archetype: s.archetype,
+          strategy: s.strategy,
+          coinBalance: s.coinBalance,
+          gamesPlayed: s.gamesPlayed,
+          wins: s.wins,
+          avgProfit: s.avgProfit,
+          totalProfit: s.totalProfit,
+          generationNumber: s.generationNumber,
+          parentIds: s.parentIds,
+          parentNames: s.parentNames,
+          blendWeights: s.blendWeights,
+          evolutionReasoning: s.evolutionReasoning
+        })),
+        eliminatedStrategies: this.eliminatedStrategies,
+        evolutionHistory: this.evolutionHistory,
+        systemParams: {
+          entryFee: this.entryFee,
+          startingBalance: this.startingBalance,
+          populationSize: this.populationSize,
+          gameDelayMinutes: this.gameDelayMinutes
+        }
+      };
+      
+      const filename = `bankruptcy_progress_g${this.totalGamesPlayed}_${timestamp}.json`;
+      fs.writeFileSync(filename, JSON.stringify(progressData, null, 2));
+      this.lastProgressFile = filename;
+      
+      this.log('info', 'Persistence', `Progress saved: ${filename}`);
+      return filename;
+    } catch (error) {
+      this.log('error', 'Persistence', `Failed to save progress: ${error.message}`);
+      return null;
+    }
+  }
 }
 
-module.exports = { ContinuousEvolutionSystem }; 
+module.exports = { ContinuousEvolutionSystem };

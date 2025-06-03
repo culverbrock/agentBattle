@@ -27,6 +27,7 @@ function EvolutionObservatory() {
   const [aiReasoning, setAiReasoning] = useState([]);
   const [detailedLogs, setDetailedLogs] = useState([]);
   const [completedGames, setCompletedGames] = useState([]);
+  const [showInfoModal, setShowInfoModal] = useState(false);
   
   const wsRef = useRef(null);
   const startTimeRef = useRef(null);
@@ -240,21 +241,18 @@ function EvolutionObservatory() {
   return (
     <div className="evolution-observatory">
       <div className="observatory-header">
-        <h1>🧬 AI Strategy Evolution Observatory</h1>
+        <div className="header-title-section">
+          <h1>🧬 AI Strategy Evolution Observatory</h1>
+          <button 
+            className="info-button"
+            onClick={() => setShowInfoModal(true)}
+            title="Learn about the evolution system"
+          >
+            ℹ️ How It Works
+          </button>
+        </div>
         <p>Watch artificial intelligence learn, adapt, and evolve in real-time</p>
         
-        <div className="simulation-controls">
-          {!isSimulationRunning ? (
-            <button onClick={startSimulation} className="start-btn">
-              🚀 Start Evolution Simulation
-            </button>
-          ) : (
-            <button onClick={stopSimulation} className="stop-btn">
-              ⏹️ Stop Simulation
-            </button>
-          )}
-        </div>
-
         {/* Rate Limit Countdown Display */}
         {isWaitingForNextGame && (
           <div className="countdown-display">
@@ -359,6 +357,11 @@ function EvolutionObservatory() {
           onSelectStrategy={setSelectedStrategy}
         />}
       </div>
+
+      {/* Info Modal */}
+      {showInfoModal && (
+        <InfoModal onClose={() => setShowInfoModal(false)} />
+      )}
     </div>
   );
 }
@@ -749,6 +752,324 @@ function ReasoningView({ selectedStrategy, currentRound, strategies, onSelectStr
       ) : (
         <p>Select a strategy to see its AI reasoning and decision-making process.</p>
       )}
+    </div>
+  );
+}
+
+// Info Modal Component
+function InfoModal({ onClose }) {
+  return (
+    <div className="modal-overlay" onClick={onClose}>
+      <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+        <div className="modal-header">
+          <h2>🧬 Evolution Observatory Guide</h2>
+          <button className="modal-close" onClick={onClose}>✕</button>
+        </div>
+        
+        <div className="modal-body">
+          <div className="info-section">
+            <h3>🎯 What This System Does</h3>
+            <p>
+              This is an AI strategy evolution laboratory where artificial intelligence agents compete in negotiation games, 
+              learn from failures, and evolve new strategies through genetic programming principles. Watch as AI strategies 
+              adapt, merge successful traits, and develop increasingly sophisticated negotiation tactics over time.
+            </p>
+          </div>
+
+          <div className="info-section">
+            <h3>🎮 How The Evolution Works</h3>
+            <ul>
+              <li><strong>Continuous Games:</strong> AI strategies play endless negotiation games to split prize pools</li>
+              <li><strong>Bankruptcy Elimination:</strong> Strategies that run out of coins get eliminated</li>
+              <li><strong>Weighted Evolution:</strong> New strategies are created by combining successful traits from profitable strategies</li>
+              <li><strong>Rate Limited:</strong> 5-minute delays between games to respect OpenAI API limits</li>
+              <li><strong>Population Maintenance:</strong> Always maintains exactly 6 competing strategies</li>
+            </ul>
+          </div>
+
+          <div className="info-section">
+            <h3>📊 Dashboard Panels Explained</h3>
+            
+            <div className="panel-explanation">
+              <h4>⚡ Live Matrix System Logs</h4>
+              <p>Real-time console output showing exactly what the AI agents are thinking and doing during negotiations. 
+              This mirrors the verbose output you'd see running the system manually.</p>
+            </div>
+
+            <div className="panel-explanation">
+              <h4>🎮 Game Status & Financial Health</h4>
+              <p>Current game information and strategy financial status. Watch for strategies approaching bankruptcy 
+              (under 100 coins) - they're at risk of elimination and replacement.</p>
+            </div>
+
+            <div className="panel-explanation">
+              <h4>☠️ Recently Eliminated</h4>
+              <p>Shows the last 5 strategies that were eliminated due to bankruptcy. These failures inform the 
+              evolution process by showing what doesn't work.</p>
+            </div>
+
+            <div className="panel-explanation">
+              <h4>🧠 Latest AI Reasoning</h4>
+              <p>Peek inside the AI's strategic thinking. See the actual reasoning each strategy used in recent 
+              negotiations - their goals, tactics, and decision-making process.</p>
+            </div>
+
+            <div className="panel-explanation">
+              <h4>🏆 Game History & Results</h4>
+              <p>Complete historical record of completed games showing winners, final proposals, coin distributions, 
+              and the complete negotiation matrix. Perfect for analyzing successful strategies.</p>
+            </div>
+          </div>
+
+          <div className="info-section">
+            <h3>🔬 Other Observatory Views</h3>
+            <ul>
+              <li><strong>🌳 Evolution Tree:</strong> Family tree showing how strategies evolved from parent strategies</li>
+              <li><strong>📝 Live Logs:</strong> Full-screen view of all console output with unlimited scrollback</li>
+              <li><strong>🧠 AI Reasoning:</strong> Deep dive into individual strategy thinking and decision patterns</li>
+            </ul>
+          </div>
+
+          <div className="info-section">
+            <h3>💡 Pro Tips</h3>
+            <ul>
+              <li>Use the download button to export complete session data for external analysis</li>
+              <li>Watch for patterns in successful proposals - they often influence future evolution</li>
+              <li>Strategy names and descriptions evolve to reflect their learned behaviors</li>
+              <li>The system learns from both successes and failures to create increasingly effective strategies</li>
+            </ul>
+          </div>
+
+          <div className="info-section">
+            <h3>🤖 AI Agent Prompts & Technical Details</h3>
+            <p>
+              Each AI strategy receives a comprehensive prompt every negotiation round. Here's the actual template they see:
+            </p>
+            
+            <div className="code-block">
+              <h4>📝 Core AI Prompt Structure</h4>
+              <pre>{`🎯 MATRIX NEGOTIATION - [Player Name] (Round X)
+
+MATRIX STRUCTURE:
+- First N columns: How each agent plans to split the prize pool (must sum to 100%)
+- Next N columns: How each agent plans to vote (100 votes per agent, must sum to 100)
+- Final N columns: Vote requests from other players
+
+GAME PHASES:
+🔄 PHASE 1 - MATRIX STRATEGY: Fill complete strategy in one response
+🏃 PHASE 2 - AUTOMATIC EXECUTION: System extracts proposals and votes
+
+WINNING CONDITION:
+Proposal needs 61%+ votes to pass. If none pass, lowest-voted proposal eliminated.
+
+CRITICAL FINANCIAL CALCULATION:
+Entry cost: 100 coins. Break-even: 17% of prize pool.
+Analyze each proposal for YOUR profit/loss.
+
+RESPONSE FORMAT:
+{
+  "explanation": "Strategic reasoning for decisions",
+  "matrixRow": [proposal_percentages, vote_allocations, vote_requests]
+}`}</pre>
+            </div>
+
+            <p>
+              The AI receives detailed profit calculations, coalition analysis, and strategic guidance for each decision.
+            </p>
+          </div>
+
+          <div className="info-section">
+            <h3>🔢 Matrix System Deep Dive</h3>
+            
+            <div className="matrix-explanation">
+              <h4>📊 What Is The Matrix System?</h4>
+              <p>
+                The matrix system replaces traditional conversational negotiations with a structured numerical grid. 
+                Instead of back-and-forth chat messages, each AI agent fills out their row in a shared matrix containing 
+                their complete strategy for that round.
+              </p>
+            </div>
+
+            <div className="matrix-explanation">
+              <h4>🎯 Why Use Matrix Instead of Conversations?</h4>
+              <ul>
+                <li><strong>No Context Explosion:</strong> No need to pass entire conversation histories to each AI call</li>
+                <li><strong>Structured Decisions:</strong> Forces agents to make concrete numerical commitments</li>
+                <li><strong>Parallel Processing:</strong> All agents can update simultaneously without message ordering issues</li>
+                <li><strong>Clear State:</strong> Complete game state visible in a single matrix snapshot</li>
+                <li><strong>Faster Evolution:</strong> Rapid rounds enable more games and faster strategy evolution</li>
+                <li><strong>Quantifiable Analysis:</strong> Easy to analyze patterns, coalitions, and strategic effectiveness</li>
+              </ul>
+            </div>
+
+            <div className="matrix-explanation">
+              <h4>🗃️ Matrix Structure (3-Section Format)</h4>
+              <div className="matrix-breakdown">
+                <div className="matrix-row">
+                  <strong>Section 1 - Proposals (Columns 0-N):</strong> How to split the prize pool (must sum to 100%)
+                </div>
+                <div className="matrix-row">
+                  <strong>Section 2 - Votes (Columns N-2N):</strong> How to allocate 100 votes across all proposals (must sum to 100%)
+                </div>
+                <div className="matrix-row">
+                  <strong>Section 3 - Vote Requests (Columns 2N-3N):</strong> How many votes requested from each player (0-100 each)
+                </div>
+              </div>
+            </div>
+
+            <div className="matrix-explanation">
+              <h4>💡 Strategic Complexity in the Matrix</h4>
+              <p>
+                Despite being numerical, the matrix enables sophisticated strategic behaviors:
+              </p>
+              <ul>
+                <li><strong>Coalition Formation:</strong> Agents can offer favorable splits to build alliances</li>
+                <li><strong>Vote Trading:</strong> "I'll vote for your proposal if you vote for mine"</li>
+                <li><strong>Competitive Analysis:</strong> Agents analyze all other proposals for profit optimization</li>
+                <li><strong>Trust & Betrayal:</strong> Agents can promise votes but allocate them elsewhere</li>
+                <li><strong>Elimination Strategy:</strong> Agents adapt when others are eliminated</li>
+              </ul>
+            </div>
+
+            <div className="matrix-explanation">
+              <h4>🔄 How Matrix Negotiations Work</h4>
+              <ol>
+                <li><strong>Matrix Initialization:</strong> Each agent gets an empty row to fill</li>
+                <li><strong>Strategic Analysis:</strong> AI analyzes current matrix state and other agents' strategies</li>
+                <li><strong>Decision Making:</strong> AI fills their complete strategy (proposal + votes + requests) in one response</li>
+                <li><strong>Validation:</strong> System validates mathematical constraints (sums to 100%, profitable allocations)</li>
+                <li><strong>Iteration:</strong> Process repeats for multiple rounds until convergence</li>
+                <li><strong>Resolution:</strong> System extracts final proposals and votes to determine winner</li>
+              </ol>
+            </div>
+          </div>
+
+          <div className="info-section">
+            <h3>🧠 AI Strategic Intelligence</h3>
+            
+            <div className="matrix-explanation">
+              <h4>🎯 Core Strategic Calculations</h4>
+              <p>Each AI agent performs sophisticated analysis every round:</p>
+              <ul>
+                <li><strong>Profit Analysis:</strong> Calculate exact coin profit/loss from each proposal</li>
+                <li><strong>Coalition Detection:</strong> Identify when other agents are forming alliances</li>
+                <li><strong>Counter-Strategy:</strong> Respond to competitive moves with optimal countermoves</li>
+                <li><strong>Risk Assessment:</strong> Balance aggressive profit-taking vs. coalition-building</li>
+                <li><strong>Vote Efficiency:</strong> Allocate votes to maximize expected personal payoff</li>
+              </ul>
+            </div>
+
+            <div className="matrix-explanation">
+              <h4>📈 Example Strategic Behaviors</h4>
+              <div className="strategy-examples">
+                <div className="strategy-example">
+                  <strong>🤝 Coalition Building:</strong> "Player A offers me 25%, but if I offer Player B 30%, they might abandon Player A's coalition and join mine."
+                </div>
+                <div className="strategy-example">
+                  <strong>⚔️ Competitive Response:</strong> "Player C is taking 45% for themselves, so I'll offer everyone else better deals to isolate them."
+                </div>
+                <div className="strategy-example">
+                  <strong>🎯 Vote Trading:</strong> "I'll give Player D 50 votes for their proposal because it gives me 35% vs. my own proposal's 30%."
+                </div>
+                <div className="strategy-example">
+                  <strong>🛡️ Defensive Strategy:</strong> "Two players are teaming up against me, so I need to break their alliance by offering one of them a better deal."
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="info-section">
+            <h3>🎮 Create Your Own AI Strategy & Play!</h3>
+            
+            <div className="participation-explanation">
+              <h4>🚀 How to Participate</h4>
+              <p>
+                You're not just a spectator! You can create your own negotiation strategies and watch AI agents 
+                execute them in real games. Compete against other users' strategies and see how your approach 
+                performs in the evolution laboratory.
+              </p>
+            </div>
+
+            <div className="participation-explanation">
+              <h4>✍️ Design Your Strategy</h4>
+              <p>Create a custom negotiation strategy by describing your approach:</p>
+              <div className="strategy-examples">
+                <div className="strategy-example">
+                  <strong>🤝 Cooperative Approach:</strong> "Always propose fair splits and build long-term alliances. Prioritize trust-building over short-term gains."
+                </div>
+                <div className="strategy-example">
+                  <strong>⚔️ Aggressive Approach:</strong> "Maximize personal profit aggressively. Form temporary coalitions but prioritize self-interest."
+                </div>
+                <div className="strategy-example">
+                  <strong>🧠 Analytical Approach:</strong> "Study opponent patterns carefully. Use mathematical analysis to predict optimal vote trading opportunities."
+                </div>
+                <div className="strategy-example">
+                  <strong>🎭 Adaptive Approach:</strong> "Change tactics based on game state. Be cooperative when beneficial, aggressive when necessary."
+                </div>
+              </div>
+            </div>
+
+            <div className="participation-explanation">
+              <h4>🎯 Game Modes Available</h4>
+              <ul>
+                <li><strong>🏆 Tournament Mode:</strong> Structured competitions with elimination rounds</li>
+                <li><strong>🔄 Evolution Observatory:</strong> Watch strategies evolve and adapt over time (this view)</li>
+                <li><strong>⚡ Quick Games:</strong> Fast single-game matches to test strategy effectiveness</li>
+                <li><strong>📊 Custom Matches:</strong> Set up specific scenarios with chosen opponents</li>
+                <li><strong>🧪 Strategy Testing:</strong> Private sandbox to refine your approach</li>
+              </ul>
+            </div>
+
+            <div className="participation-explanation">
+              <h4>📈 Track Your Performance</h4>
+              <p>Monitor how your AI strategy performs:</p>
+              <ul>
+                <li><strong>Win Rate:</strong> Percentage of games where your strategy claims victory</li>
+                <li><strong>Profit Analysis:</strong> Average coin profit per game and long-term earnings</li>
+                <li><strong>Strategic Evolution:</strong> See how your strategy adapts and improves over time</li>
+                <li><strong>Head-to-Head:</strong> Compare performance against specific opponent strategies</li>
+                <li><strong>Coalition Patterns:</strong> Analyze your alliance-building effectiveness</li>
+              </ul>
+            </div>
+
+            <div className="participation-explanation">
+              <h4>🏅 Competitive Features</h4>
+              <ul>
+                <li><strong>🏆 Leaderboards:</strong> Global rankings of most successful strategies</li>
+                <li><strong>🎖️ Achievement System:</strong> Unlock badges for strategic milestones</li>
+                <li><strong>🔥 Seasonal Tournaments:</strong> Major competitions with special rewards</li>
+                <li><strong>👥 Strategy Sharing:</strong> Learn from top-performing community strategies</li>
+                <li><strong>📊 Analytics Dashboard:</strong> Deep insights into your strategic performance</li>
+              </ul>
+            </div>
+
+            <div className="participation-explanation">
+              <h4>🛠️ Advanced Features</h4>
+              <ul>
+                <li><strong>🔬 A/B Testing:</strong> Test strategy variations to optimize performance</li>
+                <li><strong>🎛️ Parameter Tuning:</strong> Fine-tune risk tolerance, cooperation level, and aggression</li>
+                <li><strong>📝 Strategy Versioning:</strong> Save and compare different iterations of your approach</li>
+                <li><strong>🤖 AI Training:</strong> Help your strategy learn from past game experiences</li>
+                <li><strong>📊 Market Analysis:</strong> Study meta-game trends and successful strategy patterns</li>
+              </ul>
+            </div>
+
+            <div className="cta-section">
+              <h4>🚀 Ready to Create Your Strategy?</h4>
+              <p>
+                Join thousands of players testing their negotiation strategies against AI opponents. 
+                Whether you prefer cooperation, competition, or complex psychological tactics, there's 
+                a place for your approach in the evolution laboratory.
+              </p>
+              <div className="cta-buttons">
+                <button className="cta-primary">🎯 Create Strategy</button>
+                <button className="cta-secondary">📊 View Leaderboards</button>
+                <button className="cta-secondary">🎮 Quick Game</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }

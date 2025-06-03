@@ -13,6 +13,48 @@ app.use(cors());
 // Use '/api' prefix for all API routes
 const router = express.Router();
 
+// Admin authentication endpoint (placed on main app, not router)
+app.post('/api/admin/authenticate', (req, res) => {
+  const { password } = req.body;
+  const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'evolutionAdmin2024';
+  
+  if (password === ADMIN_PASSWORD) {
+    // Generate a simple session token
+    const sessionToken = `admin-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+    
+    // Store session (in production, use Redis or database)
+    global.adminSessions = global.adminSessions || new Set();
+    global.adminSessions.add(sessionToken);
+    
+    // Auto-expire session after 24 hours
+    setTimeout(() => {
+      global.adminSessions.delete(sessionToken);
+    }, 24 * 60 * 60 * 1000);
+    
+    res.json({ 
+      success: true, 
+      token: sessionToken,
+      message: 'Admin access granted' 
+    });
+  } else {
+    res.status(401).json({ 
+      success: false, 
+      message: 'Invalid admin password' 
+    });
+  }
+});
+
+// Middleware to check admin session
+const requireAdminAuth = (req, res, next) => {
+  const token = req.headers.authorization?.replace('Bearer ', '');
+  
+  if (!token || !global.adminSessions?.has(token)) {
+    return res.status(401).json({ error: 'Admin authentication required' });
+  }
+  
+  next();
+};
+
 const leaderboardHandler = require('./api/leaderboard');
 const { router: gameStateRouter } = require('./api/gameState');
 const { startGameRoomWebSocketServer } = require('./gameRoomWebSocketServer');
@@ -646,11 +688,11 @@ router.post('/claim', async (req, res) => {
   }
 });
 
-// Add evolution endpoints
-router.post('/evolution/start', evolutionController.startEvolution);
-router.post('/evolution/stop', evolutionController.stopEvolution);
-router.get('/evolution/status', evolutionController.getStatus);
-router.get('/evolution/data', evolutionController.getCurrentData);
+// Add evolution endpoints - some protected, some public
+router.post('/evolution/start', requireAdminAuth, evolutionController.startEvolution);
+router.post('/evolution/stop', requireAdminAuth, evolutionController.stopEvolution);
+router.get('/evolution/status', evolutionController.getStatus); // Public - read-only
+router.get('/evolution/data', evolutionController.getCurrentData); // Public - read-only
 
 app.use('/api', router);
 app.use('/api/game-state', gameStateRouter);

@@ -41,6 +41,14 @@ class ContinuousEvolutionSystem {
     this.totalEvolutions = 0;
     
     this.initializeInitialPopulation();
+    
+    // Auto-start the simulation for continuous evolution
+    setTimeout(() => {
+      this.start();
+      this.runContinuousEvolution().catch(error => {
+        this.log('error', 'AutoStart', `Auto-start failed: ${error.message}`);
+      });
+    }, 2000); // 2 second delay to allow initialization
   }
 
   async initializeInitialPopulation() {
@@ -420,6 +428,9 @@ Respond with JSON:
             }
           });
         }
+        
+        // Also output to console for local testing
+        console.log(message);
       }
     });
 
@@ -475,91 +486,429 @@ Respond with JSON:
     const players = gameData.players.map((strategy, index) => ({
       id: strategy.id,
       name: strategy.name,
-      strategy: strategy.strategy
+      strategy: strategy.strategy,
+      agent: { strategyId: strategy.id }
     }));
 
-    matrixSystem.initializeMatrix(players);
+    let activePlayers = [...players]; // Players who can make proposals
+    let allPlayers = [...players]; // All players (including eliminated ones)
+    let roundNumber = 1;
+    let finalWinner = null;
+    let finalProposal = null;
+    let negotiationHistory = [];
+    
+    // Initialize matrix system ONCE for the entire game
+    let matrixInitialized = false;
 
-    // Run matrix negotiation rounds with delays
-    const maxRounds = 5;
-    for (let round = 1; round <= maxRounds; round++) {
-      this.log('debug', 'MatrixGame', `Round ${round} negotiation starting`);
+    // Game loop - continue until someone gets 61%+ votes or only one player remains
+    while (!finalWinner && roundNumber <= 5 && activePlayers.length >= 2) {
+      this.log('info', 'MatrixGame', `=== ROUND ${roundNumber} ===`);
       
-      // Delay between rounds to pace AI interactions
-      if (round > 1) {
-        await this.sleep(this.roundDelaySeconds * 1000);
-      }
+      const context = {
+        phase: 'negotiation',
+        round: roundNumber,
+        maxRounds: 5,
+        players: allPlayers,
+        negotiationHistory: negotiationHistory
+      };
+
+      // Matrix Negotiation phase
+      this.log('debug', 'MatrixGame', 'Matrix negotiations starting (3 rounds)');
+      const roundNegotiations = [];
       
-      for (let playerIndex = 0; playerIndex < players.length; playerIndex++) {
-        const success = await matrixSystem.performNegotiationRound(
-          playerIndex,
-          players[playerIndex].strategy,
-          round
-        );
-        
-        if (!success) {
-          this.log('warning', 'MatrixGame', `Player ${playerIndex} failed negotiation in round ${round}`);
+      try {
+        // Only initialize matrix ONCE in Round 1 - preserve elimination state in subsequent rounds
+        if (!matrixInitialized) {
+          matrixSystem.initializeMatrix(allPlayers);
+          matrixInitialized = true;
         }
         
-        // Small delay between each player's turn to pace API calls
-        await this.sleep(this.interactionDelaySeconds * 1000);
+        // Run 3 rounds of matrix negotiations
+        const matrixRounds = 3;
+        for (let matrixRound = 1; matrixRound <= matrixRounds; matrixRound++) {
+          
+          // Each player updates their matrix row (including eliminated players!)
+          for (let playerIndex = 0; playerIndex < allPlayers.length; playerIndex++) {
+            const player = allPlayers[playerIndex];
+            const isActive = activePlayers.find(p => p.id === player.id);
+            
+            // Find the strategy for this player
+            const strategy = gameData.players.find(s => s.id === player.id);
+            const strategyText = strategy ? strategy.strategy : 'Maximize my position strategically';
+            
+            // Create active players array for matrix system
+            const activePlayersInfo = allPlayers.map((p, idx) => ({
+              playerIndex: idx,
+              isActive: !!activePlayers.find(ap => ap.id === p.id)
+            }));
+            
+            try {
+              // Even eliminated players can update matrix (offers, votes, etc.)
+              const success = await matrixSystem.performNegotiationRound(
+                playerIndex,
+                strategyText,
+                roundNumber,
+                !isActive, // Pass elimination status to matrix system
+                activePlayersInfo
+              );
+              
+              if (success) {
+                const matrixNegotiation = {
+                  playerId: player.id,
+                  playerName: player.name,
+                  strategyId: player.agent.strategyId,
+                  message: isActive 
+                    ? `Matrix update completed: strategic positioning optimized`
+                    : `Matrix update completed: offering votes and influence despite elimination`,
+                  round: roundNumber,
+                  negotiationRound: matrixRound,
+                  isMatrixBased: true,
+                  isEliminated: !isActive
+                };
+                negotiationHistory.push(matrixNegotiation);
+                roundNegotiations.push(matrixNegotiation);
+                
+                const statusTag = isActive ? '' : ' [ELIMINATED - OFFERING VOTES]';
+                this.log('debug', 'MatrixGame', `${player.name}${statusTag}: Matrix updated successfully`);
+              } else {
+                const statusTag = isActive ? '' : ' [ELIMINATED]';
+                this.log('warning', 'MatrixGame', `${player.name}${statusTag}: Matrix update failed`);
+              }
+            } catch (error) {
+              const statusTag = isActive ? '' : ' [ELIMINATED]';
+              this.log('warning', 'MatrixGame', `${player.name}${statusTag}: Matrix error - ${error.message}`);
+            }
+            
+            // Small delay to prevent overwhelming the API
+            await this.sleep(this.interactionDelaySeconds * 1000);
+          }
+          
+          // Show matrix state after this matrix round
+          this.log('info', 'MatrixGame', `\n📊 Matrix State After Round ${matrixRound}/${matrixRounds}:`);
+          matrixSystem.displayResults();
+        }
+        
+        // Store matrix results in context
+        context.matrixSystem = matrixSystem;
+        context.finalMatrix = matrixSystem.getMatrix();
+        
+      } catch (error) {
+        this.log('error', 'MatrixGame', `Matrix negotiation system failed: ${error.message}`);
+        
+        // Fallback: Create simple negotiation entries
+        allPlayers.forEach(player => {
+          const fallbackNegotiation = {
+            playerId: player.id,
+            playerName: player.name,
+            strategyId: player.agent.strategyId,
+            message: `Strategic positioning evaluated (matrix fallback)`,
+            round: roundNumber,
+            negotiationRound: 1,
+            wasFailure: true,
+            isMatrixBased: true
+          };
+          negotiationHistory.push(fallbackNegotiation);
+          roundNegotiations.push(fallbackNegotiation);
+        });
       }
 
-      // Broadcast round update
+      // Proposal phase - ONLY ACTIVE PLAYERS can make proposals
+      this.log('debug', 'MatrixGame', 'Proposal phase starting');
+      const proposals = [];
+      
+      // Run all proposals in parallel
+      const proposalPromises = activePlayers.map(async (player) => {
+        try {
+          const proposal = await this.generateProposal(context, player, allPlayers, gameData);
+          
+          // Validate proposal structure and math
+          if (!proposal || typeof proposal !== 'object') {
+            throw new Error('Invalid proposal structure');
+          }
+          
+          const playerIds = allPlayers.map(p => p.id);
+          const hasAllPlayers = playerIds.every(id => proposal.hasOwnProperty(id));
+          const total = Object.values(proposal).reduce((sum, val) => sum + Number(val), 0);
+          const isValidTotal = Math.abs(total - 100) <= 5; // Allow small rounding errors
+          
+          if (!hasAllPlayers) {
+            throw new Error('Proposal missing some players');
+          }
+          if (!isValidTotal) {
+            throw new Error(`Proposal totals to ${total}%, not 100%`);
+          }
+          
+          return {
+            playerId: player.id,
+            playerName: player.name,
+            strategyId: player.agent.strategyId,
+            proposal: proposal
+          };
+        } catch (err) {
+          // Fallback: Equal split proposal
+          const equalShare = Math.floor(100 / allPlayers.length);
+          const remainder = 100 - (equalShare * allPlayers.length);
+          const fallbackProposal = {};
+          
+          allPlayers.forEach((p, index) => {
+            fallbackProposal[p.id] = equalShare + (index === 0 ? remainder : 0);
+          });
+          
+          this.log('warning', 'MatrixGame', `${player.name} proposal failed: ${err.message} - using equal split fallback`);
+          
+          return {
+            playerId: player.id,
+            playerName: player.name,
+            strategyId: player.agent.strategyId,
+            proposal: fallbackProposal,
+            wasFailure: true
+          };
+        }
+      });
+      
+      const proposalResults = await Promise.all(proposalPromises);
+      proposals.push(...proposalResults);
+      
+      // Display proposals
+      for (const proposalResult of proposalResults) {
+        const shares = Object.entries(proposalResult.proposal)
+          .map(([id, pct]) => `${allPlayers.find(p => p.id === id)?.name || id}: ${pct}%`)
+          .join(', ');
+        const failTag = proposalResult.wasFailure ? ' [FAILED - EQUAL SPLIT]' : '';
+        this.log('info', 'MatrixGame', `${proposalResult.playerName}${failTag}: {${shares}}`);
+      }
+
+      // Voting phase - ALL PLAYERS vote (including eliminated ones)
+      context.phase = 'voting';
+      context.proposals = proposals;
+      
+      this.log('debug', 'MatrixGame', 'Voting phase starting');
+      const allVotes = {};
+      
+      // Run all votes in parallel
+      const votingPromises = allPlayers.map(async (player) => {
+        try {
+          const vote = await this.generateVote(context, player, proposals, gameData);
+          
+          // Validate vote structure
+          if (!vote || typeof vote !== 'object') {
+            throw new Error('Invalid vote structure');
+          }
+          
+          const proposerIds = proposals.map(p => p.playerId);
+          const hasValidKeys = Object.keys(vote).every(k => proposerIds.includes(k));
+          const total = Object.values(vote).reduce((sum, val) => sum + Number(val), 0);
+          const isValidTotal = Math.abs(total - 100) <= 5;
+          
+          if (!hasValidKeys) {
+            throw new Error('Vote contains invalid proposer IDs');
+          }
+          if (!isValidTotal) {
+            throw new Error(`Vote totals to ${total}, not 100`);
+          }
+          
+          return {
+            playerId: player.id,
+            votes: vote,
+            playerName: player.name,
+            strategyId: player.agent.strategyId
+          };
+        } catch (err) {
+          // Fallback: Equal split votes
+          const equalVote = Math.floor(100 / proposals.length);
+          const remainder = 100 - (equalVote * proposals.length);
+          const fallbackVote = {};
+          
+          proposals.forEach((prop, index) => {
+            fallbackVote[prop.playerId] = equalVote + (index === 0 ? remainder : 0);
+          });
+          
+          this.log('warning', 'MatrixGame', `${player.name} vote failed: ${err.message} - using equal split fallback`);
+          
+          return {
+            playerId: player.id,
+            votes: fallbackVote,
+            playerName: player.name,
+            strategyId: player.agent.strategyId,
+            wasFailure: true
+          };
+        }
+      });
+      
+      const voteResults = await Promise.all(votingPromises);
+      
+      // Store votes and display
+      for (const voteResult of voteResults) {
+        allVotes[voteResult.playerId] = voteResult;
+        
+        const voteStr = Object.entries(voteResult.votes)
+          .map(([proposerId, votes]) => `${allPlayers.find(p => p.id === proposerId)?.name || proposerId}: ${votes}`)
+          .join(', ');
+        
+        const isEliminated = !activePlayers.find(p => p.id === voteResult.playerId);
+        const statusTag = isEliminated ? '[ELIMINATED]' : '';
+        const failTag = voteResult.wasFailure ? ' [FAILED - EQUAL SPLIT]' : '';
+        this.log('info', 'MatrixGame', `${voteResult.playerName}${statusTag}${failTag}: {${voteStr}}`);
+      }
+
+      // Calculate results
+      const totalVotes = {};
+      proposals.forEach(prop => {
+        totalVotes[prop.playerId] = 0;
+      });
+      
+      Object.values(allVotes).forEach(playerVote => {
+        if (playerVote.votes && typeof playerVote.votes === 'object') {
+          Object.entries(playerVote.votes).forEach(([proposerId, votes]) => {
+            if (totalVotes.hasOwnProperty(proposerId)) {
+              totalVotes[proposerId] += Number(votes) || 0;
+            }
+          });
+        }
+      });
+
+      const sortedResults = Object.entries(totalVotes)
+        .sort(([,a], [,b]) => b - a)
+        .map(([proposerId, votes]) => {
+          const proposer = allPlayers.find(p => p.id === proposerId);
+          const percentage = Math.round(votes / allPlayers.length); // Use ALL players for percentage calculation
+          return { 
+            playerId: proposerId, 
+            name: proposer?.name || proposerId, 
+            strategyId: proposer?.agent?.strategyId,
+            votes, 
+            percentage 
+          };
+        });
+
+      const topResult = sortedResults[0];
+      const hasWinner = topResult && topResult.percentage >= 61;
+
+      this.log('info', 'MatrixGame', '🏆 ROUND RESULTS:');
+      sortedResults.forEach((result, index) => {
+        const icon = index === 0 ? '👑' : index === 1 ? '🥈' : index === 2 ? '🥉' : '📍';
+        const status = hasWinner && index === 0 ? 'WINNER!' : 'Lost';
+        this.log('info', 'MatrixGame', `   ${icon} ${result.name}: ${result.votes} votes (${result.percentage}%) - ${status}`);
+      });
+
+      if (hasWinner) {
+        finalWinner = topResult;
+        finalProposal = proposals.find(p => p.playerId === topResult.playerId);
+        this.log('info', 'MatrixGame', `🎉 ${finalWinner.name} WINS THE GAME!`);
+        break;
+      } else if (activePlayers.length <= 2) {
+        // SPECIAL CASE: 2 players left - need proper tie-breaking
+        const activeResults = sortedResults.filter(r => activePlayers.find(p => p.id === r.playerId));
+        
+        if (activeResults.length === 2 && activeResults[0].votes === activeResults[1].votes) {
+          // TIE! Need tiebreaker
+          this.log('info', 'MatrixGame', `🤝 TIE! Both players have ${activeResults[0].votes} votes (${activeResults[0].percentage}% each)`);
+          
+          // Tiebreaker: Random selection
+          const randomWinner = activeResults[Math.floor(Math.random() * 2)];
+          finalWinner = randomWinner;
+          finalProposal = proposals.find(p => p.playerId === randomWinner.playerId);
+          this.log('info', 'MatrixGame', `🎲 ${finalWinner.name} wins tiebreaker (random selection)`);
+        } else {
+          // No tie - clear winner
+          finalWinner = activeResults[0];
+          finalProposal = proposals.find(p => p.playerId === topResult.playerId);
+          this.log('info', 'MatrixGame', `🎯 Final round with 2 active players - ${finalWinner.name} wins with ${finalWinner.votes} votes!`);
+        }
+        break;
+      } else {
+        // Find lowest vote-getter among ACTIVE players to eliminate
+        const activeResults = sortedResults.filter(r => activePlayers.find(p => p.id === r.playerId));
+        const lowestVotes = Math.min(...activeResults.map(r => r.votes));
+        const eliminationCandidates = activeResults.filter(r => r.votes === lowestVotes);
+        
+        // TIE BREAKING: Random selection among tied players
+        const eliminated = eliminationCandidates[Math.floor(Math.random() * eliminationCandidates.length)];
+        
+        this.log('info', 'MatrixGame', `❌ ELIMINATION: ${eliminated.name} eliminated with ${eliminated.votes} votes (${Math.round((eliminated.votes / allPlayers.length) * 100)}%)${eliminationCandidates.length > 1 ? ' (tie-breaker)' : ''}`);
+        activePlayers = activePlayers.filter(p => p.id !== eliminated.playerId);
+        this.log('info', 'MatrixGame', `📊 Active players remaining: ${activePlayers.length}`);
+        
+        // Broadcast elimination
+        if (this.realTimeUpdates) {
+          this.onUpdate({
+            type: 'player_eliminated',
+            data: {
+              gameNumber: gameData.number,
+              gameRound: roundNumber,
+              eliminatedPlayer: eliminated,
+              reason: 'lowest_votes',
+              votes: eliminated.votes,
+              votePercentage: Math.round((eliminated.votes / allPlayers.length) * 100)
+            }
+          });
+        }
+      }
+      
+      // Broadcast round results
       if (this.realTimeUpdates) {
         const reasoning = this.extractReasoningData(matrixSystem);
-        const logs = [{
+        const logs = roundNegotiations.map(neg => ({
           level: 'info',
-          source: 'MatrixGame',
-          message: `Round ${round} completed`,
+          source: 'AI_Reasoning',
+          message: `${neg.playerName}: ${neg.message}`,
           timestamp: Date.now()
-        }];
-        
-        // Add reasoning as individual log entries
-        Object.entries(reasoning).forEach(([strategyId, reasoningText]) => {
-          const player = players.find(p => p.id === strategyId);
-          if (player && reasoningText) {
-            logs.push({
-              level: 'info',
-              source: 'AI_Reasoning',
-              message: `${player.name}: ${reasoningText}`,
-              timestamp: Date.now()
-            });
-          }
-        });
+        }));
         
         this.onUpdate({
           type: 'round_update',
           data: {
-            number: round,
+            number: roundNumber,
             gameNumber: gameData.number,
-            phase: 'negotiation',
+            phase: 'voting_complete',
             matrix: this.extractMatrixData(matrixSystem),
             reasoning: reasoning,
+            proposals: proposals,
+            votes: allVotes,
+            results: sortedResults,
+            activePlayers: activePlayers.length,
             logs: logs
           }
         });
       }
+      
+      roundNumber++;
     }
 
-    // Extract proposals and votes from final matrix state
-    const finalMatrix = matrixSystem.getMatrix();
-    const proposals = this.extractProposals(finalMatrix, players.length);
-    const votes = this.extractVotes(finalMatrix, players.length);
-
-    // Determine winner
-    const winner = this.determineWinner(proposals, votes, players);
-    const winningProposal = winner ? proposals[winner.playerIndex] : null;
-    const coinDistribution = winningProposal ? 
-      winningProposal.map(percentage => Math.round((percentage / 100) * (players.length * this.entryFee))) :
-      new Array(players.length).fill(0);
-
+    // Game ended - prepare results
+    if (finalWinner && finalProposal) {
+      const winner = allPlayers.find(p => p.id === finalWinner.playerId);
+      const winningProposal = Object.values(finalProposal.proposal);
+      const coinDistribution = winningProposal.map(percentage => 
+        Math.round((percentage / 100) * (allPlayers.length * this.entryFee))
+      );
+      
+      return {
+        winner: winner,
+        winningProposal: winningProposal,
+        coinDistribution: coinDistribution,
+        proposals: proposals,
+        votes: allVotes,
+        gameRounds: roundNumber - 1
+      };
+    }
+    
+    // No winner (shouldn't happen, but safety fallback)
+    this.log('warning', 'MatrixGame', 'Game ended without clear winner - using fallback');
+    const remainingPlayers = activePlayers.length > 0 ? activePlayers : allPlayers;
+    const fallbackWinner = remainingPlayers[0];
+    const fallbackProposal = new Array(allPlayers.length).fill(Math.floor(100 / allPlayers.length));
+    const fallbackDistribution = fallbackProposal.map(percentage => 
+      Math.round((percentage / 100) * (allPlayers.length * this.entryFee))
+    );
+    
     return {
-      winner: winner,
-      winningProposal: winningProposal,
-      coinDistribution: coinDistribution,
-      proposals: proposals,
-      votes: votes
+      winner: fallbackWinner,
+      winningProposal: fallbackProposal,
+      coinDistribution: fallbackDistribution,
+      proposals: [],
+      votes: {},
+      gameRounds: roundNumber - 1
     };
   }
 
@@ -618,25 +967,31 @@ Respond with JSON:
   }
 
   extractVotes(matrix, numPlayers) {
-    return matrix.map(row => row.slice(numPlayers, numPlayers * 2));
+    return matrix.map(row => row.data.slice(numPlayers, numPlayers * 2));
   }
 
-  determineWinner(proposals, votes, players) {
-    const proposalVoteTotals = proposals.map((_, proposalIndex) => {
-      return votes.reduce((total, voteRow) => total + (voteRow[proposalIndex] || 0), 0);
-    });
-
-    const winningProposalIndex = proposalVoteTotals.findIndex(total => total >= 61);
+  calculateVoteResults(proposals, votes, players) {
+    const voteResults = {};
     
-    if (winningProposalIndex !== -1) {
-      return {
-        playerIndex: winningProposalIndex,
-        ...players[winningProposalIndex],
-        voteTotal: proposalVoteTotals[winningProposalIndex]
-      };
+    // Initialize vote totals for each active player
+    for (let playerIndex = 0; playerIndex < players.length; playerIndex++) {
+      if (!players[playerIndex].isEliminated) {
+        voteResults[playerIndex] = 0;
+      }
     }
-
-    return null; // No winner - rare case
+    
+    // Sum up votes each player receives from all voters
+    for (let voterIndex = 0; voterIndex < votes.length; voterIndex++) {
+      const voterVotes = votes[voterIndex]; // This voter's vote allocation
+      
+      for (let candidateIndex = 0; candidateIndex < voterVotes.length; candidateIndex++) {
+        if (!players[candidateIndex].isEliminated && voterVotes[candidateIndex] > 0) {
+          voteResults[candidateIndex] = (voteResults[candidateIndex] || 0) + voterVotes[candidateIndex];
+        }
+      }
+    }
+    
+    return voteResults;
   }
 
   async waitForNextGame() {
@@ -878,6 +1233,172 @@ Respond with JSON:
 
   generateUniqueId() {
     return `strategy-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+  }
+
+  async generateProposal(context, player, allPlayers, gameData) {
+    try {
+      const strategy = gameData.players ? gameData.players.find(s => s.id === player.id) : null;
+      const strategyText = strategy ? strategy.strategy : 'Maximize strategic positioning in negotiations';
+      
+      // Get matrix information for informed proposals
+      let matrixInfo = '';
+      if (context.matrixSystem) {
+        try {
+          const matrix = context.matrixSystem.getMatrix();
+          const playerIndex = allPlayers.findIndex(p => p.id === player.id);
+          if (playerIndex !== -1 && matrix[playerIndex]) {
+            const proposals = matrix[playerIndex].slice(0, allPlayers.length);
+            const votes = matrix[playerIndex].slice(allPlayers.length, allPlayers.length * 2);
+            
+            matrixInfo = `\nYour current matrix position:
+- Your last proposals: [${proposals.map((p, i) => `${allPlayers[i].name}: ${p}%`).join(', ')}]
+- Your voting weights: [${votes.map((v, i) => `${allPlayers[i].name}: ${v}`).join(', ')}]`;
+          }
+        } catch (err) {
+          // Matrix info is optional
+        }
+      }
+
+      const prompt = `You are ${player.name} in a negotiation game. Make a proposal for how to split 100% of the prize money.
+
+STRATEGY: ${strategyText}
+
+GAME CONTEXT:
+- Round ${context.round}/${context.maxRounds}
+- Players: ${allPlayers.map(p => p.name).join(', ')}
+- You need 61%+ of votes to win
+- Everyone can vote (including eliminated players)
+
+${matrixInfo}
+
+RECENT NEGOTIATIONS:
+${context.negotiationHistory.slice(-6).map(n => `${n.playerName}: ${n.message}`).join('\n')}
+
+Create a proposal that assigns percentages to all players (must total 100%).
+Consider:
+1. Your strategic advantage and negotiation position
+2. Vote-trading opportunities with other players
+3. Coalition building vs direct confrontation
+4. Risk vs reward based on current round
+
+Respond with JSON only:
+{
+  ${allPlayers.map(p => `"${p.id}": <percentage_for_${p.name.replace(/\s+/g, '_')}>`).join(',\n  ')}
+}`;
+
+      const response = await callLLM(prompt, {
+        temperature: 0.7,
+        max_tokens: 300,
+        system: 'You are a strategic negotiator. Return only valid JSON with percentages that sum to 100.'
+      });
+
+      const proposalMatch = response.match(/\{[\s\S]*\}/);
+      if (!proposalMatch) {
+        throw new Error('No JSON found in response');
+      }
+
+      const proposal = JSON.parse(proposalMatch[0]);
+      
+      // Validate that all players are included and percentages are numbers
+      for (const playerId of allPlayers.map(p => p.id)) {
+        if (!(playerId in proposal)) {
+          throw new Error(`Missing player ${playerId} in proposal`);
+        }
+        if (typeof proposal[playerId] !== 'number') {
+          proposal[playerId] = Number(proposal[playerId]) || 0;
+        }
+      }
+
+      return proposal;
+    } catch (error) {
+      this.log('warning', 'AI_Generation', `Proposal generation failed for ${player.name}: ${error.message}`);
+      throw error; // Let the calling function handle fallback
+    }
+  }
+
+  async generateVote(context, player, proposals, gameData) {
+    try {
+      const strategy = gameData.players ? gameData.players.find(s => s.id === player.id) : null;
+      const strategyText = strategy ? strategy.strategy : 'Vote strategically to maximize outcomes';
+      
+      // Get matrix information for informed voting
+      let matrixInfo = '';
+      if (context.matrixSystem) {
+        try {
+          const matrix = context.matrixSystem.getMatrix();
+          const playerIndex = context.players.findIndex(p => p.id === player.id);
+          if (playerIndex !== -1 && matrix[playerIndex]) {
+            const votes = matrix[playerIndex].slice(context.players.length, context.players.length * 2);
+            matrixInfo = `\nYour matrix voting weights: [${votes.map((v, i) => `${context.players[i].name}: ${v}`).join(', ')}]`;
+          }
+        } catch (err) {
+          // Matrix info is optional
+        }
+      }
+
+      const proposalSummary = proposals.map(p => {
+        const shares = Object.entries(p.proposal)
+          .map(([id, pct]) => `${context.players.find(pl => pl.id === id)?.name}: ${pct}%`)
+          .join(', ');
+        return `${p.playerName}: {${shares}}`;
+      }).join('\n');
+
+      const prompt = `You are ${player.name} voting on proposals. Allocate 100 voting points among the proposals.
+
+STRATEGY: ${strategyText}
+
+VOTING CONTEXT:
+- Round ${context.round}/${context.maxRounds}  
+- A proposal needs 61%+ votes to win
+- You can vote strategically, not just for highest personal allocation
+
+${matrixInfo}
+
+PROPOSALS TO VOTE ON:
+${proposalSummary}
+
+RECENT NEGOTIATIONS:
+${context.negotiationHistory.slice(-4).map(n => `${n.playerName}: ${n.message}`).join('\n')}
+
+Consider:
+1. Which proposal gives you the best outcome
+2. Strategic alliances and vote trading
+3. Blocking threats vs supporting allies  
+4. Your negotiation commitments and reputation
+
+Allocate 100 points among proposals (can be 0 for any proposal):
+{
+  ${proposals.map(p => `"${p.playerId}": <points_for_${p.playerName.replace(/\s+/g, '_')}>`).join(',\n  ')}
+}`;
+
+      const response = await callLLM(prompt, {
+        temperature: 0.7,
+        max_tokens: 200,
+        system: 'You are a strategic voter. Return only valid JSON with vote allocations that sum to 100.'
+      });
+
+      const voteMatch = response.match(/\{[\s\S]*\}/);
+      if (!voteMatch) {
+        throw new Error('No JSON found in response');
+      }
+
+      const vote = JSON.parse(voteMatch[0]);
+      
+      // Validate that all proposers are included and votes are numbers
+      for (const proposal of proposals) {
+        if (!(proposal.playerId in vote)) {
+          throw new Error(`Missing proposer ${proposal.playerId} in vote`);
+        }
+        if (typeof vote[proposal.playerId] !== 'number') {
+          vote[proposal.playerId] = Number(vote[proposal.playerId]) || 0;
+        }
+      }
+
+      return vote;
+    } catch (error) {
+      this.log('warning', 'AI_Generation', `Vote generation failed for ${player.name}: ${error.message}`);
+      throw error; // Let the calling function handle fallback
+    }
   }
 }
 

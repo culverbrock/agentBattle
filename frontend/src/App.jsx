@@ -6,6 +6,7 @@ import GameRoom from './GameRoom';
 import GameHistory from './GameHistory';
 import ClaimWinningsPage from './ClaimWinningsPage';
 import EvolutionObservatory from './EvolutionObservatory';
+import AdminPanel from './AdminPanel';
 
 function App() {
   return (
@@ -21,6 +22,7 @@ function App() {
           <Route path="/" element={<LobbyPage />} />
           <Route path="/leaderboard" element={<LeaderboardPage />} />
           <Route path="/evolution" element={<EvolutionObservatory />} />
+          <Route path="/admin" element={<AdminPanel />} />
           <Route path="/game/:gameId" element={<GameRoom />} />
           <Route path="/history/:gameId" element={<GameHistory />} />
           <Route path="/claim-winnings" element={<ClaimWinningsPage />} />

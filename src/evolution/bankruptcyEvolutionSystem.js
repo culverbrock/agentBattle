@@ -136,6 +136,12 @@ class ContinuousEvolutionSystem {
 
     this.log('info', 'System', 'Starting continuous evolution - no tournaments, just endless games with evolution on bankruptcy');
 
+    // Broadcast initial strategies to frontend
+    this.onUpdate({
+      type: 'strategies_updated',
+      strategies: this.strategies
+    });
+
     let gameNumber = 0;
 
     while (this.isRunning) {
@@ -488,6 +494,27 @@ Respond with JSON:
 
       // Broadcast round update
       if (this.realTimeUpdates) {
+        const reasoning = this.extractReasoningData(matrixSystem);
+        const logs = [{
+          level: 'info',
+          source: 'MatrixGame',
+          message: `Round ${round} completed`,
+          timestamp: Date.now()
+        }];
+        
+        // Add reasoning as individual log entries
+        Object.entries(reasoning).forEach(([strategyId, reasoningText]) => {
+          const player = players.find(p => p.id === strategyId);
+          if (player && reasoningText) {
+            logs.push({
+              level: 'info',
+              source: 'AI_Reasoning',
+              message: `${player.name}: ${reasoningText}`,
+              timestamp: Date.now()
+            });
+          }
+        });
+        
         this.onUpdate({
           type: 'round_update',
           data: {
@@ -495,13 +522,8 @@ Respond with JSON:
             gameNumber: gameData.number,
             phase: 'negotiation',
             matrix: this.extractMatrixData(matrixSystem),
-            reasoning: this.extractReasoningData(matrixSystem),
-            logs: [{
-              level: 'info',
-              source: 'MatrixGame',
-              message: `Round ${round} completed`,
-              timestamp: Date.now()
-            }]
+            reasoning: reasoning,
+            logs: logs
           }
         });
       }
@@ -532,33 +554,49 @@ Respond with JSON:
     const matrix = matrixSystem.getMatrix();
     const numPlayers = matrix.length;
     const matrixData = {};
+    const gamePlayers = matrixSystem.players; // Use the actual players from the matrix system
 
     matrix.forEach((row, playerIndex) => {
-      const proposal = row.slice(0, numPlayers);
-      const votes = row.slice(numPlayers, numPlayers * 2);
-      const requests = row.slice(numPlayers * 2, numPlayers * 3);
+      if (gamePlayers[playerIndex]) {
+        const proposal = row.slice(0, numPlayers);
+        const votes = row.slice(numPlayers, numPlayers * 2);
+        const requests = row.slice(numPlayers * 2, numPlayers * 3);
 
-      matrixData[this.strategies[playerIndex]?.id] = {
-        proposal: proposal,
-        votes: votes,
-        requests: requests
-      };
+        matrixData[gamePlayers[playerIndex].id] = {
+          proposal: proposal,
+          votes: votes,
+          requests: requests
+        };
+      }
     });
 
     return matrixData;
   }
 
   extractReasoningData(matrixSystem) {
-    if (!this.fullLogging) return {};
+    if (!this.fullLogging) {
+      console.log('🔍 Reasoning extraction skipped - fullLogging is false');
+      return {};
+    }
 
     const reasoning = {};
+    const gamePlayers = matrixSystem.players; // Use the actual players from the matrix system
+    
+    console.log('🔍 Extracting reasoning data:', {
+      fullLogging: this.fullLogging,
+      playersCount: gamePlayers?.length || 0,
+      explanationsCount: matrixSystem.playerExplanations?.length || 0
+    });
+    
     matrixSystem.playerExplanations.forEach((explanations, playerIndex) => {
-      if (explanations.length > 0) {
+      if (explanations.length > 0 && gamePlayers[playerIndex]) {
         const latestExplanation = explanations[explanations.length - 1];
-        reasoning[this.strategies[playerIndex]?.id] = latestExplanation.explanation;
+        reasoning[gamePlayers[playerIndex].id] = latestExplanation.explanation;
+        console.log(`🔍 Added reasoning for ${gamePlayers[playerIndex].name}: ${latestExplanation.explanation.substring(0, 50)}...`);
       }
     });
 
+    console.log('🔍 Final reasoning object keys:', Object.keys(reasoning));
     return reasoning;
   }
 

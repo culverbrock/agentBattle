@@ -241,7 +241,7 @@ class EvolutionController {
       case 'round_update':
         this.broadcaster.broadcast({
           type: 'round_update',
-          data: data.round
+          data: data.data
         });
         break;
 
@@ -264,11 +264,13 @@ class EvolutionController {
         break;
 
       case 'strategies_updated':
+        console.log('🔍 Updating strategies:', data.strategies?.length || 0, 'strategies');
         this.simulationData.strategies = data.strategies || [];
         this.broadcaster.broadcast({
           type: 'strategies_updated',
           data: { strategies: data.strategies }
         });
+        console.log('🔍 Broadcasted strategies_updated to clients');
         break;
 
       default:

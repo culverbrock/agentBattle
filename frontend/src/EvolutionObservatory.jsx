@@ -81,6 +81,11 @@ function EvolutionObservatory() {
       case 'initial_state':
         // Handle the initial state when connecting to ongoing simulation
         const data = message.data;
+        console.log('🔍 Frontend received initial_state:', {
+          isRunning: data.isRunning,
+          strategiesCount: data.strategies?.length || 0,
+          eliminatedCount: data.eliminatedStrategies?.length || 0
+        });
         setIsSimulationRunning(data.isRunning);
         if (data.isRunning) {
           startTimeRef.current = Date.now() - data.runTime;
@@ -160,6 +165,7 @@ function EvolutionObservatory() {
         break;
         
       case 'strategies_updated':
+        console.log('🔍 Frontend received strategies_updated:', message.data?.strategies?.length || 0, 'strategies');
         setStrategies(message.data.strategies || []);
         break;
         

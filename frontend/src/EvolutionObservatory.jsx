@@ -82,6 +82,28 @@ function EvolutionObservatory() {
 
   const handleEvolutionUpdate = (message) => {
     switch (message.type) {
+      case 'initial_state':
+        // Handle the initial state when connecting to ongoing simulation
+        const data = message.data;
+        setIsSimulationRunning(data.isRunning);
+        if (data.isRunning) {
+          startTimeRef.current = Date.now() - data.runTime;
+          setSimulationStats({
+            totalGames: data.totalGames || 0,
+            totalEliminations: data.totalEliminations || 0,
+            evolutionEvents: data.evolutionEvents || 0,
+            runningTime: Math.floor(data.runTime / 1000) || 0
+          });
+        }
+        setStrategies(data.strategies || []);
+        setEliminatedStrategies(data.eliminatedStrategies || []);
+        setEvolutionTree(data.evolutionTree || []);
+        setCurrentTournament(data.currentTournament);
+        setCurrentGame(data.currentGame);
+        setDetailedLogs(data.detailedLogs || []);
+        console.log('🧬 Received initial state - simulation running:', data.isRunning);
+        break;
+        
       case 'simulation_started':
         setIsSimulationRunning(true);
         startTimeRef.current = Date.now();
@@ -153,8 +175,17 @@ function EvolutionObservatory() {
           fullLogging: true 
         })
       });
+      
       if (response.ok) {
         console.log('🧬 Evolution simulation started');
+      } else {
+        const errorData = await response.json();
+        if (response.status === 400 && errorData.error?.includes('already running')) {
+          console.log('🧬 Simulation already running - syncing state');
+          // The WebSocket should receive the current state automatically
+        } else {
+          console.error('Failed to start simulation:', errorData);
+        }
       }
     } catch (error) {
       console.error('Failed to start simulation:', error);

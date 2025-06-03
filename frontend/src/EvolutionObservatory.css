@@ -139,16 +139,19 @@
 /* Dashboard View */
 .dashboard-grid {
   display: grid;
-  grid-template-columns: 1fr 2fr;
-  grid-template-rows: auto auto;
+  grid-template-columns: 1fr 1fr;
   gap: 20px;
+  margin-top: 20px;
 }
 
-.game-status-panel, .strategy-health-panel, .elimination-panel, .live-activity-panel {
-  background: rgba(255, 255, 255, 0.05);
-  border-radius: 10px;
-  padding: 20px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
+.game-status-panel,
+.strategy-health-panel {
+  grid-column: span 1;
+}
+
+.elimination-panel,
+.live-activity-panel {
+  grid-column: span 1;
 }
 
 .game-status-panel h3, .strategy-health-panel h3, .elimination-panel h3, .live-activity-panel h3 {
@@ -567,4 +570,132 @@
   background: linear-gradient(90deg, #FFC107, #FF9800);
   border-radius: 4px;
   transition: width 1s ease;
+}
+
+/* Live Logs Panel */
+.live-logs-container {
+  max-height: 300px;
+  overflow-y: auto;
+  padding: 10px;
+  background: #f8f9fa;
+  border-radius: 6px;
+}
+
+.log-entry {
+  display: flex;
+  gap: 8px;
+  padding: 6px 0;
+  border-bottom: 1px solid #e9ecef;
+  font-size: 12px;
+  align-items: flex-start;
+}
+
+.log-entry:last-child {
+  border-bottom: none;
+}
+
+.log-time {
+  color: #6c757d;
+  font-weight: 500;
+  min-width: 60px;
+  font-size: 11px;
+}
+
+.log-source {
+  color: #495057;
+  font-weight: 600;
+  min-width: 80px;
+  font-size: 11px;
+}
+
+.log-message {
+  color: #212529;
+  flex: 1;
+  word-wrap: break-word;
+}
+
+.log-entry.log-info .log-source {
+  color: #0056b3;
+}
+
+.log-entry.log-warning .log-source {
+  color: #e67e22;
+}
+
+.log-entry.log-error .log-source {
+  color: #dc3545;
+}
+
+.log-entry.log-debug .log-source {
+  color: #6f42c1;
+}
+
+.log-entry.delay {
+  background: #fff3cd;
+  padding: 8px;
+  border-radius: 4px;
+  border: 1px solid #ffeaa7;
+}
+
+/* AI Reasoning Panel */
+.ai-reasoning-panel {
+  grid-column: span 2;
+}
+
+.reasoning-container {
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.reasoning-feed {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.reasoning-entry {
+  background: #f8f9fa;
+  border-radius: 6px;
+  padding: 12px;
+  border-left: 4px solid #007bff;
+}
+
+.reasoning-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.strategy-name {
+  font-weight: 600;
+  color: #495057;
+  font-size: 14px;
+}
+
+.reasoning-round {
+  font-size: 12px;
+  color: #6c757d;
+  background: #e9ecef;
+  padding: 2px 6px;
+  border-radius: 3px;
+}
+
+.reasoning-text {
+  color: #212529;
+  font-size: 13px;
+  line-height: 1.4;
+  font-style: italic;
+}
+
+/* Panel styling for all dashboard panels */
+.game-status-panel,
+.strategy-health-panel,
+.elimination-panel,
+.live-activity-panel,
+.ai-reasoning-panel {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 10px;
+  padding: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
 } 

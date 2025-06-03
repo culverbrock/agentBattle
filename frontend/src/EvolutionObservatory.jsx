@@ -24,12 +24,9 @@ function EvolutionObservatory() {
   
   // Rate limiting and countdown states
   const [isWaitingForNextGame, setIsWaitingForNextGame] = useState(false);
-  const [countdown, setCountdown] = useState({
-    timeRemaining: 0,
-    minutes: 0,
-    seconds: 0,
-    formattedTime: '0:00'
-  });
+  const [countdown, setCountdown] = useState({ minutes: 0, seconds: 0, formattedTime: '0:00', timeRemaining: 0 });
+  const [liveLogs, setLiveLogs] = useState([]);
+  const [aiReasoning, setAiReasoning] = useState([]);
   
   const wsRef = useRef(null);
   const startTimeRef = useRef(null);
@@ -143,6 +140,14 @@ function EvolutionObservatory() {
         if (message.data.logs) {
           setDetailedLogs(prev => [...prev.slice(-200), ...message.data.logs]); // Keep last 200 logs
         }
+        if (message.data.reasoning) {
+          setAiReasoning(prev => [...prev.slice(-10), ...Object.entries(message.data.reasoning).map(([strategyId, reasoning]) => ({
+            strategyId,
+            reasoning,
+            timestamp: Date.now(),
+            round: message.data.number
+          }))]);
+        }
         break;
         
       case 'strategy_eliminated':
@@ -157,6 +162,15 @@ function EvolutionObservatory() {
         
       case 'strategies_updated':
         setStrategies(message.data.strategies || []);
+        break;
+        
+      case 'log':
+        // Handle individual log messages
+        const logEntry = {
+          ...message.data,
+          timestamp: message.data.timestamp || Date.now()
+        };
+        setLiveLogs(prev => [...prev.slice(-50), logEntry]); // Keep last 50 logs
         break;
         
       default:
@@ -296,16 +310,20 @@ function EvolutionObservatory() {
       </div>
 
       <div className="observatory-content">
-        {activeView === 'dashboard' && <DashboardView 
-          strategies={strategies}
-          currentGame={currentGame}
-          currentTournament={currentTournament}
-          currentRound={currentRound}
-          eliminatedStrategies={eliminatedStrategies}
-          onSelectStrategy={setSelectedStrategy}
-          isWaitingForNextGame={isWaitingForNextGame}
-          countdown={countdown}
-        />}
+        {activeView === 'dashboard' && (
+          <DashboardView 
+            strategies={strategies}
+            currentGame={currentGame}
+            currentTournament={currentTournament}
+            currentRound={currentRound}
+            eliminatedStrategies={eliminatedStrategies}
+            onSelectStrategy={setSelectedStrategy}
+            isWaitingForNextGame={isWaitingForNextGame}
+            countdown={countdown}
+            liveLogs={liveLogs}
+            aiReasoning={aiReasoning}
+          />
+        )}
         
         {activeView === 'tree' && <EvolutionTreeView 
           evolutionTree={evolutionTree}
@@ -330,7 +348,7 @@ function EvolutionObservatory() {
 }
 
 // Dashboard View Component
-function DashboardView({ strategies, currentGame, currentTournament, currentRound, eliminatedStrategies, onSelectStrategy, isWaitingForNextGame, countdown }) {
+function DashboardView({ strategies, currentGame, currentTournament, currentRound, eliminatedStrategies, onSelectStrategy, isWaitingForNextGame, countdown, liveLogs, aiReasoning }) {
   return (
     <div className="dashboard-view">
       <div className="dashboard-grid">
@@ -396,41 +414,66 @@ function DashboardView({ strategies, currentGame, currentTournament, currentRoun
         </div>
 
         <div className="live-activity-panel">
-          <h3>⚡ Live Activity</h3>
-          {isWaitingForNextGame ? (
-            <div className="activity-feed">
-              <div className="activity-item delay">
-                <strong>Rate Limit Delay:</strong> {countdown.formattedTime} remaining
-              </div>
-              <div className="activity-item">
-                <strong>Reason:</strong> Respecting OpenAI API limits
-              </div>
-            </div>
-          ) : currentRound ? (
-            <div className="activity-feed">
-              {currentRound.proposals && (
-                <div className="activity-item">
-                  <strong>Proposals Submitted:</strong> {currentRound.proposals.length}
+          <h3>⚡ Live Logs</h3>
+          <div className="live-logs-container">
+            {isWaitingForNextGame ? (
+              <div className="activity-feed">
+                <div className="log-entry delay">
+                  <span className="log-time">{countdown.formattedTime}</span>
+                  <span className="log-source">RateLimit</span>
+                  <span className="log-message">Waiting for rate limit delay</span>
                 </div>
-              )}
-              {currentRound.votes && (
-                <div className="activity-item">
-                  <strong>Votes Cast:</strong> {Object.keys(currentRound.votes).length}
-                </div>
-              )}
-              {currentRound.eliminations && currentRound.eliminations.map((elim, idx) => (
-                <div key={idx} className="activity-item elimination">
-                  <strong>Eliminated:</strong> {elim.playerName}
-                </div>
-              ))}
-            </div>
-          ) : (
-            <div className="activity-feed">
-              <div className="activity-item">
-                <strong>Status:</strong> Waiting for game to start
               </div>
-            </div>
-          )}
+            ) : liveLogs.length > 0 ? (
+              <div className="activity-feed">
+                {liveLogs.slice(-8).map((log, idx) => (
+                  <div key={idx} className={`log-entry log-${log.level || 'info'}`}>
+                    <span className="log-time">{new Date(log.timestamp).toLocaleTimeString()}</span>
+                    <span className="log-source">{log.source || 'System'}</span>
+                    <span className="log-message">{log.message}</span>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="activity-feed">
+                <div className="log-entry">
+                  <span className="log-source">System</span>
+                  <span className="log-message">Waiting for simulation to start...</span>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+
+        <div className="ai-reasoning-panel">
+          <h3>🧠 Latest AI Reasoning</h3>
+          <div className="reasoning-container">
+            {aiReasoning.length > 0 ? (
+              <div className="reasoning-feed">
+                {aiReasoning.slice(-3).map((reasoning, idx) => {
+                  const strategy = strategies.find(s => s.id === reasoning.strategyId);
+                  return (
+                    <div key={idx} className="reasoning-entry">
+                      <div className="reasoning-header">
+                        <span className="strategy-name">{strategy?.name || 'Unknown Strategy'}</span>
+                        <span className="reasoning-round">Round {reasoning.round}</span>
+                      </div>
+                      <div className="reasoning-text">
+                        {reasoning.reasoning.substring(0, 150)}
+                        {reasoning.reasoning.length > 150 ? '...' : ''}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            ) : (
+              <div className="reasoning-feed">
+                <div className="reasoning-entry">
+                  <div className="reasoning-text">No AI reasoning available yet. Start simulation to see strategic thinking!</div>
+                </div>
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </div>

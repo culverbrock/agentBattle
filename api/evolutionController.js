@@ -297,18 +297,14 @@ class EvolutionController {
       this.simulationData.detailedLogs = this.simulationData.detailedLogs.slice(-1000);
     }
 
-    // Broadcast log updates in batches every few seconds
-    if (!this.logBatchTimeout) {
-      this.logBatchTimeout = setTimeout(() => {
-        this.broadcaster.broadcast({
-          type: 'logs_update',
-          data: {
-            logs: this.simulationData.detailedLogs.slice(-50) // Send last 50 logs
-          }
-        });
-        this.logBatchTimeout = null;
-      }, 2000);
-    }
+    // Send individual log message immediately for real-time display
+    this.broadcaster.broadcast({
+      type: 'log',
+      data: {
+        ...log,
+        timestamp: Date.now()
+      }
+    });
   }
 
   // Add WebSocket client

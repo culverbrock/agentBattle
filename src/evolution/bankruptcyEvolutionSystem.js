@@ -6,6 +6,7 @@
 
 const { ImprovedMatrixSystem } = require('../matrix/improvedMatrixSystem');
 const { callLLM } = require('../core/llmApi');
+const pool = require('../../database'); // Add database connection
 
 class ContinuousEvolutionSystem {
   constructor(options = {}) {
@@ -48,7 +49,10 @@ class ContinuousEvolutionSystem {
     const shouldResume = options.resume !== false; // Resume by default
     if (shouldResume) {
       this.log('info', 'System', 'Attempting to resume from previous state...');
-      this.tryResumeFromPreviousState();
+      this.tryResumeFromPreviousState().catch(error => {
+        this.log('error', 'Resume', `Resume failed: ${error.message}, starting fresh`);
+        this.initializeInitialPopulation();
+      });
     } else {
       this.log('info', 'System', 'Starting fresh (resume disabled)');
       this.initializeInitialPopulation();
@@ -191,7 +195,7 @@ class ContinuousEvolutionSystem {
       
       // Save progress periodically and after evolutions
       if (gameNumber % this.saveProgressEveryGames === 0 || this.totalEvolutions > 0) {
-        this.saveProgressState();
+        await this.saveProgressState();
       }
       
       // Brief pause before next iteration
@@ -287,7 +291,7 @@ class ContinuousEvolutionSystem {
     
     // Save progress after evolution events
     if (evolutionsThisRound > 0) {
-      this.saveProgressState();
+      await this.saveProgressState();
     }
   }
 
@@ -1122,7 +1126,7 @@ Respond with JSON:
     this.stopCountdownTimer();
     
     // Save final progress state
-    const savedFile = this.saveProgressState();
+    const savedFile = await this.saveProgressState();
     if (savedFile) {
       this.log('info', 'System', `Final progress saved to: ${savedFile}`);
     }
@@ -1447,14 +1451,14 @@ Allocate 100 points among proposals (can be 0 for any proposal):
     }
   }
 
-  tryResumeFromPreviousState() {
+  async tryResumeFromPreviousState() {
     try {
-      const latestProgressFile = this.findLatestProgressFile();
-      if (latestProgressFile) {
-        this.log('info', 'Resume', `Found previous state: ${latestProgressFile}`);
-        const resumed = this.resumeFromProgressFile(latestProgressFile);
+      const latestProgress = await this.findLatestProgressFromDB();
+      if (latestProgress) {
+        this.log('info', 'Resume', `Found previous state: evolution_state_${latestProgress.id}`);
+        const resumed = this.resumeFromProgressData(latestProgress);
         if (resumed) {
-          this.log('info', 'Resume', `Successfully resumed from ${latestProgressFile}`);
+          this.log('info', 'Resume', `Successfully resumed from state ${latestProgress.id}`);
           this.log('info', 'Resume', `Continuing from game ${this.totalGamesPlayed + 1} with ${this.strategies.length} strategies`);
           return;
         }
@@ -1465,34 +1469,48 @@ Allocate 100 points among proposals (can be 0 for any proposal):
     
     // Fallback to fresh start
     this.log('info', 'Resume', 'No previous state found, starting with fresh population');
-    this.initializeInitialPopulation();
+    await this.initializeInitialPopulation();
   }
 
-  findLatestProgressFile() {
-    const fs = require('fs');
-    const path = require('path');
-    
+  async findLatestProgressFromDB() {
     try {
-      const files = fs.readdirSync('.')
-        .filter(file => file.startsWith('bankruptcy_progress_') && file.endsWith('.json'))
-        .map(file => ({
-          name: file,
-          time: fs.statSync(file).mtime.getTime()
-        }))
-        .sort((a, b) => b.time - a.time);
+      // Ensure the evolution_states table exists
+      await this.ensureEvolutionStateTable();
       
-      return files.length > 0 ? files[0].name : null;
+      const result = await pool.query(`
+        SELECT id, state_data, created_at 
+        FROM evolution_states 
+        ORDER BY created_at DESC 
+        LIMIT 1
+      `);
+      
+      return result.rows.length > 0 ? result.rows[0] : null;
     } catch (error) {
+      this.log('error', 'Resume', `Database query failed: ${error.message}`);
       return null;
     }
   }
 
-  resumeFromProgressFile(filename) {
-    const fs = require('fs');
-    
+  async ensureEvolutionStateTable() {
     try {
-      const rawData = fs.readFileSync(filename, 'utf8');
-      const progressData = JSON.parse(rawData);
+      await pool.query(`
+        CREATE TABLE IF NOT EXISTS evolution_states (
+          id SERIAL PRIMARY KEY,
+          state_data JSONB NOT NULL,
+          total_games_played INTEGER DEFAULT 0,
+          total_evolutions INTEGER DEFAULT 0,
+          created_at TIMESTAMP DEFAULT NOW(),
+          updated_at TIMESTAMP DEFAULT NOW()
+        )
+      `);
+    } catch (error) {
+      this.log('warning', 'Database', `Failed to create evolution_states table: ${error.message}`);
+    }
+  }
+
+  resumeFromProgressData(progressRecord) {
+    try {
+      const progressData = progressRecord.state_data;
       
       // Validate the progress data
       if (!progressData.strategies || !Array.isArray(progressData.strategies) || progressData.strategies.length !== 6) {
@@ -1514,7 +1532,7 @@ Allocate 100 points among proposals (can be 0 for any proposal):
       this.totalEvolutions = progressData.totalEvolutions || 0;
       this.eliminatedStrategies = progressData.eliminatedStrategies || [];
       this.evolutionHistory = progressData.evolutionHistory || [];
-      this.lastProgressFile = filename;
+      this.lastProgressId = progressRecord.id;
       
       this.log('info', 'Resume', `Restored state: ${this.strategies.length} strategies, ${this.totalGamesPlayed} games played, ${this.totalEvolutions} evolutions`);
       
@@ -1528,12 +1546,65 @@ Allocate 100 points among proposals (can be 0 for any proposal):
       
       return true;
     } catch (error) {
-      this.log('error', 'Resume', `Failed to resume from ${filename}: ${error.message}`);
+      this.log('error', 'Resume', `Failed to resume from database record: ${error.message}`);
       return false;
     }
   }
 
-  saveProgressState() {
+  async saveProgressStateToDB() {
+    try {
+      // Ensure table exists
+      await this.ensureEvolutionStateTable();
+      
+      const progressData = {
+        timestamp: new Date().toISOString(),
+        totalGamesPlayed: this.totalGamesPlayed,
+        totalEvolutions: this.totalEvolutions,
+        strategies: this.strategies.map(s => ({
+          id: s.id,
+          name: s.name,
+          archetype: s.archetype,
+          strategy: s.strategy,
+          coinBalance: s.coinBalance,
+          gamesPlayed: s.gamesPlayed,
+          wins: s.wins,
+          avgProfit: s.avgProfit,
+          totalProfit: s.totalProfit,
+          generationNumber: s.generationNumber,
+          parentIds: s.parentIds,
+          parentNames: s.parentNames,
+          blendWeights: s.blendWeights,
+          evolutionReasoning: s.evolutionReasoning
+        })),
+        eliminatedStrategies: this.eliminatedStrategies,
+        evolutionHistory: this.evolutionHistory,
+        systemParams: {
+          entryFee: this.entryFee,
+          startingBalance: this.startingBalance,
+          populationSize: this.populationSize,
+          gameDelayMinutes: this.gameDelayMinutes
+        }
+      };
+      
+      const result = await pool.query(`
+        INSERT INTO evolution_states (state_data, total_games_played, total_evolutions)
+        VALUES ($1, $2, $3)
+        RETURNING id
+      `, [progressData, this.totalGamesPlayed, this.totalEvolutions]);
+      
+      this.lastProgressId = result.rows[0].id;
+      
+      this.log('info', 'Persistence', `Progress saved to database: evolution_state_${this.lastProgressId}`);
+      return `evolution_state_${this.lastProgressId}`;
+    } catch (error) {
+      this.log('error', 'Persistence', `Failed to save progress to database: ${error.message}`);
+      
+      // Fallback to filesystem if database fails
+      return this.saveProgressStateToFile();
+    }
+  }
+
+  saveProgressStateToFile() {
     try {
       const fs = require('fs');
       const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
@@ -1572,12 +1643,17 @@ Allocate 100 points among proposals (can be 0 for any proposal):
       fs.writeFileSync(filename, JSON.stringify(progressData, null, 2));
       this.lastProgressFile = filename;
       
-      this.log('info', 'Persistence', `Progress saved: ${filename}`);
+      this.log('info', 'Persistence', `Progress saved to file (fallback): ${filename}`);
       return filename;
     } catch (error) {
-      this.log('error', 'Persistence', `Failed to save progress: ${error.message}`);
+      this.log('error', 'Persistence', `Failed to save progress to file: ${error.message}`);
       return null;
     }
+  }
+
+  async saveProgressState() {
+    // Try database first, fallback to file
+    return await this.saveProgressStateToDB();
   }
 }
 

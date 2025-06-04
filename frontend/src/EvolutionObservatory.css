@@ -217,7 +217,7 @@
   transform: translateY(0);
 }
 
-/* Combined Game + Strategy Panel */
+/* Game Strategy Panel - Combined Game + Strategy Panel */
 .game-strategy-panel {
   grid-column: span 2;
   order: 2;
@@ -243,19 +243,10 @@
   font-size: 1.1em;
 }
 
-/* Elimination and AI Reasoning Panels - Side by Side */
-.elimination-panel {
-  grid-column: span 1;
-  order: 3;
-}
-
-.ai-reasoning-panel {
-  grid-column: span 1;
-  order: 4;
-}
-
-/* Game History Panel - Full Width Below Others */
+/* Game History Panel - Full Width Below Game Status */
 .game-history-panel {
+  grid-column: span 2;
+  order: 3;
   background: linear-gradient(135deg, rgba(255, 193, 7, 0.1), rgba(255, 152, 0, 0.05));
   border-radius: 12px;
   padding: 20px;
@@ -1605,4 +1596,15 @@
     align-items: flex-start;
     gap: 4px;
   }
+}
+
+/* Elimination and AI Reasoning Panels - Side by Side Below Game History */
+.elimination-panel {
+  grid-column: span 1;
+  order: 4;
+}
+
+.ai-reasoning-panel {
+  grid-column: span 1;
+  order: 5;
 } 

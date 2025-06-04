@@ -32,7 +32,7 @@ class ContinuousEvolutionSystem {
     // Rate limiting and timing
     this.maxRounds = options.maxRounds || 100;
     this.maxNegotiationRounds = options.maxNegotiationRounds || 3;
-    this.gameDelayMinutes = 0.17; // 10 seconds between games (was 5 minutes)
+    this.gameDelayMinutes = 10; // 10 minutes between games (increased from 10 seconds)
     this.llmDelaySeconds = 3; // 3 second delay between individual LLM calls
     this.interactionDelaySeconds = 3; // 3 second delay between interactions
     this.roundDelaySeconds = 10; // 10 second delay between negotiation rounds

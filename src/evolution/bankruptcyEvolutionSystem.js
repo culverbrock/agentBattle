@@ -415,6 +415,14 @@ class ContinuousEvolutionSystem {
             timestamp: Date.now()
           }
         });
+        
+        // IMMEDIATE BACKUP: Save evolution event immediately to preserve data
+        this.log('info', 'Evolution', `Triggering immediate backup for evolution event #${this.totalEvolutions + evolutionsThisRound}`);
+        try {
+          await this.saveEvolutionEventBackup(bankruptStrategy, evolvedReplacement);
+        } catch (backupError) {
+          this.log('warning', 'Evolution', `Immediate evolution backup failed: ${backupError.message}`);
+        }
       }
     }
 
@@ -2080,6 +2088,140 @@ Allocate 100 points among proposals (can be 0 for any proposal):
   async saveProgressState() {
     // Try database first, fallback to file
     return await this.saveProgressStateToDB();
+  }
+  
+  async saveEvolutionEventBackup(eliminatedStrategy, newStrategy) {
+    // Immediate backup specifically for evolution events
+    this.log('info', 'EvolutionBackup', `Creating immediate backup for evolution: ${eliminatedStrategy.name} → ${newStrategy.name}`);
+    
+    try {
+      const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+      const evolutionBackupDir = `./backups/evolution-${timestamp}`;
+      
+      // Create evolution-specific backup directory
+      const fs = require('fs');
+      if (!fs.existsSync('./backups')) {
+        fs.mkdirSync('./backups');
+      }
+      if (!fs.existsSync(evolutionBackupDir)) {
+        fs.mkdirSync(evolutionBackupDir);
+      }
+      
+      // Comprehensive evolution event data
+      const evolutionEventData = {
+        backupType: 'evolution_event',
+        timestamp: new Date().toISOString(),
+        gameNumber: this.totalGamesPlayed,
+        totalEvolutions: this.totalEvolutions + 1, // Include current evolution
+        
+        // Current evolution event details
+        currentEvolution: {
+          eliminatedStrategy: {
+            ...eliminatedStrategy,
+            eliminationReason: 'bankruptcy',
+            finalBalance: eliminatedStrategy.coinBalance,
+            gameNumber: this.totalGamesPlayed
+          },
+          newStrategy: {
+            ...newStrategy,
+            evolutionType: 'profit_weighted_hybrid',
+            birthGame: this.totalGamesPlayed
+          },
+          reason: 'Bankruptcy replacement',
+          timestamp: Date.now()
+        },
+        
+        // Complete evolution history up to this point
+        evolutionHistory: [...this.evolutionHistory, {
+          gameNumber: this.totalGamesPlayed,
+          eliminatedStrategy: eliminatedStrategy,
+          newStrategy: newStrategy,
+          reason: 'Bankruptcy replacement',
+          timestamp: Date.now()
+        }],
+        
+        // Current population state after evolution
+        currentStrategies: this.strategies.map(s => ({
+          id: s.id,
+          name: s.name,
+          archetype: s.archetype,
+          strategy: s.strategy,
+          coinBalance: s.coinBalance,
+          generationNumber: s.generationNumber,
+          parentIds: s.parentIds,
+          parentNames: s.parentNames,
+          birthGame: s.birthGame,
+          evolutionReasoning: s.evolutionReasoning
+        })),
+        
+        // All eliminated strategies for lineage tracking
+        eliminatedStrategies: this.eliminatedStrategies,
+        
+        // System state
+        systemState: {
+          totalGamesPlayed: this.totalGamesPlayed,
+          totalEvolutions: this.totalEvolutions + 1,
+          populationSize: this.strategies.length,
+          entryFee: this.entryFee,
+          startingBalance: this.startingBalance
+        }
+      };
+      
+      // Save evolution event backup
+      const path = require('path');
+      fs.writeFileSync(
+        path.join(evolutionBackupDir, 'evolution_event.json'),
+        JSON.stringify(evolutionEventData, null, 2)
+      );
+      
+      // Also save current complete state for context
+      const completeStateData = {
+        timestamp: new Date().toISOString(),
+        totalGamesPlayed: this.totalGamesPlayed,
+        totalEvolutions: this.totalEvolutions + 1,
+        strategies: this.strategies,
+        eliminatedStrategies: this.eliminatedStrategies,
+        evolutionHistory: [...this.evolutionHistory, {
+          gameNumber: this.totalGamesPlayed,
+          eliminatedStrategy: eliminatedStrategy,
+          newStrategy: newStrategy,
+          reason: 'Bankruptcy replacement',
+          timestamp: Date.now()
+        }]
+      };
+      
+      fs.writeFileSync(
+        path.join(evolutionBackupDir, 'complete_state.json'),
+        JSON.stringify(completeStateData, null, 2)
+      );
+      
+      // Create evolution summary
+      const evolutionSummary = {
+        evolutionNumber: this.totalEvolutions + 1,
+        gameNumber: this.totalGamesPlayed,
+        eliminatedStrategyName: eliminatedStrategy.name,
+        newStrategyName: newStrategy.name,
+        newStrategyGeneration: newStrategy.generationNumber,
+        parentStrategies: newStrategy.parentNames || [],
+        evolutionReasoning: newStrategy.evolutionReasoning || 'Profit-weighted evolution',
+        timestamp: new Date().toISOString(),
+        backupPath: evolutionBackupDir
+      };
+      
+      fs.writeFileSync(
+        path.join(evolutionBackupDir, 'evolution_summary.json'),
+        JSON.stringify(evolutionSummary, null, 2)
+      );
+      
+      this.log('info', 'EvolutionBackup', `Evolution event backup completed: ${evolutionBackupDir}`);
+      this.log('info', 'EvolutionBackup', `📁 Saved: evolution_event.json, complete_state.json, evolution_summary.json`);
+      
+      return evolutionBackupDir;
+      
+    } catch (error) {
+      this.log('error', 'EvolutionBackup', `Evolution event backup failed: ${error.message}`);
+      throw error;
+    }
   }
 }
 

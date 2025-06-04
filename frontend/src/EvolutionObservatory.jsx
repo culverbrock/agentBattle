@@ -341,6 +341,7 @@ function EvolutionObservatory() {
             detailedLogs={detailedLogs}
             aiReasoning={aiReasoning}
             balanceHistory={balanceHistory}
+            completedGames={completedGames}
           />
         )}
         
@@ -372,7 +373,7 @@ function EvolutionObservatory() {
 }
 
 // Dashboard View Component
-function DashboardView({ strategies, currentGame, currentTournament, currentRound, eliminatedStrategies, onSelectStrategy, isWaitingForNextGame, countdown, detailedLogs, aiReasoning, balanceHistory }) {
+function DashboardView({ strategies, currentGame, currentTournament, currentRound, eliminatedStrategies, onSelectStrategy, isWaitingForNextGame, countdown, detailedLogs, aiReasoning, balanceHistory, completedGames }) {
   
   const downloadLogs = () => {
     const logData = {

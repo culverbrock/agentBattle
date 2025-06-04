@@ -243,6 +243,246 @@ function EvolutionObservatory() {
     return `${hrs.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
   };
 
+  const downloadLogs = () => {
+    const logData = {
+      exportTimestamp: new Date().toISOString(),
+      totalLogs: detailedLogs.length,
+      logs: detailedLogs,
+      metadata: {
+        gameInfo: {
+          currentTournament: currentTournament?.number || 'N/A',
+          currentGame: currentGame?.number || 'N/A',
+          currentRound: currentRound?.number || 'N/A'
+        },
+        strategiesSnapshot: strategies.map(s => ({
+          id: s.id,
+          name: s.name,
+          balance: s.coinBalance,
+          gamesPlayed: s.gamesPlayed
+        })),
+        eliminatedCount: eliminatedStrategies.length,
+        completedGames: completedGames.length
+      }
+    };
+
+    const blob = new Blob([JSON.stringify(logData, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `evolution-logs-${new Date().toISOString().replace(/[:.]/g, '-')}.json`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  };
+
+  const exportGameHistory = (games, format) => {
+    if (!games || games.length === 0) {
+      alert('No game data to export');
+      return;
+    }
+
+    const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+    let filename, content, mimeType;
+
+    switch (format) {
+      case 'games':
+        // Export complete game data as JSON
+        const gameData = {
+          exportTimestamp: new Date().toISOString(),
+          totalGames: games.length,
+          exportFormat: 'complete_games',
+          description: 'Complete game history with all player data, results, and metadata',
+          games: games.map(game => ({
+            ...game,
+            exportNote: 'Complete game record with player results and validation data'
+          }))
+        };
+        content = JSON.stringify(gameData, null, 2);
+        filename = `evolution-games-${timestamp}.json`;
+        mimeType = 'application/json';
+        break;
+
+      case 'summary':
+        // Export summary statistics
+        const summaryData = generateGameSummary(games);
+        const summary = {
+          exportTimestamp: new Date().toISOString(),
+          exportFormat: 'game_summary',
+          description: 'Statistical summary of game history with performance analysis',
+          ...summaryData
+        };
+        content = JSON.stringify(summary, null, 2);
+        filename = `evolution-summary-${timestamp}.json`;
+        mimeType = 'application/json';
+        break;
+
+      case 'csv':
+        // Export as CSV for spreadsheet analysis
+        content = generateGameHistoryCSV(games);
+        filename = `evolution-games-${timestamp}.csv`;
+        mimeType = 'text/csv';
+        break;
+
+      default:
+        alert('Unknown export format');
+        return;
+    }
+
+    // Create and download file
+    const blob = new Blob([content], { type: mimeType });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = filename;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+
+    console.log(`✅ Exported ${format} format: ${filename}`);
+  };
+
+  const generateGameSummary = (games) => {
+    if (!games || games.length === 0) {
+      return { totalGames: 0, summary: 'No completed games to analyze' };
+    }
+    
+    const summary = {
+      totalGames: games.length,
+      dateRange: {
+        earliest: games[0]?.endTime || 'Unknown',
+        latest: games[games.length - 1]?.endTime || 'Unknown'
+      },
+      averageGameDuration: 0,
+      totalPrizePoolDistributed: 0,
+      playerPerformance: {},
+      generationStats: {},
+      winnerDistribution: {},
+      gameValidation: { valid: 0, invalid: 0 }
+    };
+    
+    let totalDuration = 0;
+    let durationCount = 0;
+    
+    games.forEach(game => {
+      // Duration analysis
+      if (game.duration) {
+        totalDuration += game.duration;
+        durationCount++;
+      }
+      
+      // Validation analysis
+      if (game.summary && game.summary.isValid !== undefined) {
+        if (game.summary.isValid) {
+          summary.gameValidation.valid++;
+        } else {
+          summary.gameValidation.invalid++;
+        }
+      }
+      
+      // Prize pool analysis
+      if (game.summary && game.summary.totalEntryFees) {
+        summary.totalPrizePoolDistributed += game.summary.totalEntryFees;
+      }
+      
+      // Player performance tracking
+      if (game.players) {
+        game.players.forEach(player => {
+          if (!summary.playerPerformance[player.name]) {
+            summary.playerPerformance[player.name] = {
+              gamesPlayed: 0,
+              totalProfitLoss: 0,
+              wins: 0,
+              generation: player.generation || 'Unknown',
+              averageProfit: 0
+            };
+          }
+          
+          const playerStats = summary.playerPerformance[player.name];
+          playerStats.gamesPlayed++;
+          playerStats.totalProfitLoss += (player.balanceChange || 0);
+          playerStats.averageProfit = playerStats.totalProfitLoss / playerStats.gamesPlayed;
+          
+          if (player.isWinner) {
+            playerStats.wins++;
+            
+            // Winner distribution
+            if (!summary.winnerDistribution[player.name]) {
+              summary.winnerDistribution[player.name] = 0;
+            }
+            summary.winnerDistribution[player.name]++;
+          }
+          
+          // Generation stats
+          const gen = player.generation || 'Unknown';
+          if (!summary.generationStats[gen]) {
+            summary.generationStats[gen] = { count: 0, totalProfit: 0, avgProfit: 0 };
+          }
+          summary.generationStats[gen].count++;
+          summary.generationStats[gen].totalProfit += (player.balanceChange || 0);
+          summary.generationStats[gen].avgProfit = summary.generationStats[gen].totalProfit / summary.generationStats[gen].count;
+        });
+      }
+    });
+    
+    if (durationCount > 0) {
+      summary.averageGameDuration = Math.round(totalDuration / durationCount);
+    }
+    
+    return summary;
+  };
+
+  const generateGameHistoryCSV = (games) => {
+    const headers = [
+      'Game Number', 'End Time', 'Duration (seconds)', 'Valid', 'Prize Pool', 'Winner',
+      'Player Name', 'Generation', 'Pre-Game Balance', 'Post-Game Balance', 'Balance Change', 
+      'Total Change', 'Games Played', 'Is Winner'
+    ];
+    
+    const rows = [headers.join(',')];
+    
+    games.forEach(game => {
+      const gameNumber = game.number || 'Unknown';
+      const endTime = game.endTime ? new Date(game.endTime).toISOString() : 'Unknown';
+      const duration = game.duration ? Math.round(game.duration / 1000) : 'Unknown';
+      const isValid = game.summary?.isValid ? 'Yes' : 'No';
+      const prizePool = game.summary?.totalEntryFees || 'Unknown';
+      const winner = game.winner?.name || 'Unknown';
+      
+      if (game.players && game.players.length > 0) {
+        game.players.forEach(player => {
+          const row = [
+            gameNumber,
+            endTime,
+            duration,
+            isValid,
+            prizePool,
+            winner,
+            `"${player.name}"`, // Quoted in case of commas in name
+            player.generation || 'Unknown',
+            player.preGameBalance || 'Unknown',
+            player.currentBalance || 'Unknown',
+            player.balanceChange || 0,
+            player.totalChange || 0,
+            player.gamesPlayed || 0,
+            player.isWinner ? 'Yes' : 'No'
+          ];
+          rows.push(row.join(','));
+        });
+      } else {
+        // Game with no player data
+        const row = [
+          gameNumber, endTime, duration, isValid, prizePool, winner,
+          'No player data', '', '', '', '', '', '', ''
+        ];
+        rows.push(row.join(','));
+      }
+    });
+    
+    return rows.join('\n');
+  };
+
   return (
     <div className="evolution-observatory">
       <div className="observatory-header">
@@ -619,7 +859,35 @@ function DashboardView({ strategies, currentGame, currentTournament, currentRoun
 
         {/* Game History Panel */}
         <div className="game-history-panel">
-          <h3>🏆 Game History & Results</h3>
+          <div className="panel-header-with-download">
+            <h3>🏆 Game History & Results</h3>
+            <div className="export-buttons">
+              <button 
+                className="export-btn export-games"
+                onClick={() => exportGameHistory(completedGames, 'games')}
+                title="Export completed games as JSON"
+                disabled={completedGames.length === 0}
+              >
+                📥 Export Games ({completedGames.length})
+              </button>
+              <button 
+                className="export-btn export-summary"
+                onClick={() => exportGameHistory(completedGames, 'summary')}
+                title="Export game summary with statistics"
+                disabled={completedGames.length === 0}
+              >
+                📊 Export Summary
+              </button>
+              <button 
+                className="export-btn export-csv"
+                onClick={() => exportGameHistory(completedGames, 'csv')}
+                title="Export game data as CSV for Excel/Sheets"
+                disabled={completedGames.length === 0}
+              >
+                📋 Export CSV
+              </button>
+            </div>
+          </div>
           <div className="game-history-container">
             {completedGames.length > 0 ? (
               <div className="completed-games-display">

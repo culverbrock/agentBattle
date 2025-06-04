@@ -1983,6 +1983,9 @@ Allocate 100 points among proposals (can be 0 for any proposal):
         })),
         eliminatedStrategies: this.eliminatedStrategies,
         evolutionHistory: this.evolutionHistory,
+        // Preserve completed games for game history display
+        completedGames: this.completedGames || [],
+        evolutionTree: this.evolutionTree || [],
         systemParams: {
           entryFee: this.entryFee,
           startingBalance: this.startingBalance,
@@ -2000,6 +2003,19 @@ Allocate 100 points among proposals (can be 0 for any proposal):
       this.lastProgressId = result.rows[0].id;
       
       this.log('info', 'Persistence', `Progress saved to database: evolution_state_${this.lastProgressId}`);
+      
+      // Create automatic backup every 10 games
+      if (this.totalGamesPlayed % 10 === 0 && this.totalGamesPlayed > 0) {
+        this.log('info', 'Backup', 'Triggering automatic backup every 10 games...');
+        try {
+          const { backupGameData } = require('../../backupGameData');
+          const backupPath = await backupGameData();
+          this.log('info', 'Backup', `Automatic backup created: ${backupPath}`);
+        } catch (backupError) {
+          this.log('warning', 'Backup', `Automatic backup failed: ${backupError.message}`);
+        }
+      }
+      
       return `evolution_state_${this.lastProgressId}`;
     } catch (error) {
       this.log('error', 'Persistence', `Failed to save progress to database: ${error.message}`);

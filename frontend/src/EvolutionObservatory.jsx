@@ -27,6 +27,7 @@ function EvolutionObservatory() {
   const [aiReasoning, setAiReasoning] = useState([]);
   const [detailedLogs, setDetailedLogs] = useState([]);
   const [completedGames, setCompletedGames] = useState([]);
+  const [balanceHistory, setBalanceHistory] = useState([]);
   const [showInfoModal, setShowInfoModal] = useState(false);
   
   const wsRef = useRef(null);
@@ -189,6 +190,10 @@ function EvolutionObservatory() {
         setDetailedLogs(prev => [...prev.slice(-10000), logEntry]); // Keep last 10,000 logs
         break;
         
+      case 'balance_timeline_history':
+        setBalanceHistory(message.data);
+        break;
+        
       default:
         console.log('Unknown evolution message:', message);
     }
@@ -335,7 +340,7 @@ function EvolutionObservatory() {
             countdown={countdown}
             detailedLogs={detailedLogs}
             aiReasoning={aiReasoning}
-            completedGames={completedGames}
+            balanceHistory={balanceHistory}
           />
         )}
         
@@ -367,7 +372,7 @@ function EvolutionObservatory() {
 }
 
 // Dashboard View Component
-function DashboardView({ strategies, currentGame, currentTournament, currentRound, eliminatedStrategies, onSelectStrategy, isWaitingForNextGame, countdown, detailedLogs, aiReasoning, completedGames }) {
+function DashboardView({ strategies, currentGame, currentTournament, currentRound, eliminatedStrategies, onSelectStrategy, isWaitingForNextGame, countdown, detailedLogs, aiReasoning, balanceHistory }) {
   
   const downloadLogs = () => {
     const logData = {
@@ -613,113 +618,62 @@ function DashboardView({ strategies, currentGame, currentTournament, currentRoun
 
         {/* Game History Panel */}
         <div className="game-history-panel">
-          <h3>🏆 Game History & Results</h3>
+          <h3>🏆 Balance History & Game Progression</h3>
           <div className="game-history-container">
-            {completedGames.length > 0 ? (
-              <div className="game-history-list">
-                {completedGames.slice(-10).reverse().map((game, idx) => (
-                  <div key={idx} className="game-history-entry">
-                    <div className="game-history-header">
-                      <span className="game-number">Game #{game.number}</span>
-                      <span className="game-duration">
-                        {Math.round((game.endTime - game.startTime) / 1000)}s
-                      </span>
+            {balanceHistory.length > 0 ? (
+              <div className="balance-history-display">
+                {/* Group balance data by game number */}
+                {Object.entries(
+                  balanceHistory.reduce((games, entry) => {
+                    if (!games[entry.game]) games[entry.game] = [];
+                    games[entry.game].push(entry);
+                    return games;
+                  }, {})
+                )
+                .sort(([gameA], [gameB]) => parseInt(gameB) - parseInt(gameA)) // Most recent games first
+                .slice(0, 10) // Show last 10 games
+                .map(([gameNumber, gameEntries]) => (
+                  <div key={gameNumber} className="game-balance-entry">
+                    <div className="game-balance-header">
+                      <span className="game-number">Game #{gameNumber}</span>
                       <span className="game-timestamp">
-                        {new Date(game.endTime).toLocaleTimeString()}
+                        {new Date(gameEntries[0]?.timestamp).toLocaleTimeString()}
                       </span>
                     </div>
                     
-                    <div className="game-result-summary">
-                      <div className="winner-section">
-                        <strong>🏆 Winner:</strong> {game.winner?.name || 'No Winner'}
-                        {game.winner && (
-                          <span className="winner-votes"> ({game.winner.voteTotal || 0} votes)</span>
-                        )}
-                      </div>
-                      
-                      {game.finalProposal && (
-                        <div className="winning-proposal">
-                          <strong>💰 Winning Split:</strong> [{game.finalProposal.join(', ')}]
-                        </div>
-                      )}
-                      
-                      {game.coinDistribution && (
-                        <div className="coin-distribution">
-                          <strong>🪙 Coin Distribution:</strong> [{game.coinDistribution.join(', ')}]
-                        </div>
-                      )}
-                    </div>
-
-                    {/* Player Balance Changes Section */}
-                    {game.players && game.players.length > 0 && (
-                      <div className="game-balance-changes">
-                        <strong>💰 Player Balance Changes:</strong>
-                        <div className="balance-changes-grid">
-                          {game.players.map((player, pIdx) => (
-                            <div key={pIdx} className="player-balance-change">
-                              <div className="player-balance-name">{player.name}</div>
-                              <div className="player-balance-details">
-                                <span className="balance-before">{player.preGameBalance}</span>
+                    <div className="game-balance-changes">
+                      <strong>💰 Strategy Balance Changes:</strong>
+                      <div className="balance-changes-grid">
+                        {gameEntries.map((entry, idx) => {
+                          // Calculate balance change from previous game
+                          const prevGameEntries = balanceHistory.filter(h => 
+                            h.strategyId === entry.strategyId && h.game === entry.game - 1
+                          );
+                          const prevBalance = prevGameEntries.length > 0 ? prevGameEntries[0].balance + 100 : 500; // +100 for entry fee
+                          const balanceChange = entry.balance - prevBalance;
+                          
+                          return (
+                            <div key={idx} className="strategy-balance-change">
+                              <div className="strategy-balance-name">{entry.strategyName}</div>
+                              <div className="strategy-balance-details">
+                                <span className="balance-before">{prevBalance}</span>
                                 <span className="balance-arrow">→</span>
-                                <span className="balance-after">{player.currentBalance}</span>
-                                <span className={`balance-change ${player.balanceChange >= 0 ? 'positive' : 'negative'}`}>
-                                  ({player.balanceChange >= 0 ? '+' : ''}{player.balanceChange})
+                                <span className="balance-after">{entry.balance}</span>
+                                <span className={`balance-change ${balanceChange >= 0 ? 'positive' : 'negative'}`}>
+                                  ({balanceChange >= 0 ? '+' : ''}{balanceChange})
                                 </span>
                               </div>
-                              {player.totalProfit !== undefined && (
-                                <div className="player-profit-info">
-                                  <span className="profit-label">Total Profit:</span>
-                                  <span className={`profit-value ${player.totalProfit >= 0 ? 'positive' : 'negative'}`}>
-                                    {player.totalProfit >= 0 ? '+' : ''}{player.totalProfit}
-                                  </span>
-                                  {player.avgProfit !== undefined && (
-                                    <>
-                                      <span className="avg-label">| Avg:</span>
-                                      <span className={`avg-value ${player.avgProfit >= 0 ? 'positive' : 'negative'}`}>
-                                        {player.avgProfit >= 0 ? '+' : ''}{player.avgProfit.toFixed(1)}
-                                      </span>
-                                    </>
-                                  )}
-                                </div>
-                              )}
                             </div>
-                          ))}
-                        </div>
+                          );
+                        })}
                       </div>
-                    )}
-
-                    {game.finalMatrix && (
-                      <div className="final-matrix-display">
-                        <strong>📊 Final Game Matrix:</strong>
-                        <div className="matrix-grid">
-                          {Object.entries(game.finalMatrix).map(([strategyId, matrixData]) => {
-                            const playerName = game.players?.find(p => p.id === strategyId)?.name || 'Unknown';
-                            return (
-                              <div key={strategyId} className="matrix-player-row">
-                                <div className="player-name">{playerName}:</div>
-                                <div className="matrix-data">
-                                  <span className="matrix-section">
-                                    Proposal: [{matrixData.proposal?.join(', ') || 'N/A'}]
-                                  </span>
-                                  <span className="matrix-section">
-                                    Votes: [{matrixData.votes?.join(', ') || 'N/A'}]
-                                  </span>
-                                  <span className="matrix-section">
-                                    Requests: [{matrixData.requests?.join(', ') || 'N/A'}]
-                                  </span>
-                                </div>
-                              </div>
-                            );
-                          })}
-                        </div>
-                      </div>
-                    )}
+                    </div>
                   </div>
                 ))}
               </div>
             ) : (
               <div className="no-game-history">
-                <p>No completed games yet. Start the simulation to see game results!</p>
+                <p>No balance history yet. Start the simulation to see balance progression!</p>
               </div>
             )}
           </div>
@@ -922,7 +876,7 @@ function InfoModal({ onClose }) {
             </div>
 
             <div className="panel-explanation">
-              <h4>🏆 Game History & Results</h4>
+              <h4>🏆 Balance History & Game Progression</h4>
               <p>Complete historical record of completed games showing winners, final proposals, coin distributions, 
               and the complete negotiation matrix. Perfect for analyzing successful strategies.</p>
             </div>

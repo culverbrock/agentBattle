@@ -256,16 +256,91 @@
 
 /* Game History Panel - Full Width Below Others */
 .game-history-panel {
-  grid-column: span 2;
-  order: 5;
+  background: linear-gradient(135deg, rgba(255, 193, 7, 0.1), rgba(255, 152, 0, 0.05));
+  border-radius: 12px;
+  padding: 20px;
+  border: 1px solid rgba(255, 193, 7, 0.2);
 }
 
-/* Game History Panel Styles */
 .game-history-container {
   max-height: 600px;
   overflow-y: auto;
 }
 
+.balance-history-display {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.game-balance-entry {
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 8px;
+  padding: 15px;
+  border-left: 3px solid #FFC107;
+}
+
+.game-balance-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+  font-weight: bold;
+  color: #FFC107;
+}
+
+.game-number {
+  font-size: 1.1em;
+  color: #FFC107;
+}
+
+.game-timestamp {
+  font-size: 0.9em;
+  color: #ccc;
+}
+
+.strategy-balance-change {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 6px;
+  padding: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.strategy-balance-name {
+  font-weight: bold;
+  color: #fff;
+  font-size: 0.85em;
+  margin-bottom: 4px;
+}
+
+.strategy-balance-details {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.8em;
+}
+
+.balance-before,
+.balance-after {
+  font-weight: bold;
+  color: #fff;
+}
+
+.balance-arrow {
+  color: #888;
+}
+
+.balance-change.positive {
+  color: #4CAF50;
+  font-weight: bold;
+}
+
+.balance-change.negative {
+  color: #f44336;
+  font-weight: bold;
+}
+
+/* Game History Panel Styles */
 .game-history-list {
   display: flex;
   flex-direction: column;
@@ -292,25 +367,6 @@
   margin-bottom: 12px;
   padding-bottom: 8px;
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.game-number {
-  font-weight: bold;
-  color: #4CAF50;
-  font-size: 1.1em;
-}
-
-.game-duration {
-  background: rgba(33, 150, 243, 0.2);
-  color: #2196F3;
-  padding: 2px 8px;
-  border-radius: 12px;
-  font-size: 0.9em;
-}
-
-.game-timestamp {
-  opacity: 0.7;
-  font-size: 0.9em;
 }
 
 .game-result-summary {

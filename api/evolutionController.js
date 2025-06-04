@@ -247,7 +247,7 @@ class EvolutionController {
         this.simulationData.totalEliminations++;
         this.broadcaster.broadcast({
           type: 'strategy_eliminated',
-          data: data.elimination
+          elimination: data.elimination
         });
         break;
 
@@ -256,7 +256,7 @@ class EvolutionController {
         this.simulationData.evolutionEvents++;
         this.broadcaster.broadcast({
           type: 'strategy_evolved',
-          data: data.evolution
+          evolution: data.evolution
         });
         break;
 

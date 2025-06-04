@@ -752,26 +752,88 @@ Respond with JSON:
     this.log('info', 'Game', `Game ${gameNumber} completed. Winner: ${gameResult.winner?.name || 'None'}`);
 
     // Broadcast game completion with full results including balance changes
+    const totalEntryFees = gameData.players.length * this.entryFee; // Should be 600 (6 * 100)
+    const totalWinningsDistributed = gameData.players.reduce((sum, p) => sum + Math.max(0, p.coinBalance - p.preGameBalance), 0);
+    
     this.onUpdate({
       type: 'game_completed',
       game: {
         number: gameNumber,
+        startTime: gameData.startTime,
+        endTime: gameData.endTime,
+        duration: gameData.endTime - gameData.startTime,
+        
+        // Game summary
+        summary: {
+          totalPlayers: gameData.players.length,
+          expectedPlayers: 6,
+          totalEntryFees: totalEntryFees,
+          totalWinningsDistributed: totalWinningsDistributed,
+          prizePoolUtilized: (totalWinningsDistributed / totalEntryFees * 100).toFixed(1) + '%',
+          isValid: gameData.players.length === 6 && totalWinningsDistributed <= totalEntryFees
+        },
+        
+        // Complete player data with all balance information
         players: gameData.players.map(p => ({ 
           id: p.id, 
           name: p.name,
-          preGameBalance: p.preGameBalance,
-          currentBalance: p.coinBalance,
-          balanceChange: p.coinBalance - p.preGameBalance,
+          archetype: p.archetype || 'Unknown',
+          generation: p.generationNumber || 1,
+          
+          // Balance tracking
+          initialBalance: p.initialBalance || this.startingBalance, // Original starting balance
+          preGameBalance: p.preGameBalance, // Balance before this game
+          currentBalance: p.coinBalance, // Balance after this game
+          balanceChange: p.coinBalance - p.preGameBalance, // Change from this game
+          totalChange: p.coinBalance - (p.initialBalance || this.startingBalance), // Total change from start
+          
+          // Entry fees and winnings breakdown
+          entryFee: this.entryFee, // Always 100
+          winnings: Math.max(0, p.coinBalance - p.preGameBalance), // Winnings from this game (0 if lost money)
+          netResult: p.coinBalance - p.preGameBalance, // Net result (can be negative)
+          
+          // Performance tracking
+          gamesPlayed: p.gamesPlayed || 0,
           totalProfit: p.totalProfit || 0,
-          avgProfit: p.avgProfit || 0
+          avgProfit: p.avgProfit || 0,
+          
+          // Game-specific data
+          isWinner: gameResult.winner && gameResult.winner.id === p.id,
+          wasEliminated: false // Will be updated in next round if bankrupt
         })),
-        winner: gameResult.winner,
+        
+        // Game result details
+        winner: gameResult.winner ? {
+          id: gameResult.winner.id,
+          name: gameResult.winner.name,
+          winnings: gameResult.winner.coinBalance - gameResult.winner.preGameBalance
+        } : null,
+        
         finalProposal: gameResult.winningProposal,
         coinDistribution: gameResult.coinDistribution,
+        
+        // Matrix and reasoning data for detailed analysis
         finalMatrix: this.extractMatrixData(matrixSystem),
         finalReasoning: this.extractReasoningData(matrixSystem),
-        endTime: gameData.endTime,
-        duration: gameData.endTime - gameData.startTime
+        
+        // Game system info
+        gameType: 'bankruptcyEvolution',
+        entryFee: this.entryFee,
+        prizePool: totalEntryFees,
+        systemParams: {
+          startingBalance: this.startingBalance,
+          populationSize: this.populationSize,
+          gameDelayMinutes: this.gameDelayMinutes
+        },
+        
+        // Validation and integrity
+        validation: {
+          playersValid: gameData.players.length === 6,
+          balancesValid: totalWinningsDistributed <= totalEntryFees,
+          prizePoolValid: totalEntryFees === 600,
+          winnerValid: gameResult.winner !== null,
+          dataComplete: true
+        }
       }
     });
 

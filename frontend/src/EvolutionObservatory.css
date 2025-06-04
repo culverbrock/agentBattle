@@ -717,11 +717,31 @@
   margin-bottom: 10px;
 }
 
+.event-game {
+  color: #4CAF50;
+  font-weight: bold;
+  margin-left: 10px;
+}
+
 .parent-strategy, .child-strategy {
   background: rgba(255, 255, 255, 0.08);
   padding: 10px;
   border-radius: 8px;
   margin: 5px 0;
+}
+
+.elimination-reason {
+  font-size: 0.85em;
+  color: #ff6b6b;
+  margin-top: 5px;
+  font-style: italic;
+}
+
+.parent-blend {
+  font-size: 0.85em;
+  color: #4CAF50;
+  margin-top: 5px;
+  font-style: italic;
 }
 
 .evolution-arrow {
@@ -743,6 +763,15 @@
   background: rgba(33, 150, 243, 0.1);
   border-radius: 8px;
   border-left: 3px solid #2196F3;
+}
+
+.new-strategy-description {
+  margin-top: 10px;
+  padding: 10px;
+  background: rgba(76, 175, 80, 0.1);
+  border-radius: 8px;
+  border-left: 3px solid #4CAF50;
+  font-size: 0.9em;
 }
 
 /* Logs View - Console Style */
@@ -1607,4 +1636,255 @@
 .ai-reasoning-panel {
   grid-column: span 1;
   order: 5;
+}
+
+/* Enhanced Game History - Completed Games Display */
+.completed-games-display {
+  max-height: 600px;
+  overflow-y: auto;
+  padding-right: 8px;
+}
+
+.completed-game-entry {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  transition: all 0.3s ease;
+}
+
+.completed-game-entry:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(76, 175, 80, 0.3);
+}
+
+.game-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.game-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.game-number {
+  font-weight: bold;
+  color: #4CAF50;
+  font-size: 1.1em;
+}
+
+.game-time {
+  color: #888;
+  font-size: 0.9em;
+}
+
+.game-duration {
+  color: #666;
+  font-size: 0.8em;
+  background: rgba(255, 255, 255, 0.1);
+  padding: 2px 6px;
+  border-radius: 10px;
+}
+
+.game-summary {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.validation-badge {
+  padding: 3px 8px;
+  border-radius: 12px;
+  font-size: 0.8em;
+  font-weight: bold;
+}
+
+.validation-badge.valid {
+  background: rgba(76, 175, 80, 0.2);
+  color: #4CAF50;
+  border: 1px solid rgba(76, 175, 80, 0.3);
+}
+
+.validation-badge.invalid {
+  background: rgba(244, 67, 54, 0.2);
+  color: #f44336;
+  border: 1px solid rgba(244, 67, 54, 0.3);
+}
+
+.prize-pool {
+  color: #FF9800;
+  font-size: 0.85em;
+  font-weight: 500;
+}
+
+.utilization {
+  color: #2196F3;
+  font-size: 0.85em;
+  background: rgba(33, 150, 243, 0.1);
+  padding: 2px 6px;
+  border-radius: 8px;
+}
+
+.game-winner {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(255, 193, 7, 0.1);
+  border-radius: 8px;
+  padding: 8px 12px;
+  margin-bottom: 12px;
+  border-left: 3px solid #FFC107;
+}
+
+.winner-icon {
+  font-size: 1.2em;
+}
+
+.winner-name {
+  font-weight: bold;
+  color: #FFC107;
+}
+
+.winner-winnings {
+  color: #4CAF50;
+  font-weight: bold;
+  font-family: 'Courier New', monospace;
+}
+
+.game-players {
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 8px;
+  padding: 12px;
+}
+
+.players-header {
+  color: #FF9800;
+  margin-bottom: 10px;
+  font-size: 0.9em;
+}
+
+.players-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 10px;
+}
+
+.player-result {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 6px;
+  padding: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.player-name-section {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 8px;
+  flex-wrap: wrap;
+}
+
+.player-name {
+  font-weight: bold;
+  color: #fff;
+  font-size: 0.9em;
+}
+
+.winner-badge {
+  font-size: 0.8em;
+}
+
+.player-generation {
+  background: rgba(156, 39, 176, 0.2);
+  color: #E1BEE7;
+  padding: 1px 6px;
+  border-radius: 8px;
+  font-size: 0.7em;
+  font-weight: 500;
+}
+
+.player-balance-section {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.balance-change-display {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  font-family: 'Courier New', monospace;
+  font-size: 0.85em;
+}
+
+.player-performance {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.75em;
+  color: #888;
+}
+
+.total-change {
+  font-weight: 500;
+}
+
+.games-played {
+  color: #666;
+}
+
+.game-warnings {
+  background: rgba(244, 67, 54, 0.1);
+  border-radius: 6px;
+  padding: 8px;
+  margin-top: 8px;
+  border-left: 3px solid #f44336;
+}
+
+.warning {
+  color: #f44336;
+  font-size: 0.8em;
+  margin: 2px 0;
+}
+
+.fallback-notice {
+  background: rgba(255, 152, 0, 0.1);
+  color: #FF9800;
+  padding: 8px 12px;
+  border-radius: 6px;
+  margin-bottom: 12px;
+  font-size: 0.9em;
+  text-align: center;
+  border: 1px solid rgba(255, 152, 0, 0.2);
+}
+
+/* Mobile responsiveness for completed games */
+@media (max-width: 768px) {
+  .game-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .players-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .game-summary {
+    justify-content: flex-start;
+  }
+  
+  .player-name-section {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+  }
 } 

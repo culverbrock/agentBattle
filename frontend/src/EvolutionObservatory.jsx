@@ -167,12 +167,12 @@ function EvolutionObservatory() {
         break;
         
       case 'strategy_eliminated':
-        setEliminatedStrategies(prev => [...prev, message.data]);
+        setEliminatedStrategies(prev => [...prev, message.elimination]);
         setSimulationStats(prev => ({ ...prev, totalEliminations: prev.totalEliminations + 1 }));
         break;
         
       case 'strategy_evolved':
-        setEvolutionTree(prev => [...prev, message.data]);
+        setEvolutionTree(prev => [...prev, message.evolution]);
         setSimulationStats(prev => ({ ...prev, evolutionEvents: prev.evolutionEvents + 1 }));
         break;
         
@@ -618,10 +618,110 @@ function DashboardView({ strategies, currentGame, currentTournament, currentRoun
 
         {/* Game History Panel */}
         <div className="game-history-panel">
-          <h3>🏆 Balance History & Game Progression</h3>
+          <h3>🏆 Game History & Results</h3>
           <div className="game-history-container">
-            {balanceHistory.length > 0 ? (
+            {completedGames.length > 0 ? (
+              <div className="completed-games-display">
+                {completedGames
+                  .slice(-10) // Show last 10 games
+                  .reverse() // Most recent first
+                  .map((game, idx) => (
+                    <div key={game.number || idx} className="completed-game-entry">
+                      <div className="game-header">
+                        <div className="game-info">
+                          <span className="game-number">🎮 Game #{game.number}</span>
+                          <span className="game-time">
+                            {game.endTime ? new Date(game.endTime).toLocaleTimeString() : 'In Progress'}
+                          </span>
+                          {game.duration && (
+                            <span className="game-duration">
+                              Duration: {Math.round(game.duration / 1000)}s
+                            </span>
+                          )}
+                        </div>
+                        
+                        {game.summary && (
+                          <div className="game-summary">
+                            <span className={`validation-badge ${game.summary.isValid ? 'valid' : 'invalid'}`}>
+                              {game.summary.isValid ? '✅ Valid' : '❌ Invalid'}
+                            </span>
+                            <span className="prize-pool">
+                              Prize Pool: {game.summary.totalEntryFees} coins
+                            </span>
+                            <span className="utilization">
+                              Used: {game.summary.prizePoolUtilized}
+                            </span>
+                          </div>
+                        )}
+                      </div>
+
+                      {game.winner && (
+                        <div className="game-winner">
+                          <span className="winner-icon">🏆</span>
+                          <span className="winner-name">{game.winner.name}</span>
+                          <span className="winner-winnings">
+                            +{game.winner.winnings} coins
+                          </span>
+                        </div>
+                      )}
+
+                      <div className="game-players">
+                        <div className="players-header">
+                          <strong>💰 Player Results ({game.players?.length || 0}/6):</strong>
+                        </div>
+                        <div className="players-grid">
+                          {game.players?.map((player, playerIdx) => (
+                            <div key={player.id || playerIdx} className="player-result">
+                              <div className="player-name-section">
+                                <span className="player-name">{player.name}</span>
+                                {player.isWinner && <span className="winner-badge">👑</span>}
+                                <span className="player-generation">Gen {player.generation}</span>
+                              </div>
+                              
+                              <div className="player-balance-section">
+                                <div className="balance-change-display">
+                                  <span className="balance-before">{player.preGameBalance}</span>
+                                  <span className="balance-arrow">→</span>
+                                  <span className="balance-after">{player.currentBalance}</span>
+                                  <span className={`balance-change ${player.balanceChange >= 0 ? 'positive' : 'negative'}`}>
+                                    ({player.balanceChange >= 0 ? '+' : ''}{player.balanceChange})
+                                  </span>
+                                </div>
+                                
+                                <div className="player-performance">
+                                  <span className="total-change">
+                                    Total: {player.totalChange >= 0 ? '+' : ''}{player.totalChange}
+                                  </span>
+                                  <span className="games-played">
+                                    Games: {player.gamesPlayed}
+                                  </span>
+                                </div>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+
+                      {game.validation && !game.validation.dataComplete && (
+                        <div className="game-warnings">
+                          <div className="warning">⚠️ Incomplete game data</div>
+                          {!game.validation.playersValid && (
+                            <div className="warning">❌ Player count invalid</div>
+                          )}
+                          {!game.validation.balancesValid && (
+                            <div className="warning">❌ Balance validation failed</div>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  ))}
+              </div>
+            ) : balanceHistory.length > 0 ? (
+              // Fallback to balance history if no completed games yet
               <div className="balance-history-display">
+                <div className="fallback-notice">
+                  📊 Using legacy balance data (enhanced game history will appear for new games)
+                </div>
                 {/* Group balance data by game number */}
                 {Object.entries(
                   balanceHistory.reduce((games, entry) => {
@@ -670,7 +770,7 @@ function DashboardView({ strategies, currentGame, currentTournament, currentRoun
               </div>
             ) : (
               <div className="no-game-history">
-                <p>No balance history yet. Start the simulation to see balance progression!</p>
+                <p>No completed games yet. Start the simulation to see game results!</p>
               </div>
             )}
           </div>
@@ -694,20 +794,40 @@ function EvolutionTreeView({ evolutionTree, strategies, eliminatedStrategies }) 
           <div className="evolution-timeline">
             {evolutionTree.map((event, idx) => (
               <div key={idx} className="evolution-event">
-                <div className="event-time">{new Date(event.timestamp).toLocaleString()}</div>
+                <div className="event-time">
+                  {new Date(event.timestamp).toLocaleString()} 
+                  <span className="event-game"> - Game #{event.gameNumber}</span>
+                </div>
                 <div className="event-content">
                   <div className="parent-strategy">
-                    📰 {event.parentStrategy?.name || 'Unknown'} 
-                    <span className="fitness">Fitness: {event.parentFitness?.toFixed(2) || 'N/A'}</span>
+                    ☠️ {event.eliminatedStrategy?.name || 'Unknown Strategy'} 
+                    <span className="fitness">
+                      Balance: {event.eliminatedStrategy?.finalBalance || event.eliminatedStrategy?.coinBalance || 'N/A'} coins
+                    </span>
+                    <div className="elimination-reason">
+                      Eliminated due to: {event.reason || 'Unknown reason'}
+                    </div>
                   </div>
                   <div className="evolution-arrow">⬇️ EVOLVED INTO ⬇️</div>
                   <div className="child-strategy">
-                    🧬 {event.childStrategy?.name || 'Unknown'}
-                    <span className="mutation">Mutation: {event.mutationType || 'Unknown'}</span>
+                    🧬 {event.newStrategy?.name || 'Unknown Strategy'}
+                    <span className="mutation">
+                      Generation: {event.newStrategy?.generationNumber || 'N/A'}
+                    </span>
+                    {event.newStrategy?.parentNames && (
+                      <div className="parent-blend">
+                        Parents: {event.newStrategy.parentNames.join(', ')}
+                      </div>
+                    )}
                   </div>
-                  {event.reasoning && (
+                  {event.newStrategy?.evolutionReasoning && (
                     <div className="evolution-reasoning">
-                      <strong>Evolution Reasoning:</strong> {event.reasoning}
+                      <strong>Evolution Reasoning:</strong> {event.newStrategy.evolutionReasoning}
+                    </div>
+                  )}
+                  {event.newStrategy?.strategy && (
+                    <div className="new-strategy-description">
+                      <strong>New Strategy:</strong> {event.newStrategy.strategy}
                     </div>
                   )}
                 </div>
@@ -873,7 +993,7 @@ function InfoModal({ onClose }) {
             </div>
 
             <div className="panel-explanation">
-              <h4>🏆 Balance History & Game Progression</h4>
+              <h4>🏆 Game History & Results</h4>
               <p>Complete historical record of completed games showing winners, final proposals, coin distributions, 
               and the complete negotiation matrix. Perfect for analyzing successful strategies.</p>
             </div>

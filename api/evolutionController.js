@@ -322,6 +322,86 @@ class EvolutionController {
         runTime: this.isRunning ? Date.now() - this.simulationData.startTime : 0
       }
     }));
+    
+    // Reconstruct completed games from strategy balance histories (if system resumed from state)
+    if (system && system.strategies && system.totalGamesPlayed > 0) {
+      const completedGames = this.reconstructCompletedGamesFromBalanceHistory(system);
+      if (completedGames.length > 0) {
+        console.log(`📜 Reconstructed ${completedGames.length} completed games from balance history`);
+        completedGames.forEach(game => {
+          ws.send(JSON.stringify({
+            type: 'game_completed',
+            game: game
+          }));
+        });
+      }
+    }
+  }
+
+  // Reconstruct completed games from strategy balance histories
+  reconstructCompletedGamesFromBalanceHistory(system) {
+    const completedGames = [];
+    const gameNumbers = new Set();
+    
+    // Collect all game numbers from all strategies' balance histories
+    system.strategies.forEach(strategy => {
+      if (strategy.balanceHistory) {
+        strategy.balanceHistory.forEach(entry => {
+          if (entry.game > 0 && entry.reason !== 'Entry fee deducted') {
+            gameNumbers.add(entry.game);
+          }
+        });
+      }
+    });
+    
+    // Reconstruct each completed game
+    Array.from(gameNumbers).sort((a, b) => a - b).forEach(gameNumber => {
+      const gamePlayerData = [];
+      
+      // Find balance data for this game from each strategy
+      system.strategies.forEach(strategy => {
+        if (strategy.balanceHistory) {
+          const gameEntries = strategy.balanceHistory.filter(entry => entry.game === gameNumber);
+          const entryFeeEntry = gameEntries.find(entry => entry.reason === 'Entry fee deducted');
+          const winningsEntry = gameEntries.find(entry => entry.reason !== 'Entry fee deducted');
+          
+          if (entryFeeEntry && winningsEntry) {
+            const preGameBalance = entryFeeEntry.balance + 100; // Add back entry fee to get pre-game balance
+            const currentBalance = winningsEntry.balance;
+            const balanceChange = currentBalance - preGameBalance;
+            
+            gamePlayerData.push({
+              id: strategy.id,
+              name: strategy.name,
+              preGameBalance: preGameBalance,
+              currentBalance: currentBalance,
+              balanceChange: balanceChange,
+              totalProfit: strategy.totalProfit || 0,
+              avgProfit: strategy.avgProfit || 0
+            });
+          }
+        }
+      });
+      
+      // Only include games where we have data for multiple players
+      if (gamePlayerData.length >= 2) {
+        // Determine winner (highest balance change that's positive)
+        const positiveChanges = gamePlayerData.filter(p => p.balanceChange > 0);
+        const winner = positiveChanges.length > 0 
+          ? positiveChanges.reduce((max, p) => p.balanceChange > max.balanceChange ? p : max)
+          : null;
+        
+        completedGames.push({
+          number: gameNumber,
+          players: gamePlayerData,
+          winner: winner,
+          completedAt: Date.now() - ((system.totalGamesPlayed - gameNumber) * 10 * 60 * 1000), // Rough timestamp estimate
+          duration: 120000 // Rough estimate: 2 minutes per game
+        });
+      }
+    });
+    
+    return completedGames;
   }
 
   removeWebSocketClient(ws) {

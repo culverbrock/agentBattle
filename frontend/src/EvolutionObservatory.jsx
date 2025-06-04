@@ -645,18 +645,15 @@ function DashboardView({ strategies, currentGame, currentTournament, currentRoun
                       <strong>💰 Strategy Balance Changes:</strong>
                       <div className="balance-changes-grid">
                         {gameEntries.map((entry, idx) => {
-                          // Calculate balance change from previous game
-                          const prevGameEntries = balanceHistory.filter(h => 
-                            h.strategyId === entry.strategyId && h.game === entry.game - 1
-                          );
-                          const prevBalance = prevGameEntries.length > 0 ? prevGameEntries[0].balance + 100 : 500; // +100 for entry fee
-                          const balanceChange = entry.balance - prevBalance;
+                          // Use the balance change calculated by the backend
+                          const balanceChange = entry.balanceChange;
+                          const beforeBalance = entry.balance - balanceChange;
                           
                           return (
                             <div key={idx} className="strategy-balance-change">
                               <div className="strategy-balance-name">{entry.strategyName}</div>
                               <div className="strategy-balance-details">
-                                <span className="balance-before">{prevBalance}</span>
+                                <span className="balance-before">{beforeBalance}</span>
                                 <span className="balance-arrow">→</span>
                                 <span className="balance-after">{entry.balance}</span>
                                 <span className={`balance-change ${balanceChange >= 0 ? 'positive' : 'negative'}`}>

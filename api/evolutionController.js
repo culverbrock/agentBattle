@@ -338,27 +338,95 @@ class EvolutionController {
 
   // Reconstruct balance timeline from strategy balance histories
   reconstructBalanceTimelineFromHistory(system) {
-    const balanceTimeline = [];
+    const gameResults = new Map(); // gameNumber -> { players: [], timestamp: number }
     
-    // Collect all balance data from all strategies' balance histories
+    // First pass: collect all balance entries organized by game and strategy
     system.strategies.forEach(strategy => {
-      if (strategy.balanceHistory) {
-        strategy.balanceHistory.forEach(entry => {
-          if (entry.game > 0 && entry.reason !== 'Entry fee deducted') {
-            balanceTimeline.push({
-              game: entry.game,
-              strategyId: strategy.id,
-              strategyName: strategy.name,
-              balance: entry.balance,
-              timestamp: Date.now() - ((system.totalGamesPlayed - entry.game) * 10 * 60 * 1000), // Rough timestamp estimate
-              duration: 120000 // Rough estimate: 2 minutes per game
-            });
-          }
-        });
-      }
+      if (!strategy.balanceHistory) return;
+      
+      strategy.balanceHistory.forEach(entry => {
+        if (!entry.game || entry.game <= 0) return;
+        
+        const gameNum = entry.game;
+        if (!gameResults.has(gameNum)) {
+          gameResults.set(gameNum, { players: new Map(), timestamp: entry.timestamp || Date.now() });
+        }
+        
+        const gameData = gameResults.get(gameNum);
+        if (!gameData.players.has(strategy.id)) {
+          gameData.players.set(strategy.id, {
+            strategyId: strategy.id,
+            strategyName: strategy.name,
+            entries: []
+          });
+        }
+        
+        gameData.players.get(strategy.id).entries.push(entry);
+      });
     });
     
-    return balanceTimeline;
+    const balanceTimeline = [];
+    
+    // Second pass: reconstruct game results with proper validation
+    for (const [gameNumber, gameData] of gameResults.entries()) {
+      const gamePlayerData = [];
+      let totalPayout = 0;
+      let validGame = true;
+      
+      // Process each player's balance changes for this game
+      for (const [strategyId, playerData] of gameData.players.entries()) {
+        const entries = playerData.entries;
+        
+        // Find entry fee and winnings entries
+        const entryFeeEntry = entries.find(e => e.reason === 'Entry fee deducted');
+        const winningsEntries = entries.filter(e => e.reason !== 'Entry fee deducted');
+        
+        if (!entryFeeEntry || winningsEntries.length === 0) {
+          // Missing critical data for this player in this game
+          validGame = false;
+          break;
+        }
+        
+        // Calculate pre-game balance (before entry fee)
+        const preGameBalance = entryFeeEntry.balance + 100; // Add back the deducted fee
+        
+        // Get final balance after all winnings for this game
+        const finalEntry = winningsEntries[winningsEntries.length - 1]; // Last entry for this game
+        const finalBalance = finalEntry.balance;
+        
+        // Calculate total payout for this player (excluding entry fee)
+        const playerPayout = finalBalance - (preGameBalance - 100); // preGameBalance - 100 = balance after entry fee
+        
+        totalPayout += playerPayout;
+        
+        gamePlayerData.push({
+          game: gameNumber,
+          strategyId: strategyId,
+          strategyName: playerData.strategyName,
+          balance: finalBalance,
+          balanceChange: playerPayout,
+          timestamp: finalEntry.timestamp || gameData.timestamp
+        });
+      }
+      
+      // Validate game data
+      const expectedPlayers = 6;
+      const maxTotalPayout = 600; // Prize pool size
+      
+      if (validGame && 
+          gamePlayerData.length === expectedPlayers && 
+          totalPayout <= maxTotalPayout && 
+          totalPayout >= 0) {
+        
+        // Add all valid player entries for this game
+        balanceTimeline.push(...gamePlayerData);
+      } else {
+        console.log(`⚠️ Skipping invalid game ${gameNumber}: ${gamePlayerData.length} players, ${totalPayout} total payout`);
+      }
+    }
+    
+    // Sort by game number and return
+    return balanceTimeline.sort((a, b) => a.game - b.game);
   }
 
   removeWebSocketClient(ws) {

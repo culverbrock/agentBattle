@@ -2004,9 +2004,9 @@ Allocate 100 points among proposals (can be 0 for any proposal):
       
       this.log('info', 'Persistence', `Progress saved to database: evolution_state_${this.lastProgressId}`);
       
-      // Create automatic backup every 10 games
-      if (this.totalGamesPlayed % 10 === 0 && this.totalGamesPlayed > 0) {
-        this.log('info', 'Backup', 'Triggering automatic backup every 10 games...');
+      // Create automatic backup after every game (changed from every 10 games)
+      if (this.totalGamesPlayed > 0) {
+        this.log('info', 'Backup', 'Triggering automatic backup after every game...');
         try {
           const { backupGameData } = require('../../backupGameData');
           const backupPath = await backupGameData();
